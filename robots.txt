@@ -1,0 +1,3 @@
+User-agent: *
+
+Sitemap: https://johnjfarrow.github.io/sitemap.xml

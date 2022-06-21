@@ -1,7 +1,7 @@
 
 ---
 title: Building From Source
-layout: template
+layout: page
 filename: BuildFromSource.md
 --- 
 

@@ -1,4 +1,10 @@
 
+---
+title: Building From Source
+layout: template
+filename: BuildFromSource.md
+--- 
+
 # Building Unreal 5 from Source
 
 This is a brief guide on downloading and building UE5 using git command line tools
@@ -83,16 +89,17 @@ See [devblogs.microsoft.com](https://devblogs.microsoft.com/visualstudio/code-se
 
 Make a new directory such as c:\work, and change into it
 
-Clone the repository:
+Clone the Unreal Engine source repository:
 
 ```
 git clone https://github.com/EpicGames/UnrealEngine.git UnrealSource
 ```
 
-where ```UnrealSource``` is the name of a new directory the source will be download to
+where ```UnrealSource``` is the name of a new directory to which the source will be downloaded
 
 ## Installing UnrealVS
 
+UnrealVS is a Visual Studio plugin from Epic.  It is included in the 
 If you are using Visual Studio 2022 exit Visual Studio and install this file
 [UnrealEngineSource]\Engine\Extras\UnrealVS\VS2022\UnrealVS.vsix by double clicking it
 
@@ -112,7 +119,8 @@ Run ```git checkout [branch-name]``` for whichever branch you chose to build
 
 This is a summary of information from [https://github.com/EpicGames/UnrealEngine/tree/master]
 
-Run this command to download and install prerequisites required to build UE - it might take a while:
+Change to the directory in which you downloaded the UE source code and
+run this command to download and install prerequisites required to build UE - it might take a while:
 
 ```
 Setup.bat
@@ -127,16 +135,16 @@ GenerateProjectFiles.bat -2022
 
 The above commands will create UE5.sln in the current directory, open it
 in Visual Studio and:
-- change the Solution Configration dropdown to "Developement Editor"
+- change the Solution Configration dropdown to "Development Editor"
 - change the Solution Platform to "Win64"
 - right click the UE5 project in the solution explorer and choose "Build"
 
 ![](images/vsinstall_7.png)
 
-This will take some time to complete.  On a Ryzen 5950x using 
+This will take some time to complete.  On a Ryzen 5950x 16 core machine using 
 an M.2 SSD it took 37 minutes.
 
-## Running it
+## Running Unreal
 
 In the solution explorer right-click "UE5" under the "Engine" entry at the top
 and select "Set as Startup Project".

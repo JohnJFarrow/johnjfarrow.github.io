@@ -24,7 +24,7 @@ class UWindowsTargetSettings
 </code></pre><p>The UCLASS macro has many parameters which control how Unreal Engine treats the class, for
 example whether it can be accessed using Blueprints. The parameters are defined
 in <a href=https://docs.unrealengine.com/5.0/en-US/gameplay-classes-in-unreal-engine/ target=_blank>https://docs.unrealengine.com</a>. At
-runtime these paramters can be retrieved from using a c++ API.</p><p>Other c++ objects such as enum declarations, functions and properties have corresponding
+runtime these parameters can be retrieved from using a c++ API.</p><p>Other c++ objects such as enum declarations, functions and properties have corresponding
 macros; specifically UENUM, UFUNCTION and UPROPERTY, which behave in the same way
 as the UCLASS macro.</p><h2 id=accessing-reflection-data>Accessing Reflection Data</h2><h3 id=class-information>Class Information</h3><p>The entry point for reflection data is using iterators. To iterate
 over the reflection data for all classes which are derived from UObject
@@ -63,11 +63,11 @@ const FText ConsoleVariable = Property-&gt;GetMetaDataText(&quot;ConsoleVariable
 do not need a specific instance of a class object to access that data, it is accessed from
 static instances such as <code>UDeveloperSettings::StaticClass()</code>.</p><p>To extract a property value from an actual instance of a class requires retrieving the
 memory address where that property value is stored. Given an instance of a class
-and a property pointer retrived as shown above, we can do this to find the
+and a property pointer retrieved as shown above, we can do this to find the
 memory address where the property is stored:</p><pre><code class=language-cpp>FProperty* Property = ...
 UClass* Class = ...
 const uint8* PropertyAddr = Property-&gt;ContainerPtrToValuePtr&lt;uint8&gt;(Class);
-</code></pre><p>we can then cast the property pointer to its derived property class and retrive the
+</code></pre><p>we can then cast the property pointer to its derived property class and retrieve the
 property value using the data address:</p><pre><code class=language-cpp>if (FStrProperty* StringProperty = CastField&lt;FStrProperty&gt;(Property))
 {
     Value = StringProperty-&gt;GetPropertyValue(PropertyAddr);

@@ -1,0 +1,149 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=HandheldFriendly content="True"><meta http-equiv=x-ua-compatible content="IE=edge"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=generator content="Hugo 0.101.0"><link rel="shortcut icon" href=https://cdn.jsdelivr.net/gh/dsrkafuu/dsr-cdn-main@1/images/favicons/dsrca.ico><title>Using the Unreal Engine Json classes - Unreal Engine Development Notes</title><meta name=author content="John Farrow"><meta name=description content="A minimal Hugo theme with nice theme color."><meta name=keywords content="unreal engine,json,c++"><meta property="og:title" content="Using the Unreal Engine Json classes"><meta name=twitter:title content="Using the Unreal Engine Json classes"><meta property="og:type" content="article"><meta property="og:url" content="https://johnjfarrow.github.io/posts/basicsofjson/"><meta property="og:description" content="Notes on using the Unreal Engine Json classes"><meta name=twitter:description content="Notes on using the Unreal Engine Json classes"><meta property="og:image" content="https://johnjfarrow.github.io/img/og.png"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://johnjfarrow.github.io/img/og.png"><meta property="article:published_time" content="2022-06-24T10:27:06+12:00"><meta property="article:modified_time" content="2022-06-24T10:27:06+12:00"><style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style><link rel=stylesheet href=https://johnjfarrow.github.io/assets/css/fuji.min.css></head><body data-theme=auto data-theme-auto=true><script data-cfasync=false>var fujiThemeData=localStorage.getItem("fuji_data-theme");fujiThemeData?fujiThemeData!=="auto"&&document.body.setAttribute("data-theme",fujiThemeData==="dark"?"dark":"light"):localStorage.setItem("fuji_data-theme","auto")</script><header><div class="container-lg clearfix"><div class="col-12 header"><a class=title-main href=https://johnjfarrow.github.io>Unreal Engine Development Notes</a>
+<span class=title-sub>John Farrow</span></div></div></header><main><div class="container-lg clearfix"><div class="col-12 col-md-9 float-left content"><article><h2 class="post-item post-title"><a href=https://johnjfarrow.github.io/posts/basicsofjson/>Using the Unreal Engine Json classes</a></h2><div class="post-item post-meta"><span><i class="iconfont icon-today-sharp"></i>&nbsp;2022-06-24</span>
+<span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/unreal-engine>unreal engine</a>&nbsp;<a href=/tags/json>json</a>&nbsp;<a href=/tags/c++>c++</a>&nbsp;</span></div><div class="post-content markdown-body"><p>This document is a decription of the basics of reading and writing Json with Unreal Engine classes. This
+reads and writes elements explictly rather than reading and writing entire structs at one time. This
+is suitable for objects which are not using the UCLASS or UOBJECT macros to create reflection data.</p><h2 id=necessary-includes>Necessary Includes</h2><p>Include these header files:</p><pre><code class=language-cpp>#include &quot;Serialization/JsonTypes.h&quot;
+#include &quot;Serialization/JsonWriter.h&quot;
+#include &quot;Serialization/JsonSerializer.h&quot;
+</code></pre><h2 id=using-constant-field-names>Using constant field names</h2><p>To avoid spelling mistakes and make it easier to change Json field names, I suggest making the field names
+constants like so:</p><pre><code class=language-cpp>namespace JConstants
+{
+	const char* const ArrayValue(&quot;array-value&quot;);
+	const char* const ArrayValueDisplayName(&quot;array-value-display-name&quot;);
+	const char* const ArrayValues(&quot;array-values&quot;);
+	const char* const AvailableClasses(&quot;available-classes&quot;);
+	const char* const ClassConfigName(&quot;class-config-name&quot;);
+	const char* const ClassName(&quot;class-name&quot;);
+	const char* const ClassDisplayName(&quot;class-display-name&quot;);
+	const char* const ConsoleVariable(&quot;console-variable&quot;);
+	...
+}
+</code></pre><p>It is a bit more work up front but it reduces errors.</p><h2 id=writing-json>Writing Json</h2><p>To create Json make a Json object which will contain everything:</p><pre><code class=language-cpp>TSharedRef&lt; FJsonObject &gt; JsonClassObject = MakeShared&lt;FJsonObject&gt;();
+</code></pre><p>Then you can add fields to it using SetXXX methods like so:</p><pre><code class=language-cpp>JsonClassObject-&gt;SetStringField( JConstants::ClassName, ClassName);
+JsonClassObject-&gt;SetBoolField( JConstants::RestartRequired, bRestartRequired);
+</code></pre><p>If you need to add a list of child objects, create an array object to hold this list:</p><pre><code class=language-cpp>TArray &lt; TSharedPtr&lt;FJsonValue&gt; &gt; JsonPropertyList;
+</code></pre><p>Then create each child object and add it to the list object, then finally add the list object
+to the containing object like so:</p><pre><code class=language-cpp>for( int i = 0; i &lt; 10; ++i )
+{
+	// make new child object
+	TSharedRef&lt; FJsonObject &gt; ChildObject = MakeShared&lt;FJsonObject&gt;();
+	// populate the child object
+	ChildObject-&gt;SetStringField( JConstants::ClassConfigName, ClassConfigName );
+	ChildObject-&gt;SetStringField( JConstants::ClassDisplayName, ClassDisplayName );
+	// add the child object to the collection
+	JsonPropertyList.Add(MakeShared&lt;FJsonValueObject&gt;(ChildObject));
+}
+// add the collection to the outer object which contains it
+JsonClassObject-&gt;SetArrayField(JConstants::Properties, JsonPropertyList);
+</code></pre><h3 id=writing-json-to-a-file>Writing Json to a file</h3><p>First you need to write the Json object to a string, then serialize that string to file like this:</p><pre><code class=language-cpp>FString OutputString;
+TSharedRef&lt;TJsonWriter&lt;&gt;&gt; Writer = TJsonWriterFactory&lt;&gt;::Create(&amp;OutputString);
+FJsonSerializer::Serialize(JsonOuter, Writer);
+FFileHelper::SaveStringToFile(OutputString, *AvailableClassesFileName );
+Writer-&gt;Close();
+</code></pre><h2 id=reading-json-from-a-file>Reading Json from a file</h2><p>The entire Json is read from the file into a string, then that string is parsed using the
+TJsonReader class, then each field and child object can be extracted.</p><p>Reading from a file into string is like so:</p><pre><code class=language-cpp>const FString FileName = ResourceDirectory + &quot;\\Index.json&quot;;
+FString Contents;
+if (FFileHelper::LoadFileToString(Contents, *FileName))
+{
+	...
+}
+</code></pre><p>Parsing the string into Json uses a TJsonReader and a static call on the FJsonSerializer class:</p><pre><code class=language-cpp>TSharedPtr&lt;FJsonObject&gt; FullJsonObject = MakeShared&lt;FJsonObject&gt;();
+TSharedRef&lt;TJsonReader&lt;&gt;&gt; Reader = TJsonReaderFactory&lt;&gt;::Create(Contents);
+
+if( FJsonSerializer::Deserialize(Reader, FullJsonObject) )
+{
+	...
+}
+</code></pre><h3 id=extracting-fields-from-the-reader>Extracting fields from the reader</h3><p>The most basic approach is to test for the existence of a field and, if it exists, read it from the Json like so:</p><pre><code class=language-cpp>if (JsonObject-&gt;HasTypedField&lt;EJson::String&gt;(JConstants::Title))
+{
+	JsonObject-&gt;GetStringField(PropertyName);
+}
+</code></pre><p>With some templates shown below this can be simplified to one call per field:</p><pre><code class=language-cpp>Description = GetIfExists&lt;FString&gt;(JsonObject, JConstants::Description );
+Source = GetIfExists&lt;FString&gt;(JsonObject, JConstants::Source);
+SourceURL = GetIfExists&lt;FString&gt;(JsonObject, JConstants::SourceURL );
+Version = GetIfExists&lt;FString&gt;(JsonObject, JConstants::Version);
+</code></pre><p>The GetIfExists() function uses templates which are specialized for each data type (to save space only the FString and bool specializations are shown below).
+First the <code>struct JsonEnum&lt;T></code> maps from a c++ data type such as FString to the corresponding EJson enumeration EJson::String.</p><pre><code class=language-cpp>template&lt; typename T &gt;
+struct JsonEnum;
+
+template &lt;&gt;
+struct JsonEnum&lt;FString&gt;
+{
+	const static EJson Type = EJson::String;
+};
+
+template &lt;&gt;
+struct JsonEnum&lt;bool&gt;
+{
+	const static EJson Type = EJson::Boolean;
+};
+</code></pre><p>Then the <code>struct Extractor&lt;T></code> maps from a c++ data type such as FString to the corresponding GetXXX() call on the
+FJsonObject like this:</p><pre><code class=language-cpp>template&lt; typename T &gt;
+struct Extractor;
+
+template &lt;&gt;
+struct Extractor&lt;FString&gt;
+{
+	FString operator()(const TSharedPtr&lt;FJsonObject&gt;&amp; JsonObject, 
+	                   const FString&amp; PropertyName)
+	{
+		return JsonObject-&gt;GetStringField(PropertyName);
+	}
+};
+
+template &lt;&gt;
+struct Extractor&lt;bool&gt;
+{
+	bool operator()(const TSharedPtr&lt;FJsonObject&gt;&amp; JsonObject, 
+	                const FString&amp; PropertyName)
+	{
+		return JsonObject-&gt;GetBoolField(PropertyName);
+	}
+};
+</code></pre><p>And finally the <code>GetIfExists()</code> function uses the two above templates:</p><pre><code class=language-cpp>template&lt; typename T &gt;
+T GetIfExists(const TSharedPtr&lt;FJsonObject&gt;&amp; JsonObject, 
+			  const FString&amp; PropertyName)
+{
+	if (JsonObject &amp;&amp; JsonObject-&gt;HasTypedField&lt; JsonEnum&lt;T&gt;::Type &gt;(PropertyName))
+	{
+		return Extractor&lt;T&gt;{}(JsonObject, PropertyName);
+	}
+
+	return T();
+}
+</code></pre><h3 id=reading-arrays-of-child-objects>Reading arrays of child objects</h3><p>When the Json object has a child array of other objects, this can be accessed using the GetArrayField method:</p><pre><code class=language-cpp>if (JsonObject-&gt;HasTypedField&lt;EJson::Array&gt;(JConstants::Settings))
+{
+	const TArray&lt;TSharedPtr&lt;FJsonValue&gt;&gt;&amp; Settings = 
+			JsonObject-&gt;GetArrayField(JConstants::Settings);
+
+	for ( const TSharedPtr&lt;FJsonValue&gt;&amp; Setting : Settings)
+	{
+		const TSharedPtr&lt;FJsonObject&gt; Object = Setting-&gt;AsObject();
+		if (Object)
+		{
+			TSharedRef&lt;FPresetSetting&gt; PresetSetting = MakeShared&lt;FPresetSetting&gt;();
+			PresetSetting-&gt;ClassConfigName = 
+			               GetIfExists&lt;FString&gt;( Object, JConstants::ClassConfig);
+			PresetSetting-&gt;ClassDisplayName = 
+			               GetIfExists&lt;FString&gt;(Object, JConstants::ClassDisplay);
+			PresetSetting-&gt;PropertyDisplayName = 
+			               GetIfExists&lt;FString&gt;(Object, JConstants::DisplayName);
+			...
+		}
+	}
+}
+</code></pre></div></article><div class="license markdown-body"><blockquote><p>Unless otherwise noted, the content of this site is licensed under <a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a>.</p></blockquote></div></div><aside class="col-12 col-md-3 float-left sidebar"><div class="sidebar-item sidebar-pages"><h3>Pages</h3><ul><li><a href=/>Home</a></li></ul></div><div class="sidebar-item sidebar-links"><h3>Links</h3><ul><li><a href=https://github.com/johnjfarrow target=_blank><span>GitHub</span></a></li><li><a href=https://www.linkedin.com/in/johnjfarrow target=_blank><span>LinkedIn</span></a></li></ul></div><div class="sidebar-item sidebar-tags"><h3>Tags</h3><div><span><a href=/tags/build/>build</a></span>
+<span><a href=/tags/c++/>c++</a></span>
+<span><a href=/tags/json/>json</a></span>
+<span><a href=/tags/reflection/>reflection</a></span>
+<span><a href=/tags/unreal-engine/>unreal engine</a></span></div></div><div class="sidebar-item sidebar-toc"><h3>Table of Contents</h3><nav id=TableOfContents><ul><li><a href=#necessary-includes>Necessary Includes</a></li><li><a href=#using-constant-field-names>Using constant field names</a></li><li><a href=#writing-json>Writing Json</a><ul><li><a href=#writing-json-to-a-file>Writing Json to a file</a></li></ul></li><li><a href=#reading-json-from-a-file>Reading Json from a file</a><ul><li><a href=#extracting-fields-from-the-reader>Extracting fields from the reader</a></li><li><a href=#reading-arrays-of-child-objects>Reading arrays of child objects</a></li></ul></li></ul></nav></div></aside></div><div class=btn><div class=btn-menu id=btn-menu><i class="iconfont icon-grid-sharp"></i></div><div class=btn-toggle-mode><i class="iconfont icon-contrast-sharp"></i></div><div class=btn-scroll-top><i class="iconfont icon-chevron-up-circle-sharp"></i></div></div><aside class=sidebar-mobile style=display:none><div class=sidebar-wrapper><div class="sidebar-item sidebar-pages"><h3>Pages</h3><ul><li><a href=/>Home</a></li></ul></div><div class="sidebar-item sidebar-links"><h3>Links</h3><ul><li><a href=https://github.com/johnjfarrow target=_blank><span>GitHub</span></a></li><li><a href=https://www.linkedin.com/in/johnjfarrow target=_blank><span>LinkedIn</span></a></li></ul></div><div class="sidebar-item sidebar-tags"><h3>Tags</h3><div><span><a href=/tags/build/>build</a></span>
+<span><a href=/tags/c++/>c++</a></span>
+<span><a href=/tags/json/>json</a></span>
+<span><a href=/tags/reflection/>reflection</a></span>
+<span><a href=/tags/unreal-engine/>unreal engine</a></span></div></div><div class="sidebar-item sidebar-toc"><h3>Table of Contents</h3><nav id=TableOfContents><ul><li><a href=#necessary-includes>Necessary Includes</a></li><li><a href=#using-constant-field-names>Using constant field names</a></li><li><a href=#writing-json>Writing Json</a><ul><li><a href=#writing-json-to-a-file>Writing Json to a file</a></li></ul></li><li><a href=#reading-json-from-a-file>Reading Json from a file</a><ul><li><a href=#extracting-fields-from-the-reader>Extracting fields from the reader</a></li><li><a href=#reading-arrays-of-child-objects>Reading arrays of child objects</a></li></ul></li></ul></nav></div></div></aside></main><footer><div class="container-lg clearfix"><div class="col-12 footer"><span>&copy; 2020-2022
+<a href=https://johnjfarrow.github.io>John Farrow</a>
+| Powered by <a href=https://github.com/dsrkafuu/hugo-theme-fuji/ target=_blank>Fuji-v2</a> & <a href=https://gohugo.io/ target=_blank>Hugo</a></span></div></div></footer><script defer src=https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.27.0/components/prism-core.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.27.0/plugins/autoloader/prism-autoloader.min.js></script>
+<script defer src=/assets/js/fuji.min.js></script></body></html>

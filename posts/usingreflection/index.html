@@ -5,16 +5,16 @@ their data types and properties. Normally C++
 does not maintain programmer-accessible information about, say, what members a struct or
 class has. Unreal Engine uses macros such as UCLASS and UPROPERTY to create information
 about classes, structs, methods, properties, and to make
-that information available to C++ at runtime.</p><p>This enables a programmer to introspect an object and find out, for example, what properties
+that information available to C++ at runtime.</p><p>This enables a program to introspect an object and find out, for example, what properties
 that object has, what the types of those properties are, and given an instance of that object,
-what the values of those properties are.</p><h2 id=intentions>Intentions</h2><p>The notes here were made in the course of
-creating a plugin which could check a project configuration
+what the values of those properties are.</p><h2 id=background>Background</h2><p>The notes here were made in the course of
+creating a plugin which checks a project configuration
 against a known-good collection of configuration settings, for
 example to check that all the settings required for hardware
 raytracing have their correct values, and have to options to display and change
-the current settings, as shown here:</p><p><img class=img-zoomable src=/images/reflection_1.png alt></p><p>This plugin needed to:</p><ul><li>identify Unreal Engine classes which were used for project settings</li><li>identify properties on those classes</li><li>retrieve the current values of those properties</li><li>change the current values of those properties</li></ul><p>The classes which Unreal Engine uses for project settings cannot be hard-coded
+the current settings, as shown here:</p><p><img class=img-zoomable src=/images/reflection_1.png alt></p><p>This plugin needs to:</p><ul><li>identify Unreal Engine classes which are used for project settings</li><li>identify properties on those classes</li><li>retrieve the current values of those properties</li><li>change the current values of those properties</li></ul><p>The classes which Unreal Engine uses for project settings cannot be hard-coded
 because they depend on which plugins the user has loaded; so reflection
-seems like a good way of retrieving the required information.</p><h2 id=creating-reflection-data>Creating Reflection Data</h2><p>Unreal Engine uses macros which are embedded in the c++ class declarations to
+is a good way of retrieving the required information.</p><h2 id=creating-reflection-data>Creating Reflection Data</h2><p>Unreal Engine uses macros which are embedded in the c++ class declarations to
 create reflection data.</p><p>A class defined using the UCLASS macro like the one below will have reflection data:</p><pre><code class=language-cpp>UCLASS(config=Engine, defaultconfig)
 class UWindowsTargetSettings 
 	: public UObject
@@ -25,7 +25,7 @@ class UWindowsTargetSettings
 example whether it can be accessed using Blueprints. The parameters are defined
 in <a href=https://docs.unrealengine.com/5.0/en-US/gameplay-classes-in-unreal-engine/ target=_blank>https://docs.unrealengine.com</a>. At
 runtime these parameters can be retrieved from using a c++ API.</p><p>Other c++ objects such as enum declarations, functions and properties have corresponding
-macros; specifically UENUM, UFUNCTION and UPROPERTY, which behave in the same way
+macros (namely UENUM, UFUNCTION and UPROPERTY) which are used in a similar way
 as the UCLASS macro.</p><h2 id=accessing-reflection-data>Accessing Reflection Data</h2><h3 id=class-information>Class Information</h3><p>The entry point for reflection data is using iterators. To iterate
 over the reflection data for all classes which are derived from UObject
 you use this:</p><pre><code class=language-cpp>for (FThreadSafeObjectIterator Itr(UObject::StaticClass()); Itr; ++Itr)
@@ -33,7 +33,7 @@ you use this:</p><pre><code class=language-cpp>for (FThreadSafeObjectIterator It
 	UClass* Class = Itr-&gt;GetClass();
     ...
 }
-</code></pre><p>To limit the search to classes which derived from a
+</code></pre><p>To limit the search to classes which are derived from a
 base class such as UDeveloperSettings you do this:</p><pre><code class=language-cpp>for (FThreadSafeObjectIterator Itr(UDeveloperSettings::StaticClass()); Itr; ++Itr)
 {
 	UClass* Class = Itr-&gt;GetClass();
@@ -132,11 +132,13 @@ GetIndexByNameString() to get the int representation of that string:</p><pre><co
 <span><a href=/tags/c++/>c++</a></span>
 <span><a href=/tags/json/>json</a></span>
 <span><a href=/tags/reflection/>reflection</a></span>
-<span><a href=/tags/unreal-engine/>unreal engine</a></span></div></div><div class="sidebar-item sidebar-toc"><h3>Table of Contents</h3><nav id=TableOfContents><ul><li><a href=#reflection>Reflection</a></li><li><a href=#intentions>Intentions</a></li><li><a href=#creating-reflection-data>Creating Reflection Data</a></li><li><a href=#accessing-reflection-data>Accessing Reflection Data</a><ul><li><a href=#class-information>Class Information</a></li><li><a href=#reading-property-values>Reading Property Values</a></li><li><a href=#writing-property-values>Writing Property Values</a></li></ul></li></ul></nav></div></aside></div><div class=btn><div class=btn-menu id=btn-menu><i class="iconfont icon-grid-sharp"></i></div><div class=btn-toggle-mode><i class="iconfont icon-contrast-sharp"></i></div><div class=btn-scroll-top><i class="iconfont icon-chevron-up-circle-sharp"></i></div></div><aside class=sidebar-mobile style=display:none><div class=sidebar-wrapper><div class="sidebar-item sidebar-pages"><h3>Pages</h3><ul><li><a href=/>Home</a></li></ul></div><div class="sidebar-item sidebar-links"><h3>Links</h3><ul><li><a href=https://github.com/johnjfarrow target=_blank><span>GitHub</span></a></li><li><a href=https://www.linkedin.com/in/johnjfarrow target=_blank><span>LinkedIn</span></a></li></ul></div><div class="sidebar-item sidebar-tags"><h3>Tags</h3><div><span><a href=/tags/build/>build</a></span>
+<span><a href=/tags/slate/>slate</a></span>
+<span><a href=/tags/unreal-engine/>unreal engine</a></span></div></div><div class="sidebar-item sidebar-toc"><h3>Table of Contents</h3><nav id=TableOfContents><ul><li><a href=#reflection>Reflection</a></li><li><a href=#background>Background</a></li><li><a href=#creating-reflection-data>Creating Reflection Data</a></li><li><a href=#accessing-reflection-data>Accessing Reflection Data</a><ul><li><a href=#class-information>Class Information</a></li><li><a href=#reading-property-values>Reading Property Values</a></li><li><a href=#writing-property-values>Writing Property Values</a></li></ul></li></ul></nav></div></aside></div><div class=btn><div class=btn-menu id=btn-menu><i class="iconfont icon-grid-sharp"></i></div><div class=btn-toggle-mode><i class="iconfont icon-contrast-sharp"></i></div><div class=btn-scroll-top><i class="iconfont icon-chevron-up-circle-sharp"></i></div></div><aside class=sidebar-mobile style=display:none><div class=sidebar-wrapper><div class="sidebar-item sidebar-pages"><h3>Pages</h3><ul><li><a href=/>Home</a></li></ul></div><div class="sidebar-item sidebar-links"><h3>Links</h3><ul><li><a href=https://github.com/johnjfarrow target=_blank><span>GitHub</span></a></li><li><a href=https://www.linkedin.com/in/johnjfarrow target=_blank><span>LinkedIn</span></a></li></ul></div><div class="sidebar-item sidebar-tags"><h3>Tags</h3><div><span><a href=/tags/build/>build</a></span>
 <span><a href=/tags/c++/>c++</a></span>
 <span><a href=/tags/json/>json</a></span>
 <span><a href=/tags/reflection/>reflection</a></span>
-<span><a href=/tags/unreal-engine/>unreal engine</a></span></div></div><div class="sidebar-item sidebar-toc"><h3>Table of Contents</h3><nav id=TableOfContents><ul><li><a href=#reflection>Reflection</a></li><li><a href=#intentions>Intentions</a></li><li><a href=#creating-reflection-data>Creating Reflection Data</a></li><li><a href=#accessing-reflection-data>Accessing Reflection Data</a><ul><li><a href=#class-information>Class Information</a></li><li><a href=#reading-property-values>Reading Property Values</a></li><li><a href=#writing-property-values>Writing Property Values</a></li></ul></li></ul></nav></div></div></aside></main><footer><div class="container-lg clearfix"><div class="col-12 footer"><span>&copy; 2020-2022
+<span><a href=/tags/slate/>slate</a></span>
+<span><a href=/tags/unreal-engine/>unreal engine</a></span></div></div><div class="sidebar-item sidebar-toc"><h3>Table of Contents</h3><nav id=TableOfContents><ul><li><a href=#reflection>Reflection</a></li><li><a href=#background>Background</a></li><li><a href=#creating-reflection-data>Creating Reflection Data</a></li><li><a href=#accessing-reflection-data>Accessing Reflection Data</a><ul><li><a href=#class-information>Class Information</a></li><li><a href=#reading-property-values>Reading Property Values</a></li><li><a href=#writing-property-values>Writing Property Values</a></li></ul></li></ul></nav></div></div></aside></main><footer><div class="container-lg clearfix"><div class="col-12 footer"><span>&copy; 2020-2022
 <a href=https://johnjfarrow.github.io>John Farrow</a>
 | Powered by <a href=https://github.com/dsrkafuu/hugo-theme-fuji/ target=_blank>Fuji-v2</a> & <a href=https://gohugo.io/ target=_blank>Hugo</a></span></div></div></footer><script defer src=https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js></script>
 <script defer src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js></script>

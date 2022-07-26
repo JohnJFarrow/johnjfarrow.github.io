@@ -4,7 +4,7 @@
 physics example implementing a trebuchet using blueprints.</p><p>This page describes implementing the same thing using c++.</p><h2 id=trebuchet-c-class>Trebuchet C++ Class</h2><p>Create the class using the Tools | New C++ Class menu option. Derive the class from the Actor
 base class and call it &ldquo;Trebuchet&rdquo;. The editor will automatically prefix the
 class name with &ldquo;A&rdquo; so the actual c++ class name will be &ldquo;ATrebuchet&rdquo;.</p><p>Note that this will work even if the project was created as a blueprint project -
-adding a c++ class will convert the project to a c++ project.</p><h3 id=atrebuchet-header-file>ATrebuchet Header File</h3><p>This header file looks like this:</p><pre><code>#pragma once
+adding a c++ class will convert the project to a c++ project.</p><h3 id=atrebuchet-header-file>ATrebuchet Header File</h3><p>This header file looks like this:</p><pre><code class=language-cpp>#pragma once
 
 #include &quot;CoreMinimal.h&quot;
 #include &quot;GameFramework/Actor.h&quot;
@@ -43,7 +43,7 @@ public:
 private:
 	bool bConstraintBroken = false;
 };
-</code></pre><p>In addition to the generated code we have added:</p><ul><li>forward declarations for USphereComponent and UPhysicsConstraintComponent classes</li><li>member variables to hold the static mesh components which form the body of the trebuchet</li><li>member variables for the physics constraints</li><li>a member variable to track whether the cable constraint has been broken when the projectile is fired</li></ul><h3 id=atrebuchet-cpp-file>ATrebuchet CPP File</h3><p>The constructor for the ATrebuchet class is shown here:</p><pre><code>ATrebuchet::ATrebuchet()
+</code></pre><p>In addition to the generated code we have added:</p><ul><li>forward declarations for USphereComponent and UPhysicsConstraintComponent classes</li><li>member variables to hold the static mesh components which form the body of the trebuchet</li><li>member variables for the physics constraints</li><li>a member variable to track whether the cable constraint has been broken when the projectile is fired</li></ul><h3 id=atrebuchet-cpp-file>ATrebuchet CPP File</h3><p>The constructor for the ATrebuchet class is shown here:</p><pre><code class=language-cpp>ATrebuchet::ATrebuchet()
 {
   PrimaryActorTick.bCanEverTick = true;
 
@@ -132,8 +132,8 @@ private:
   CableConstraint-&gt;SetDisableCollision(true);
   CableConstraint-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
 }
-</code></pre><h4 id=static-mesh-loading>Static Mesh Loading</h4><p>For each static mesh we have an object to locate and load it:</p><pre><code>static ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; ArmMeshAsset(TEXT(&quot;StaticMesh'/Game/Meshes/SM_Arm.SM_Arm'&quot;));
-</code></pre><p>This works for a simple example, in a larger project you would not do this because:</p><ul><li>it forces the mesh assets to be loaded even if they are not in use</li><li>hard coding the asset path is brittle and hard to maintain</li></ul><p>For most of the static mesh components we set properties like this:</p><pre><code>Weight = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(&quot;Weight&quot;));
+</code></pre><h4 id=static-mesh-loading>Static Mesh Loading</h4><p>For each static mesh we have an object to locate and load it:</p><pre><code class=language-cpp>static ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; ArmMeshAsset(TEXT(&quot;StaticMesh'/Game/Meshes/SM_Arm.SM_Arm'&quot;));
+</code></pre><p>This works for a simple example, in a larger project you would not do this because:</p><ul><li>it forces the mesh assets to be loaded even if they are not in use</li><li>hard coding the asset path is brittle and hard to maintain</li></ul><p>For most of the static mesh components we set properties like this:</p><pre><code class=language-cpp>Weight = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(&quot;Weight&quot;));
 Weight-&gt;SetStaticMesh(WeightMeshAsset.Object);
 Weight-&gt;SetMobility(EComponentMobility::Movable);
 Weight-&gt;SetRelativeLocation(FVector( 10.000000, -165.000000, 640.000000));
@@ -146,13 +146,13 @@ Weight-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransf
 show physics working from c++.</p><h3 id=properties-and-defaults>Properties and Defaults</h3><p>Note that more properties required setting from c++ than when using the editor. When
 using the editor, changing the Mobility property to &ldquo;Movable&rdquo; also changes the
 Collision Preset value to &ldquo;PhysicsActor&rdquo;. In c++ we need to manually set both
-properties like this:</p><pre><code>Weight-&gt;SetMobility(EComponentMobility::Movable);
+properties like this:</p><pre><code class=language-cpp>Weight-&gt;SetMobility(EComponentMobility::Movable);
 Weight-&gt;SetCollisionProfileName(TEXT(&quot;PhysicsActor&quot;));
 </code></pre><p>Also note the defaults for components are different depending on how they are created. A USphere
 component has the Hidden In Game property set to false when created in the blueprint editor and
-true when created from c++, so we need to explcitly set it in c++:</p><pre><code>Ball-&gt;SetHiddenInGame(false);
+true when created from c++, so we need to explcitly set it in c++:</p><pre><code class=language-cpp>Ball-&gt;SetHiddenInGame(false);
 </code></pre><h3 id=cable-release-code>Cable Release Code</h3><p>This image shows the blueprint which breaks the Physics Constraint once the projectile
-is travelling in the right direction and at an angle of &lt;= 45 degrees:</p><p><img class=img-zoomable src=/images/chaos_029.png alt></p><p>This is converted into the c++ code shown here:</p><pre><code>void ATrebuchet::Tick(float DeltaTime)
+is travelling in the right direction and at an angle of &lt;= 45 degrees:</p><p><img class=img-zoomable src=/images/chaos_029.png alt></p><p>This is converted into the c++ code shown here:</p><pre><code class=language-cpp>void ATrebuchet::Tick(float DeltaTime)
 {
   check(Ball);
   check(CableConstraint);
@@ -177,6 +177,7 @@ is travelling in the right direction and at an angle of &lt;= 45 degrees:</p><p>
   }
 }
 </code></pre></div></article><div class="license markdown-body"><blockquote><p>Unless otherwise noted, the content of this site is licensed under <a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a>.</p></blockquote></div></div><aside class="col-12 col-md-3 float-left sidebar"><div class="sidebar-item sidebar-pages"><h3>Pages</h3><ul><li><a href=/>Home</a></li></ul></div><div class="sidebar-item sidebar-links"><h3>Links</h3><ul><li><a href=https://github.com/johnjfarrow target=_blank><span>GitHub</span></a></li><li><a href=https://www.linkedin.com/in/johnjfarrow target=_blank><span>LinkedIn</span></a></li></ul></div><div class="sidebar-item sidebar-tags"><h3>Tags</h3><div><span><a href=/tags/blender/>blender</a></span>
+<span><a href=/tags/blueprint/>blueprint</a></span>
 <span><a href=/tags/blueprints/>blueprints</a></span>
 <span><a href=/tags/build/>build</a></span>
 <span><a href=/tags/c++/>c++</a></span>
@@ -186,8 +187,10 @@ is travelling in the right direction and at an angle of &lt;= 45 degrees:</p><p>
 <span><a href=/tags/json/>json</a></span>
 <span><a href=/tags/physics/>physics</a></span>
 <span><a href=/tags/reflection/>reflection</a></span>
+<span><a href=/tags/rotation/>rotation</a></span>
 <span><a href=/tags/slate/>slate</a></span>
 <span><a href=/tags/unreal-engine/>unreal engine</a></span></div></div><div class="sidebar-item sidebar-toc"><h3>Table of Contents</h3><nav id=TableOfContents><ul><li><a href=#introduction>Introduction</a></li><li><a href=#trebuchet-c-class>Trebuchet C++ Class</a><ul><li><a href=#atrebuchet-header-file>ATrebuchet Header File</a></li><li><a href=#atrebuchet-cpp-file>ATrebuchet CPP File</a></li><li><a href=#properties-and-defaults>Properties and Defaults</a></li><li><a href=#cable-release-code>Cable Release Code</a></li></ul></li></ul></nav></div></aside></div><div class=btn><div class=btn-menu id=btn-menu><i class="iconfont icon-grid-sharp"></i></div><div class=btn-toggle-mode><i class="iconfont icon-contrast-sharp"></i></div><div class=btn-scroll-top><i class="iconfont icon-chevron-up-circle-sharp"></i></div></div><aside class=sidebar-mobile style=display:none><div class=sidebar-wrapper><div class="sidebar-item sidebar-pages"><h3>Pages</h3><ul><li><a href=/>Home</a></li></ul></div><div class="sidebar-item sidebar-links"><h3>Links</h3><ul><li><a href=https://github.com/johnjfarrow target=_blank><span>GitHub</span></a></li><li><a href=https://www.linkedin.com/in/johnjfarrow target=_blank><span>LinkedIn</span></a></li></ul></div><div class="sidebar-item sidebar-tags"><h3>Tags</h3><div><span><a href=/tags/blender/>blender</a></span>
+<span><a href=/tags/blueprint/>blueprint</a></span>
 <span><a href=/tags/blueprints/>blueprints</a></span>
 <span><a href=/tags/build/>build</a></span>
 <span><a href=/tags/c++/>c++</a></span>
@@ -197,6 +200,7 @@ is travelling in the right direction and at an angle of &lt;= 45 degrees:</p><p>
 <span><a href=/tags/json/>json</a></span>
 <span><a href=/tags/physics/>physics</a></span>
 <span><a href=/tags/reflection/>reflection</a></span>
+<span><a href=/tags/rotation/>rotation</a></span>
 <span><a href=/tags/slate/>slate</a></span>
 <span><a href=/tags/unreal-engine/>unreal engine</a></span></div></div><div class="sidebar-item sidebar-toc"><h3>Table of Contents</h3><nav id=TableOfContents><ul><li><a href=#introduction>Introduction</a></li><li><a href=#trebuchet-c-class>Trebuchet C++ Class</a><ul><li><a href=#atrebuchet-header-file>ATrebuchet Header File</a></li><li><a href=#atrebuchet-cpp-file>ATrebuchet CPP File</a></li><li><a href=#properties-and-defaults>Properties and Defaults</a></li><li><a href=#cable-release-code>Cable Release Code</a></li></ul></li></ul></nav></div></div></aside></main><footer><div class="container-lg clearfix"><div class="col-12 footer"><span>&copy; 2020-2022
 <a href=https://johnjfarrow.github.io>John Farrow</a>

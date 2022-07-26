@@ -1,0 +1,95 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=HandheldFriendly content="True"><meta http-equiv=x-ua-compatible content="IE=edge"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=generator content="Hugo 0.101.0"><link rel="shortcut icon" href=https://cdn.jsdelivr.net/gh/dsrkafuu/dsr-cdn-main@1/images/favicons/dsrca.ico><title>Creating a Blueprint Node in C++ - Unreal Engine Development Notes</title><meta name=author content="John Farrow"><meta name=description content="A minimal Hugo theme with nice theme color."><meta name=keywords content="unreal engine,blueprint,c++,rotation"><meta property="og:title" content="Creating a Blueprint Node in C++"><meta name=twitter:title content="Creating a Blueprint Node in C++"><meta property="og:type" content="article"><meta property="og:url" content="https://johnjfarrow.github.io/posts/rotation/"><meta property="og:description" content="Creating a blueprint node which rotates an Actor around a pivot point"><meta name=twitter:description content="Creating a blueprint node which rotates an Actor around a pivot point"><meta property="og:image" content="https://johnjfarrow.github.io/img/og.png"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://johnjfarrow.github.io/img/og.png"><meta property="article:published_time" content="2022-07-26T10:27:06+12:00"><meta property="article:modified_time" content="2022-07-26T10:27:06+12:00"><style>@media(prefers-color-scheme:dark){body[data-theme=auto] img{filter:brightness(60%)}}body[data-theme=dark] img{filter:brightness(60%)}</style><link rel=stylesheet href=https://johnjfarrow.github.io/assets/css/fuji.min.css></head><body data-theme=auto data-theme-auto=true><script data-cfasync=false>var fujiThemeData=localStorage.getItem("fuji_data-theme");fujiThemeData?fujiThemeData!=="auto"&&document.body.setAttribute("data-theme",fujiThemeData==="dark"?"dark":"light"):localStorage.setItem("fuji_data-theme","auto")</script><header><div class="container-lg clearfix"><div class="col-12 header"><a class=title-main href=https://johnjfarrow.github.io>Unreal Engine Development Notes</a>
+<span class=title-sub>John Farrow</span></div></div></header><main><div class="container-lg clearfix"><div class="col-12 col-md-9 float-left content"><article><h2 class="post-item post-title"><a href=https://johnjfarrow.github.io/posts/rotation/>Creating a Blueprint Node in C++</a></h2><div class="post-item post-meta"><span><i class="iconfont icon-today-sharp"></i>&nbsp;2022-07-26</span>
+<span><i class="iconfont icon-pricetags-sharp"></i>&nbsp;<a href=/tags/unreal-engine>unreal engine</a>&nbsp;<a href=/tags/blueprint>blueprint</a>&nbsp;<a href=/tags/c++>c++</a>&nbsp;<a href=/tags/rotation>rotation</a>&nbsp;</span></div><div class="post-content markdown-body"><h2 id=introduction>Introduction</h2><p>This post is about creating a new Blueprint node in c++ to rotate an Actor object around
+a pivot point.</p><p>The image below shows a mesh (called SM_Arm) that was imported into Unreal from
+a FBX file generated in Blender.</p><p><img class=img-zoomable src=/images/rotn_001.png alt></p><p>The gizmo on the left is at the position of a socket. The red, green and blue lines near the middle
+indicate the origin of the mesh, which is where the origin was in the Blender model.</p><p>We create a new blueprint actor, add a Static Mesh component, and
+set the mesh to SM_Arm. If we place this actor in the world,
+select it in the outliner, and press E to rotate it, the rotation gizmo (which
+indicates the pivot point around which it will rotate) is
+positioned on the origin of the SM_Arm mesh:</p><p><img class=img-zoomable src=/images/rotn_002.png alt></p><h2 id=manual-rotation>Manual Rotation</h2><p>If we want to manually rotate around the socket position, we can use ALT-middle-mouse-click
+to temporarily move the pivot point like so:</p><p><img class=img-zoomable src=/images/rotn_003.png alt></p><p>Once we have applied a rotation the pivot point will return to the original position.</p><h2 id=blueprint-rotation>Blueprint Rotation</h2><h3 id=header-file>Header File</h3><p>No existing single blueprint node supports rotating an actor around a specified pivot point, so as an
+exercise I decided to write one.</p><p>A blueprint node can be implemented as a static function on a c++ class which is derived from
+the UBlueprintFunctionLibrary class. To create such a node use the <code>Tools | New C++ Class</code> menu option and create a class
+derived from UBlueprintFunctionLibrary. In this example the new class is called &ldquo;UtilityFunctionLibrary&rdquo;.</p><p>Unreal will create the header and implementation files. The header looks like this:</p><pre><code class=language-cpp>#pragma once
+#include &quot;CoreMinimal.h&quot;
+#include &quot;Kismet/BlueprintFunctionLibrary.h&quot;
+#include &quot;UtilityFunctionLibrary.generated.h&quot;
+
+UCLASS()
+class MYPROJECT8_API UUtilityFunctionLibrary : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+};
+</code></pre><p>There are no methods on the new class. We can add one like so:</p><pre><code class=language-cpp>#pragma once
+#include &quot;CoreMinimal.h&quot;
+#include &quot;Kismet/BlueprintFunctionLibrary.h&quot;
+#include &quot;UtilityFunctionLibrary.generated.h&quot;
+
+UCLASS()
+class MYPROJECT8_API UUtilityFunctionLibrary : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+	UFUNCTION(BlueprintCallable, Category = &quot;Utility&quot;)
+	static void RotateActorAroundPivot( 
+		AActor* Actor,
+		const FVector&amp; PivotLocation,
+		const FRotator&amp; DeltaRotation );	
+};
+</code></pre><p>The new function RotateActorAroundPivot takes as parameters the actor object we want to rotate, the pivot point
+we want to rotate it around, and the size of the rotation.</p><h3 id=ufunction-declaration>UFUNCTION Declaration</h3><p>There are a couple of improvements we can make to the declaration of the RotateActorAroundPivot function, which currently
+looks like this:</p><p><img class=img-zoomable src=/images/rotn_004.png alt></p><ul><li>we can make the Actor parameter default to &ldquo;self&rdquo;, which is the actor which this blueprint is a part of, by adding <code>meta = (DefaultToSelf = "Actor")</code>
+to the UFUNCTION declaration</li><li>we can make the node easier to use by making the parameters optional (so they will be replaced by default values), by making them values, not references.</li></ul><p>The updated declaration looks this this:</p><pre><code class=language-cpp>UFUNCTION(BlueprintCallable, Category = &quot;Utility&quot;, meta = (DefaultToSelf = &quot;Actor&quot;))
+static void RotateActorAroundPivot(
+	AActor* Actor,
+	const FVector PivotLocation,
+	const FRotator DeltaRotation);
+</code></pre><p>and the node now looks like this:</p><p><img class=img-zoomable src=/images/rotn_005.png alt></p><h3 id=implementation>Implementation</h3><p>The implementation of the node contains the maths operations needed to rotate the actor around the pivot point:</p><pre><code class=language-cpp>void UUtilityFunctionLibrary::RotateActorAroundPivot(
+	AActor* Actor,
+	const FVector PivotLocation,
+	const FRotator DeltaRotation)
+{
+	if (!Actor) return;
+	Actor-&gt;AddActorWorldRotation(DeltaRotation);
+	FVector NewActorLocation = Actor-&gt;GetActorLocation();
+	NewActorLocation -= PivotLocation;
+	NewActorLocation = 
+	   FRotationMatrix(DeltaRotation).TransformPosition(NewActorLocation);
+	NewActorLocation += PivotLocation;
+	NewActorLocation -= Actor-&gt;GetActorLocation();
+	Actor-&gt;AddActorWorldOffset(NewActorLocation);
+}
+</code></pre><p>This code is very substantially based on the code the editor uses to implement manual rotation.</p><h3 id=usage>Usage</h3><p>This blueprint shows an example usage:</p><p><img class=img-zoomable src=/images/rotn_006.png alt></p><p>Every tick it:</p><ul><li>multiplies the tick duration by a factor (the Rotation Step variable) to calculate a rotation amount</li><li>finds the location of the named socket on the Static Mesh component of the actor</li><li>and rotates the actor around the position of that socket.</li></ul><p>(This does not need sockets to work, the pivot location could come from anywhere.)</p><p>If the socket name is left blank, so the socket location is (0,0,0), the mesh rotates around its origin like so:</p><p><img class=img-zoomable src=/images/rotn_020.gif alt></p><p>Whereas if a socket is chosen which is on the narrow end of the arm mesh, the the rotation is like this:</p><p><img class=img-zoomable src=/images/rotn_021.gif alt></p></div></article><div class="license markdown-body"><blockquote><p>Unless otherwise noted, the content of this site is licensed under <a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/ target=_blank>CC BY-NC-SA 4.0</a>.</p></blockquote></div></div><aside class="col-12 col-md-3 float-left sidebar"><div class="sidebar-item sidebar-pages"><h3>Pages</h3><ul><li><a href=/>Home</a></li></ul></div><div class="sidebar-item sidebar-links"><h3>Links</h3><ul><li><a href=https://github.com/johnjfarrow target=_blank><span>GitHub</span></a></li><li><a href=https://www.linkedin.com/in/johnjfarrow target=_blank><span>LinkedIn</span></a></li></ul></div><div class="sidebar-item sidebar-tags"><h3>Tags</h3><div><span><a href=/tags/blender/>blender</a></span>
+<span><a href=/tags/blueprint/>blueprint</a></span>
+<span><a href=/tags/blueprints/>blueprints</a></span>
+<span><a href=/tags/build/>build</a></span>
+<span><a href=/tags/c++/>c++</a></span>
+<span><a href=/tags/chaos/>chaos</a></span>
+<span><a href=/tags/ffmpeg/>ffmpeg</a></span>
+<span><a href=/tags/gif/>gif</a></span>
+<span><a href=/tags/json/>json</a></span>
+<span><a href=/tags/physics/>physics</a></span>
+<span><a href=/tags/reflection/>reflection</a></span>
+<span><a href=/tags/rotation/>rotation</a></span>
+<span><a href=/tags/slate/>slate</a></span>
+<span><a href=/tags/unreal-engine/>unreal engine</a></span></div></div><div class="sidebar-item sidebar-toc"><h3>Table of Contents</h3><nav id=TableOfContents><ul><li><a href=#introduction>Introduction</a></li><li><a href=#manual-rotation>Manual Rotation</a></li><li><a href=#blueprint-rotation>Blueprint Rotation</a><ul><li><a href=#header-file>Header File</a></li><li><a href=#ufunction-declaration>UFUNCTION Declaration</a></li><li><a href=#implementation>Implementation</a></li><li><a href=#usage>Usage</a></li></ul></li></ul></nav></div></aside></div><div class=btn><div class=btn-menu id=btn-menu><i class="iconfont icon-grid-sharp"></i></div><div class=btn-toggle-mode><i class="iconfont icon-contrast-sharp"></i></div><div class=btn-scroll-top><i class="iconfont icon-chevron-up-circle-sharp"></i></div></div><aside class=sidebar-mobile style=display:none><div class=sidebar-wrapper><div class="sidebar-item sidebar-pages"><h3>Pages</h3><ul><li><a href=/>Home</a></li></ul></div><div class="sidebar-item sidebar-links"><h3>Links</h3><ul><li><a href=https://github.com/johnjfarrow target=_blank><span>GitHub</span></a></li><li><a href=https://www.linkedin.com/in/johnjfarrow target=_blank><span>LinkedIn</span></a></li></ul></div><div class="sidebar-item sidebar-tags"><h3>Tags</h3><div><span><a href=/tags/blender/>blender</a></span>
+<span><a href=/tags/blueprint/>blueprint</a></span>
+<span><a href=/tags/blueprints/>blueprints</a></span>
+<span><a href=/tags/build/>build</a></span>
+<span><a href=/tags/c++/>c++</a></span>
+<span><a href=/tags/chaos/>chaos</a></span>
+<span><a href=/tags/ffmpeg/>ffmpeg</a></span>
+<span><a href=/tags/gif/>gif</a></span>
+<span><a href=/tags/json/>json</a></span>
+<span><a href=/tags/physics/>physics</a></span>
+<span><a href=/tags/reflection/>reflection</a></span>
+<span><a href=/tags/rotation/>rotation</a></span>
+<span><a href=/tags/slate/>slate</a></span>
+<span><a href=/tags/unreal-engine/>unreal engine</a></span></div></div><div class="sidebar-item sidebar-toc"><h3>Table of Contents</h3><nav id=TableOfContents><ul><li><a href=#introduction>Introduction</a></li><li><a href=#manual-rotation>Manual Rotation</a></li><li><a href=#blueprint-rotation>Blueprint Rotation</a><ul><li><a href=#header-file>Header File</a></li><li><a href=#ufunction-declaration>UFUNCTION Declaration</a></li><li><a href=#implementation>Implementation</a></li><li><a href=#usage>Usage</a></li></ul></li></ul></nav></div></div></aside></main><footer><div class="container-lg clearfix"><div class="col-12 footer"><span>&copy; 2020-2022
+<a href=https://johnjfarrow.github.io>John Farrow</a>
+| Powered by <a href=https://github.com/dsrkafuu/hugo-theme-fuji/ target=_blank>Fuji-v2</a> & <a href=https://gohugo.io/ target=_blank>Hugo</a></span></div></div></footer><script defer src=https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.27.0/components/prism-core.min.js></script>
+<script defer src=https://cdn.jsdelivr.net/npm/prismjs@1.27.0/plugins/autoloader/prism-autoloader.min.js></script>
+<script defer src=/assets/js/fuji.min.js></script></body></html>

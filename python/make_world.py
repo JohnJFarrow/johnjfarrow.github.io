@@ -1,5 +1,12 @@
 import unreal
+from pprint import pprint
 
+# set this dir in project settings, filter python, add to additional paths
+# from importlib import reload
+# import make_world as MW
+
+# reload(MW)
+# MW.make_blueprint("/Game/Blueprints", "TestNN" )
 
 def check_loaded():
     print("make_world loaded ok")
@@ -42,13 +49,73 @@ def import_static_meshes():
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks(tasks)
 
 
-def make_blueprint(asset_name, package_path):
+def all_subclasses(cls):
+
+    if cls == type:
+        raise ValueError("Invalid class - 'type' is not a class")
+
+    subclasses = set()
+
+    stack = []
+    try:
+        stack.extend(cls.__subclasses__())
+    except (TypeError, AttributeError) as ex:
+        raise ValueError("Invalid class" + repr(cls)) from ex
+
+    while stack:
+        sub = stack.pop()
+        subclasses.add(sub)
+        try:
+            stack.extend(sub.__subclasses__())
+        except (TypeError, AttributeError):
+           continue
+
+    return list(subclasses)
+
+
+def make_blueprint(package_path, asset_name):
+
+    BFL = unreal.SubobjectDataBlueprintFunctionLibrary
+
     factory = unreal.BlueprintFactory()
+    # this works, the saved blueprint is derived from Actor
     factory.set_editor_property("parent_class", unreal.Actor)
 
+    factory = unreal.BlueprintFactory()
+    factory.set_editor_property("parent_class", unreal.Actor)
+    # make the blueprint
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
     blueprint = asset_tools.create_asset(asset_name, package_path, None, factory)
-    print(blueprint)
+    #
+    subsystem = unreal.get_engine_subsystem(unreal.SubobjectDataSubsystem)
+    # get the root data handle
+    root_data_handle = subsystem.k2_gather_subobject_data_for_blueprint(blueprint)[0]
+
+    # add sub object ARM
+    sub_handle, fail_reason = subsystem.add_new_subobject(
+        unreal.AddNewSubobjectParams(
+            parent_handle=root_data_handle,
+            new_class=unreal.StaticMeshComponent,
+            blueprint_context=blueprint))
+    if not fail_reason.is_empty():
+        print("fail_reason", fail_reason)
+        print("ERROR from sub_object_subsystem.add_new_subobject: %s" % fail_reason )
+        return
+    renamed = subsystem.rename_subobject( sub_handle, "Arm")
+    print("renamed", renamed)
+
+    arm = BFL.get_object(BFL.get_data(sub_handle))
+    assert isinstance(arm, unreal.StaticMeshComponent)
+    # Arm->SetStaticMesh(ArmMeshAsset.Object);
+    arm.set_editor_property("mobility", unreal.ComponentMobility.MOVABLE )
+    arm.set_editor_property("relative_location", unreal.Vector(20.000000, 57.132445, 694.646682))
+    arm.set_editor_property("relative_rotation", unreal.Rotator(0.000000, 0.000000, 40.000000))
+    arm.set_mass_override_in_kg(unreal.Name("NAME_None"), 505)
+    arm.set_enable_gravity(True)
+    arm.set_collision_profile_name("PhysicsActor")
+
+
+    attached = subsystem.attach_subobject(root_data_handle, sub_handle )
 
 
 def run():
@@ -56,9 +123,5 @@ def run():
 
     #new_level(level_name)
     #set_current_level(level_name)
-    #import_static_meshes()
-    make_blueprint("BP_Trebuchet", "/Game/Blueprints")
-
-
-
-
+    import_static_meshes()
+    make_blueprint("/Game/Blueprints", "BP_Trebuchet" )

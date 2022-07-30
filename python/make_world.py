@@ -1,11 +1,9 @@
 import unreal
 from pprint import pprint
 
-
 # set this dir in project settings, filter python, add to additional paths
 # from importlib import reload
 # import make_world as MW
-
 # reload(MW)
 # MW.make_blueprint("/Game/Blueprints", "TestNN" )
 
@@ -74,11 +72,10 @@ def import_static_meshes():
     assert isinstance(mesh, unreal.StaticMesh)
     body_setup = mesh.get_editor_property("body_setup")
     body_setup.set_editor_property("collision_trace_flag", unreal.CollisionTraceFlag.CTF_USE_COMPLEX_AS_SIMPLE )
-    mesh.set_editor_property( "body_setup", body_setup )
 
+def add_subobject(subsystem, blueprint, new_class, name):
 
-def add_subobject(subsystem, blueprint, root_data_handle, new_class, name):
-    BFL = unreal.SubobjectDataBlueprintFunctionLibrary
+    root_data_handle = subsystem.k2_gather_subobject_data_for_blueprint(blueprint)[0]
 
     sub_handle, fail_reason = subsystem.add_new_subobject(
         unreal.AddNewSubobjectParams(
@@ -94,6 +91,7 @@ def add_subobject(subsystem, blueprint, root_data_handle, new_class, name):
 
     subsystem.attach_subobject(root_data_handle, sub_handle)
 
+    BFL = unreal.SubobjectDataBlueprintFunctionLibrary
     obj = BFL.get_object(BFL.get_data(sub_handle))
     return sub_handle, obj
 
@@ -111,18 +109,14 @@ def make_blueprint(package_path, asset_name):
     # this works, the saved blueprint is derived from Actor
     factory.set_editor_property("parent_class", unreal.Actor)
 
-    factory = unreal.BlueprintFactory()
-    factory.set_editor_property("parent_class", unreal.Actor)
     # make the blueprint
     asset_tools = unreal.AssetToolsHelpers.get_asset_tools()
     blueprint = asset_tools.create_asset(asset_name, package_path, None, factory)
     #
     subsystem = unreal.get_engine_subsystem(unreal.SubobjectDataSubsystem)
-    # get the root data handle
-    root_data_handle = subsystem.k2_gather_subobject_data_for_blueprint(blueprint)[0]
 
     # BASE
-    base_handle, base = add_subobject(subsystem, blueprint, root_data_handle, unreal.StaticMeshComponent, "Base")
+    base_handle, base = add_subobject(subsystem, blueprint, unreal.StaticMeshComponent, "Base")
     mesh = EAL.load_asset("/Game/Meshes/SM_Base")
     assert isinstance(base, unreal.StaticMeshComponent)
     assert isinstance(mesh, unreal.StaticMesh)
@@ -131,7 +125,7 @@ def make_blueprint(package_path, asset_name):
     base.set_collision_profile_name("BlockAll")
 
     # RAMP
-    sub_handle, ramp = add_subobject(subsystem, blueprint, root_data_handle, unreal.StaticMeshComponent, "Ramp")
+    sub_handle, ramp = add_subobject(subsystem, blueprint, unreal.StaticMeshComponent, "Ramp")
     mesh = EAL.load_asset("/Game/Meshes/SM_Ramp")
     assert isinstance(ramp, unreal.StaticMeshComponent)
     assert isinstance(mesh, unreal.StaticMesh)
@@ -142,7 +136,7 @@ def make_blueprint(package_path, asset_name):
     subsystem.attach_subobject( base_handle, sub_handle )
 
     # WEIGHT
-    sub_handle, weight = add_subobject(subsystem, blueprint, root_data_handle, unreal.StaticMeshComponent, "Weight")
+    sub_handle, weight = add_subobject(subsystem, blueprint, unreal.StaticMeshComponent, "Weight")
     assert isinstance(weight, unreal.StaticMeshComponent)
     assert isinstance(mesh, unreal.StaticMesh)
     mesh = EAL.load_asset("/Game/Meshes/SM_Weight")
@@ -156,7 +150,7 @@ def make_blueprint(package_path, asset_name):
     subsystem.attach_subobject( base_handle, sub_handle )
 
     # ARM
-    sub_handle, arm = add_subobject(subsystem, blueprint, root_data_handle, unreal.StaticMeshComponent, "Arm")
+    sub_handle, arm = add_subobject(subsystem, blueprint, unreal.StaticMeshComponent, "Arm")
     mesh = EAL.load_asset("/Game/Meshes/SM_Arm")
     assert isinstance(arm, unreal.StaticMeshComponent)
     assert isinstance(mesh, unreal.StaticMesh)
@@ -171,7 +165,7 @@ def make_blueprint(package_path, asset_name):
     subsystem.attach_subobject( base_handle, sub_handle )
 
     # BALL
-    sub_handle, ball = add_subobject(subsystem, blueprint, root_data_handle, unreal.SphereComponent, "Ball")
+    sub_handle, ball = add_subobject(subsystem, blueprint, unreal.SphereComponent, "Ball")
     # mesh = EAL.load_asset("/Game/Meshes/SM_Arm")
     assert isinstance(arm, unreal.StaticMeshComponent)
     # assert isinstance(mesh, unreal.StaticMesh)
@@ -195,7 +189,7 @@ def make_blueprint(package_path, asset_name):
     ccBall = make_component_name("Ball")
 
     # ArmBaseConstraint
-    sub_handle, arm_base = add_subobject(subsystem, blueprint, root_data_handle, unreal.PhysicsConstraintComponent, "ArmBaseConstraint")
+    sub_handle, arm_base = add_subobject(subsystem, blueprint, unreal.PhysicsConstraintComponent, "ArmBaseConstraint")
     assert isinstance(arm_base, unreal.PhysicsConstraintComponent)
     arm_base.set_editor_property("relative_location", unreal.Vector(10.000000, 0.000000, 740.000000))
     arm_base.set_editor_property("component_name1", ccBase)
@@ -210,7 +204,7 @@ def make_blueprint(package_path, asset_name):
     subsystem.attach_subobject( base_handle, sub_handle )
 
     # ArmWeightConstraint
-    sub_handle, arm_weight = add_subobject(subsystem, blueprint, root_data_handle, unreal.PhysicsConstraintComponent, "ArmWeightConstraint")
+    sub_handle, arm_weight = add_subobject(subsystem, blueprint, unreal.PhysicsConstraintComponent, "ArmWeightConstraint")
     assert isinstance(arm_weight, unreal.PhysicsConstraintComponent)
     arm_weight.set_editor_property("relative_location", unreal.Vector(15.000000, -168.000000, 883.000000))
     arm_weight.set_editor_property("component_name1", ccArm)
@@ -225,7 +219,7 @@ def make_blueprint(package_path, asset_name):
     subsystem.attach_subobject( base_handle, sub_handle )
 
     # CableConstraint
-    sub_handle, cable_constraint = add_subobject(subsystem, blueprint, root_data_handle, unreal.PhysicsConstraintComponent, "CableConstraint")
+    sub_handle, cable_constraint = add_subobject(subsystem, blueprint, unreal.PhysicsConstraintComponent, "CableConstraint")
     assert isinstance(cable_constraint, unreal.PhysicsConstraintComponent)
     cable_constraint.set_editor_property("relative_location", unreal.Vector(14.000000, 634.000000, 210.000000))
     cable_constraint.set_editor_property("component_name1", ccArm)
@@ -240,12 +234,35 @@ def make_blueprint(package_path, asset_name):
     subsystem.attach_subobject( base_handle, sub_handle )
 
 
+def spawn(package_path, asset_name):
+    # spawn actor on map
+    EAL = unreal.EditorAssetLibrary
+    ELL = unreal.EditorLevelLibrary
+    blueprint_class = EAL.load_blueprint_class( package_path + "/" + asset_name )
+    assert isinstance(blueprint_class, unreal.BlueprintGeneratedClass )
+    location = unreal.Vector(0, 0, 0)
+    rotation = (location - location).rotator()
+    actor = ELL.spawn_actor_from_class(blueprint_class, location, rotation)
+
+
+def spawn_player_start():
+    # spawn actor on map
+    EAL = unreal.EditorAssetLibrary
+    ELL = unreal.EditorLevelLibrary
+    location = unreal.Vector(2000, 0, 500)
+    rotation = unreal.Rotator(0, 0, 180)
+    actor = ELL.spawn_actor_from_class( unreal.PlayerStart, location, rotation)
+
+
 def run():
     level_name = "/Game/Levels/NewLevel21"
     new_level(level_name)
     set_current_level(level_name)
     import_static_meshes()
-    make_blueprint("/Game/Blueprints", "BP_Trebuchet20")
-    # spawn actor on map
+
+    package_path = "/Game/Blueprints"
+    asset_name = "BP_Trebuchet20"
+    make_blueprint( package_path, asset_name )
+    spawn( package_path, asset_name )
     # make player start look at actor ?
 

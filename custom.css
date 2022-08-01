@@ -50,3 +50,7 @@ main article :not(pre) > code {
     background-color: #333;
     border:none;
 }
+
+img {
+    text-align:center;
+}

@@ -1371,25 +1371,25 @@ your Epic Games and github&amp;nbsp;accounts&lt;/p&gt;
 &lt;h3&gt;Installing Visual Studio&amp;nbsp;2022&lt;/h3&gt;
 &lt;p&gt;If you do not already have Visual Studio 2022 installed, install it from &lt;a href="https://visualstudio.microsoft.com/vs/"&gt;visualstudio.microsoft.com&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Install at least these&amp;nbsp;options:&lt;/p&gt;
-&lt;p&gt;&lt;img alt="" src="/output/images/vsinstall_1.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/vsinstall_1.png"&gt;&lt;/p&gt;
 &lt;p&gt;and&lt;/p&gt;
-&lt;p&gt;&lt;img alt="" src="/output/images/vsinstall_2.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/vsinstall_2.png"&gt;&lt;/p&gt;
 &lt;h2&gt;Configuring Visual Studio&amp;nbsp;2022&lt;/h2&gt;
 &lt;p&gt;Some useful options you might like to set&amp;nbsp;are:&lt;/p&gt;
 &lt;h4&gt;Disabling Hot&amp;nbsp;Reload&lt;/h4&gt;
 &lt;p&gt;In Tools|Options|Debugging|.&lt;span class="caps"&gt;NET&lt;/span&gt;/C++ Hot Reload disable all the Hot Reload&amp;nbsp;options:&lt;/p&gt;
-&lt;p&gt;&lt;img alt="" src="/output/images/vsinstall_3.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/vsinstall_3.png"&gt;&lt;/p&gt;
 &lt;h4&gt;Set Solution Configurations dropdown&amp;nbsp;width&lt;/h4&gt;
 &lt;p&gt;Change the width of the Solution Configurations dropdown to handle the longer names used by 
 &lt;span class="caps"&gt;UE&lt;/span&gt;:
 - right-click on the toolbar shown below, select &amp;#8220;Customize&amp;#8221;
-&lt;img alt="" src="/output/images/vsinstall_4.png"&gt;&lt;/p&gt;
+&lt;img alt="" src="/images/vsinstall_4.png"&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;change to the &amp;#8220;Commands&amp;#8221;&amp;nbsp;tab&lt;/li&gt;
 &lt;li&gt;select &amp;#8220;Toolbar&amp;#8221; in the top radio button&amp;nbsp;group&lt;/li&gt;
 &lt;li&gt;change the toolbar value from &amp;#8220;Build&amp;#8221; to &amp;#8220;Standard&amp;#8221; like&amp;nbsp;so:&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;img alt="" src="/output/images/vsinstall_5.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/vsinstall_5.png"&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;in the preview panel select &amp;#8220;System&amp;nbsp;Configurations&amp;#8221; &lt;/li&gt;
 &lt;li&gt;click the &amp;#8220;Modify Selection&amp;#8221;&amp;nbsp;button&lt;/li&gt;
@@ -1397,7 +1397,7 @@ your Epic Games and github&amp;nbsp;accounts&lt;/p&gt;
 &lt;li&gt;press &amp;#8220;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#8221; and&amp;nbsp;&amp;#8220;Close&amp;#8221;.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;The toolbar will now have changed to
-&lt;img alt="" src="/output/images/vsinstall_6.png"&gt;&lt;/p&gt;
+&lt;img alt="" src="/images/vsinstall_6.png"&gt;&lt;/p&gt;
 &lt;h4&gt;Turn on&amp;nbsp;Indexing&lt;/h4&gt;
 &lt;p&gt;To make sure indexed searching is enabled, go to Tools &amp;gt; Options &amp;gt; Environment &amp;gt; Preview Features and verify that “Enable indexing for faster find experience” is&amp;nbsp;checked.&lt;/p&gt;
 &lt;p&gt;See &lt;a href="https://devblogs.microsoft.com/visualstudio/code-search-in-visual-studio-is-about-to-get-much-faster/"&gt;devblogs.microsoft.com&lt;/a&gt;.&lt;/p&gt;
@@ -1438,7 +1438,7 @@ in Visual Studio and:
 - change the Solution Configuration dropdown to &amp;#8220;Development Editor&amp;#8221;
 - change the Solution Platform to &amp;#8220;Win64&amp;#8221;
 - right click the &lt;span class="caps"&gt;UE5&lt;/span&gt; project in the solution explorer and choose&amp;nbsp;&amp;#8220;Build&amp;#8221;.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="" src="/output/images/vsinstall_7.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="/images/vsinstall_7.png"&gt;&lt;/p&gt;
 &lt;p&gt;This will take some time to complete.  On a Ryzen 5950x 16 core machine using 
 an M.2 &lt;span class="caps"&gt;SSD&lt;/span&gt; it took 37&amp;nbsp;minutes.&lt;/p&gt;
 &lt;h4&gt;Running&amp;nbsp;Unreal&lt;/h4&gt;

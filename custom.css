@@ -1,0 +1,52 @@
+@media screen and (min-width: 768px) {
+    main article {
+        max-width: 1024px;
+    }
+}
+
+
+h2 a
+{
+    color: white;
+}
+
+h2
+{
+    margin-top: 2em;
+    margin-bottom: 0.3em;
+    font-size: 1.65em;
+    color: #8aa2d3;
+    font-weight: 500;
+}
+
+h3
+{
+    margin-top: 2em;
+    margin-bottom: 0.3em;
+    color: #8aa2d3;
+    font-size: 1.6em;
+    font-weight: 500;
+}
+
+h4
+{
+    margin-top: 1.7em;
+    margin-bottom: 0.1em;
+    color: #8aa2d3;
+    font-size: 1.1em;
+    font-weight:300;
+}
+
+/* white on red tags */
+div.tag-cloud p 
+{
+    font-weight:490;
+}
+
+/* inline ```code``` inside a para */
+
+main article :not(pre) > code {
+    color:#66d9ef;
+    background-color: #333;
+    border:none;
+}

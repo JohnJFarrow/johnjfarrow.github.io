@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://johnjfarrow.github.io/theme/stylesheet/style.min.css">
+
+    <link id="dark-theme-style" rel="stylesheet" type="text/css"
+          media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+    href="https://johnjfarrow.github.io/theme/stylesheet/dark-theme.min.css">
+
+    <link id="pygments-dark-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+          href="https://johnjfarrow.github.io/theme/pygments/monokai.min.css">
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: light)"
+          href="https://johnjfarrow.github.io/theme/pygments/emacs.min.css">
+
+
+
+  <link rel="stylesheet" type="text/css" href="https://johnjfarrow.github.io/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://johnjfarrow.github.io/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://johnjfarrow.github.io/theme/font-awesome/css/solid.css">
+
+  <link rel="stylesheet" type="text/css" href="https://johnjfarrow.github.io/custom.css">
+
+    <link href="https://johnjfarrow.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Unreal Code Atom">
+
+
+
+  
+
+
+ 
+
+<meta name="author" content="John Farrow" />
+<meta name="description" content="Notes on using Chaos Physics and C++ in Unreal Engine" />
+<meta name="keywords" content="unreal engine, chaos, physics, c++">
+
+
+  <meta property="og:site_name" content="Unreal Code"/>
+  <meta property="og:title" content="Experiments With Chaos Physics - Using C++"/>
+  <meta property="og:description" content="Notes on using Chaos Physics and C++ in Unreal Engine"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="https://johnjfarrow.github.io/experiments-with-chaos-physics-using-c.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2022-07-15 10:27:00+12:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="https://johnjfarrow.github.io/author/john-farrow.html">
+  <meta property="article:section" content="unreal"/>
+  <meta property="article:tag" content="unreal engine"/>
+  <meta property="article:tag" content="chaos"/>
+  <meta property="article:tag" content="physics"/>
+  <meta property="article:tag" content="c++"/>
+  <meta property="og:image" content="">
+
+  <title>Unreal Code &ndash; Experiments With Chaos Physics - Using C++</title>
+
+</head>
+<body >
+  <aside>
+    <div>
+      <a href="https://johnjfarrow.github.io/">
+        <img src="https://johnjfarrow.github.io/theme/img/profile.png" alt="" title="">
+      </a>
+
+      <h1>
+        <a href="https://johnjfarrow.github.io/"></a>
+      </h1>
+
+<p>Experimental Unreal Engine Code</p>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/johnjfarrow/" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/johnjfarrow" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://johnjfarrow.github.io/">Home</a>
+
+
+      <a href="https://johnjfarrow.github.io/feeds/all.atom.xml">Atom</a>
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="experiments-with-chaos-physics-using-c">Experiments With Chaos Physics - Using&nbsp;C++</h1>
+    <p>
+      Posted on July 15, 2022 in <a href="https://johnjfarrow.github.io/category/unreal.html">unreal</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>The page <a href="../physicsblueprint">PhysicsUsingBlueprints</a> describes the creation of a simple
+physics example implementing a trebuchet using&nbsp;blueprints.</p>
+<p>This page describes implementing the same thing using&nbsp;c++.</p>
+<h2>Trebuchet C++&nbsp;Class</h2>
+<p>Create the class using the Tools | New C++ Class menu option. Derive the class from the Actor
+base class and call it &#8220;Trebuchet&#8221;.  The editor will automatically prefix the 
+class name with &#8220;A&#8221; so the actual c++ class name will be&nbsp;&#8220;ATrebuchet&#8221;.</p>
+<p>Note that this will work even if the project was created as a blueprint project - 
+adding a c++ class will convert the project to a c++&nbsp;project.</p>
+<h3>ATrebuchet Header&nbsp;File</h3>
+<p>This header file looks like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#pragma once</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;CoreMinimal.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;GameFramework/Actor.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;Trebuchet.generated.h&quot;</span><span class="cp"></span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">USphereComponent</span><span class="p">;</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UPhysicsConstraintComponent</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">UCLASS</span><span class="p">()</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSICS_003_API</span><span class="w"> </span><span class="n">ATrebuchet</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">AActor</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span><span class="w"></span>
+
+<span class="k">public</span><span class="o">:</span><span class="w"> </span>
+<span class="w">    </span><span class="c1">// Sets default values for this actor&#39;s properties</span>
+<span class="w">    </span><span class="n">ATrebuchet</span><span class="p">();</span><span class="w"></span>
+
+<span class="k">protected</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Called when the game starts or when spawned</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">BeginPlay</span><span class="p">()</span><span class="w"> </span><span class="k">override</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">public</span><span class="o">:</span><span class="w"> </span>
+<span class="w">    </span><span class="c1">// Called every frame</span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">Tick</span><span class="p">(</span><span class="kt">float</span><span class="w"> </span><span class="n">DeltaTime</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleAnywhere</span><span class="p">)</span><span class="w"> </span><span class="n">UStaticMeshComponent</span><span class="o">*</span><span class="w"> </span><span class="n">Arm</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleAnywhere</span><span class="p">)</span><span class="w"> </span><span class="n">UStaticMeshComponent</span><span class="o">*</span><span class="w"> </span><span class="n">Base</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleAnywhere</span><span class="p">)</span><span class="w"> </span><span class="n">UStaticMeshComponent</span><span class="o">*</span><span class="w"> </span><span class="n">Ramp</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleAnywhere</span><span class="p">)</span><span class="w"> </span><span class="n">UStaticMeshComponent</span><span class="o">*</span><span class="w"> </span><span class="n">Weight</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleAnywhere</span><span class="p">)</span><span class="w"> </span><span class="n">USphereComponent</span><span class="o">*</span><span class="w"> </span><span class="n">Ball</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleAnywhere</span><span class="p">)</span><span class="w"> </span><span class="n">UPhysicsConstraintComponent</span><span class="o">*</span><span class="w"> </span><span class="n">ArmBaseConstraint</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleAnywhere</span><span class="p">)</span><span class="w"> </span><span class="n">UPhysicsConstraintComponent</span><span class="o">*</span><span class="w"> </span><span class="n">ArmWeightConstraint</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleAnywhere</span><span class="p">)</span><span class="w"> </span><span class="n">UPhysicsConstraintComponent</span><span class="o">*</span><span class="w"> </span><span class="n">CableConstraint</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">private</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">bConstraintBroken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre></div>
+
+<p>In addition to the generated code we have added:
+- forward declarations for USphereComponent and UPhysicsConstraintComponent classes
+- member variables to hold the static mesh components which form the body of the trebuchet
+- member variables for the physics constraints
+- a member variable to track whether the cable constraint has been broken when the projectile is&nbsp;fired</p>
+<h3>ATrebuchet <span class="caps">CPP</span>&nbsp;File</h3>
+<p>The constructor for the ATrebuchet class is shown&nbsp;here:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ATrebuchet</span><span class="o">::</span><span class="n">ATrebuchet</span><span class="p">()</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">PrimaryActorTick</span><span class="p">.</span><span class="n">bCanEverTick</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="n">ConstructorHelpers</span><span class="o">::</span><span class="n">FObjectFinder</span><span class="o">&lt;</span><span class="n">UStaticMesh</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ArmMeshAsset</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;StaticMesh&#39;/Game/Meshes/SM_Arm.SM_Arm&#39;&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="n">ConstructorHelpers</span><span class="o">::</span><span class="n">FObjectFinder</span><span class="o">&lt;</span><span class="n">UStaticMesh</span><span class="o">&gt;</span><span class="w"> </span><span class="n">BaseMeshAsset</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;StaticMesh&#39;/Game/Meshes/SM_Base.SM_Base&#39;&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="n">ConstructorHelpers</span><span class="o">::</span><span class="n">FObjectFinder</span><span class="o">&lt;</span><span class="n">UStaticMesh</span><span class="o">&gt;</span><span class="w"> </span><span class="n">RampMeshAsset</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;StaticMesh&#39;/Game/Meshes/SM_Ramp.SM_Ramp&#39;&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="k">static</span><span class="w"> </span><span class="n">ConstructorHelpers</span><span class="o">::</span><span class="n">FObjectFinder</span><span class="o">&lt;</span><span class="n">UStaticMesh</span><span class="o">&gt;</span><span class="w"> </span><span class="n">WeightMeshAsset</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;StaticMesh&#39;/Game/Meshes/SM_Weight.SM_Weight&#39;&quot;</span><span class="p">));</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">Base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="n">UStaticMeshComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;Base&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Base</span><span class="o">-&gt;</span><span class="n">SetStaticMesh</span><span class="p">(</span><span class="n">BaseMeshAsset</span><span class="p">.</span><span class="n">Object</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Base</span><span class="o">-&gt;</span><span class="n">SetMobility</span><span class="p">(</span><span class="n">EComponentMobility</span><span class="o">::</span><span class="n">Static</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Base</span><span class="o">-&gt;</span><span class="n">SetCollisionProfileName</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;BlockAll&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">RootComponent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Base</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">Ramp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="n">UStaticMeshComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;Ramp&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ramp</span><span class="o">-&gt;</span><span class="n">SetStaticMesh</span><span class="p">(</span><span class="n">RampMeshAsset</span><span class="p">.</span><span class="n">Object</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ramp</span><span class="o">-&gt;</span><span class="n">SetMobility</span><span class="p">(</span><span class="n">EComponentMobility</span><span class="o">::</span><span class="n">Static</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ramp</span><span class="o">-&gt;</span><span class="n">SetCollisionProfileName</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;BlockAll&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ramp</span><span class="o">-&gt;</span><span class="n">SetRelativeLocation</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">410.0</span><span class="p">,</span><span class="w"> </span><span class="mf">40.0</span><span class="w"> </span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ramp</span><span class="o">-&gt;</span><span class="n">AttachToComponent</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span><span class="w"> </span><span class="n">FAttachmentTransformRules</span><span class="o">::</span><span class="n">KeepRelativeTransform</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">Arm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="n">UStaticMeshComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;Arm&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Arm</span><span class="o">-&gt;</span><span class="n">SetStaticMesh</span><span class="p">(</span><span class="n">ArmMeshAsset</span><span class="p">.</span><span class="n">Object</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Arm</span><span class="o">-&gt;</span><span class="n">SetMobility</span><span class="p">(</span><span class="n">EComponentMobility</span><span class="o">::</span><span class="n">Movable</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Arm</span><span class="o">-&gt;</span><span class="n">SetRelativeLocation</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="w"> </span><span class="mf">20.000000</span><span class="p">,</span><span class="w">  </span><span class="mf">57.132445</span><span class="p">,</span><span class="w">  </span><span class="mf">694.646682</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Arm</span><span class="o">-&gt;</span><span class="n">SetRelativeRotation</span><span class="p">(</span><span class="n">FRotator</span><span class="p">(</span><span class="mf">0.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">0.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">40.000000</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Arm</span><span class="o">-&gt;</span><span class="n">SetMassOverrideInKg</span><span class="p">(</span><span class="n">NAME_None</span><span class="p">,</span><span class="w"> </span><span class="mi">505</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Arm</span><span class="o">-&gt;</span><span class="n">SetSimulatePhysics</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Arm</span><span class="o">-&gt;</span><span class="n">SetEnableGravity</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Arm</span><span class="o">-&gt;</span><span class="n">SetCollisionProfileName</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;PhysicsActor&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Arm</span><span class="o">-&gt;</span><span class="n">AttachToComponent</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span><span class="w"> </span><span class="n">FAttachmentTransformRules</span><span class="o">::</span><span class="n">KeepRelativeTransform</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">Weight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="n">UStaticMeshComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;Weight&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetStaticMesh</span><span class="p">(</span><span class="n">WeightMeshAsset</span><span class="p">.</span><span class="n">Object</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetMobility</span><span class="p">(</span><span class="n">EComponentMobility</span><span class="o">::</span><span class="n">Movable</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetRelativeLocation</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="w"> </span><span class="mf">10.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">-165.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">640.000000</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetSimulatePhysics</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetMassOverrideInKg</span><span class="p">(</span><span class="n">NAME_None</span><span class="p">,</span><span class="mi">4506</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetEnableGravity</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetCollisionProfileName</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;PhysicsActor&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Weight</span><span class="o">-&gt;</span><span class="n">AttachToComponent</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span><span class="w"> </span><span class="n">FAttachmentTransformRules</span><span class="o">::</span><span class="n">KeepRelativeTransform</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">Ball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="n">USphereComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;Ball&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ball</span><span class="o">-&gt;</span><span class="n">SetMobility</span><span class="p">(</span><span class="n">EComponentMobility</span><span class="o">::</span><span class="n">Movable</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ball</span><span class="o">-&gt;</span><span class="n">SetRelativeLocation</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="mf">0.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">190.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">140.000000</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ball</span><span class="o">-&gt;</span><span class="n">SetSimulatePhysics</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ball</span><span class="o">-&gt;</span><span class="n">SetMassOverrideInKg</span><span class="p">(</span><span class="n">NAME_None</span><span class="p">,</span><span class="mi">15</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ball</span><span class="o">-&gt;</span><span class="n">SetEnableGravity</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ball</span><span class="o">-&gt;</span><span class="n">SetCollisionProfileName</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;PhysicsActor&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ball</span><span class="o">-&gt;</span><span class="n">SetHiddenInGame</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">Ball</span><span class="o">-&gt;</span><span class="n">AttachToComponent</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span><span class="w"> </span><span class="n">FAttachmentTransformRules</span><span class="o">::</span><span class="n">KeepRelativeTransform</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="w"> </span><span class="n">UPhysicsConstraintComponent</span><span class="w"> </span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;ArmBaseConstraint&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="o">-&gt;</span><span class="n">SetRelativeLocation</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="mf">10.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">0.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">740.000000</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="o">-&gt;</span><span class="n">SetConstrainedComponents</span><span class="p">(</span><span class="w"> </span><span class="n">Base</span><span class="p">,</span><span class="w"> </span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">Arm</span><span class="p">,</span><span class="w"> </span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="o">-&gt;</span><span class="n">SetLinearXLimit</span><span class="p">(</span><span class="n">ELinearConstraintMotion</span><span class="o">::</span><span class="n">LCM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="o">-&gt;</span><span class="n">SetLinearYLimit</span><span class="p">(</span><span class="n">ELinearConstraintMotion</span><span class="o">::</span><span class="n">LCM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="o">-&gt;</span><span class="n">SetLinearZLimit</span><span class="p">(</span><span class="n">ELinearConstraintMotion</span><span class="o">::</span><span class="n">LCM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="o">-&gt;</span><span class="n">SetAngularSwing1Limit</span><span class="p">(</span><span class="n">EAngularConstraintMotion</span><span class="o">::</span><span class="n">ACM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="o">-&gt;</span><span class="n">SetAngularSwing2Limit</span><span class="p">(</span><span class="n">EAngularConstraintMotion</span><span class="o">::</span><span class="n">ACM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="o">-&gt;</span><span class="n">SetAngularTwistLimit</span><span class="p">(</span><span class="n">EAngularConstraintMotion</span><span class="o">::</span><span class="n">ACM_Free</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="o">-&gt;</span><span class="n">SetDisableCollision</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmBaseConstraint</span><span class="o">-&gt;</span><span class="n">AttachToComponent</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span><span class="w"> </span><span class="n">FAttachmentTransformRules</span><span class="o">::</span><span class="n">KeepRelativeTransform</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="w"> </span><span class="n">UPhysicsConstraintComponent</span><span class="w"> </span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;ArmWeightConstraint&quot;</span><span class="p">));;</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="o">-&gt;</span><span class="n">SetRelativeLocation</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="w"> </span><span class="mf">15.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">-168.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">883.000000</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="o">-&gt;</span><span class="n">SetConstrainedComponents</span><span class="p">(</span><span class="n">Arm</span><span class="p">,</span><span class="w"> </span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">Weight</span><span class="p">,</span><span class="w"> </span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="o">-&gt;</span><span class="n">SetLinearXLimit</span><span class="p">(</span><span class="n">ELinearConstraintMotion</span><span class="o">::</span><span class="n">LCM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="o">-&gt;</span><span class="n">SetLinearYLimit</span><span class="p">(</span><span class="n">ELinearConstraintMotion</span><span class="o">::</span><span class="n">LCM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="o">-&gt;</span><span class="n">SetLinearZLimit</span><span class="p">(</span><span class="n">ELinearConstraintMotion</span><span class="o">::</span><span class="n">LCM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="o">-&gt;</span><span class="n">SetAngularSwing1Limit</span><span class="p">(</span><span class="n">EAngularConstraintMotion</span><span class="o">::</span><span class="n">ACM_Locked</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="o">-&gt;</span><span class="n">SetAngularSwing2Limit</span><span class="p">(</span><span class="n">EAngularConstraintMotion</span><span class="o">::</span><span class="n">ACM_Locked</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="o">-&gt;</span><span class="n">SetAngularTwistLimit</span><span class="p">(</span><span class="n">EAngularConstraintMotion</span><span class="o">::</span><span class="n">ACM_Free</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="o">-&gt;</span><span class="n">SetDisableCollision</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">ArmWeightConstraint</span><span class="o">-&gt;</span><span class="n">AttachToComponent</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span><span class="w"> </span><span class="n">FAttachmentTransformRules</span><span class="o">::</span><span class="n">KeepRelativeTransform</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">CableConstraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="w"> </span><span class="n">UPhysicsConstraintComponent</span><span class="w"> </span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;CableConstraint&quot;</span><span class="p">));;</span><span class="w"></span>
+<span class="w">  </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">SetRelativeLocation</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="w"> </span><span class="mf">14.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">634.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">210.000000</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">SetConstrainedComponents</span><span class="p">(</span><span class="n">Arm</span><span class="p">,</span><span class="w"> </span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">Ball</span><span class="p">,</span><span class="w"> </span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">SetLinearXLimit</span><span class="p">(</span><span class="n">ELinearConstraintMotion</span><span class="o">::</span><span class="n">LCM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">SetLinearYLimit</span><span class="p">(</span><span class="n">ELinearConstraintMotion</span><span class="o">::</span><span class="n">LCM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">SetLinearZLimit</span><span class="p">(</span><span class="n">ELinearConstraintMotion</span><span class="o">::</span><span class="n">LCM_Locked</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">SetAngularSwing1Limit</span><span class="p">(</span><span class="n">EAngularConstraintMotion</span><span class="o">::</span><span class="n">ACM_Free</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">SetAngularSwing2Limit</span><span class="p">(</span><span class="n">EAngularConstraintMotion</span><span class="o">::</span><span class="n">ACM_Free</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">SetAngularTwistLimit</span><span class="p">(</span><span class="n">EAngularConstraintMotion</span><span class="o">::</span><span class="n">ACM_Free</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">SetDisableCollision</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">AttachToComponent</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span><span class="w"> </span><span class="n">FAttachmentTransformRules</span><span class="o">::</span><span class="n">KeepRelativeTransform</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<h4>Static Mesh&nbsp;Loading</h4>
+<p>For each static mesh we have an object to locate and load&nbsp;it:</p>
+<div class="highlight"><pre><span></span><code><span class="k">static</span><span class="w"> </span><span class="n">ConstructorHelpers</span><span class="o">::</span><span class="n">FObjectFinder</span><span class="o">&lt;</span><span class="n">UStaticMesh</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ArmMeshAsset</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;StaticMesh&#39;/Game/Meshes/SM_Arm.SM_Arm&#39;&quot;</span><span class="p">));</span><span class="w"></span>
+</code></pre></div>
+
+<p>This works for a simple example, in a larger project you would not do this because:
+- it forces the mesh assets to be loaded even if they are not in use
+- hard coding the asset path is brittle and hard to&nbsp;maintain</p>
+<p>For most of the static mesh components we set properties like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Weight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateDefaultSubobject</span><span class="o">&lt;</span><span class="n">UStaticMeshComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;Weight&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetStaticMesh</span><span class="p">(</span><span class="n">WeightMeshAsset</span><span class="p">.</span><span class="n">Object</span><span class="p">);</span><span class="w"></span>
+<span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetMobility</span><span class="p">(</span><span class="n">EComponentMobility</span><span class="o">::</span><span class="n">Movable</span><span class="p">);</span><span class="w"></span>
+<span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetRelativeLocation</span><span class="p">(</span><span class="n">FVector</span><span class="p">(</span><span class="w"> </span><span class="mf">10.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">-165.000000</span><span class="p">,</span><span class="w"> </span><span class="mf">640.000000</span><span class="p">));</span><span class="w"></span>
+<span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetSimulatePhysics</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetMassOverrideInKg</span><span class="p">(</span><span class="n">NAME_None</span><span class="p">,</span><span class="mi">4506</span><span class="p">);</span><span class="w"></span>
+<span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetEnableGravity</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
+<span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetCollisionProfileName</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;PhysicsActor&quot;</span><span class="p">));</span><span class="w"></span>
+<span class="n">Weight</span><span class="o">-&gt;</span><span class="n">AttachToComponent</span><span class="p">(</span><span class="n">Base</span><span class="p">,</span><span class="w"> </span><span class="n">FAttachmentTransformRules</span><span class="o">::</span><span class="n">KeepRelativeTransform</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<p>The location and rotation values are simply copied from the blueprint project.  This is enough to
+show physics working from&nbsp;c++.</p>
+<h3>Properties and&nbsp;Defaults</h3>
+<p>Note that more properties required setting from c++ than when using the editor.  When
+using the editor, changing the Mobility property to &#8220;Movable&#8221; also changes the 
+Collision Preset value to &#8220;PhysicsActor&#8221;.  In c++ we need to manually set both 
+properties like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetMobility</span><span class="p">(</span><span class="n">EComponentMobility</span><span class="o">::</span><span class="n">Movable</span><span class="p">);</span><span class="w"></span>
+<span class="n">Weight</span><span class="o">-&gt;</span><span class="n">SetCollisionProfileName</span><span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="s">&quot;PhysicsActor&quot;</span><span class="p">));</span><span class="w"></span>
+</code></pre></div>
+
+<p>Also note the defaults for components are different depending on how they are created. A USphere
+component has the Hidden In Game property set to false when created in the blueprint editor and
+true when created from c++, so we need to explcitly set it in&nbsp;c++:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Ball</span><span class="o">-&gt;</span><span class="n">SetHiddenInGame</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<h3>Cable Release&nbsp;Code</h3>
+<p>This image shows the blueprint which breaks the Physics Constraint once the projectile
+is travelling in the right direction and at an angle of &lt;= 45&nbsp;degrees:</p>
+<p><img alt="" src="/images/chaos_029.png"></p>
+<p>This is converted into the c++ code shown&nbsp;here:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ATrebuchet::Tick</span><span class="p">(</span><span class="kt">float</span><span class="w"> </span><span class="n">DeltaTime</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">check</span><span class="p">(</span><span class="n">Ball</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">check</span><span class="p">(</span><span class="n">CableConstraint</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">Super</span><span class="o">::</span><span class="n">Tick</span><span class="p">(</span><span class="n">DeltaTime</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">bConstraintBroken</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">FVector</span><span class="w"> </span><span class="n">Velocity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Ball</span><span class="o">-&gt;</span><span class="n">GetComponentVelocity</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// assume we firing down X axis, </span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Velocity</span><span class="p">.</span><span class="n">X</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">TrajectoryDegress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">         </span><span class="n">FMath</span><span class="o">::</span><span class="n">RadiansToDegrees</span><span class="p">(</span><span class="w"> </span><span class="n">FMath</span><span class="o">::</span><span class="n">Atan</span><span class="p">(</span><span class="n">Velocity</span><span class="p">.</span><span class="n">Z</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Velocity</span><span class="p">.</span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">TrajectoryDegress</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">45</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">CableConstraint</span><span class="o">-&gt;</span><span class="n">BreakConstraint</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="n">bConstraintBroken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://johnjfarrow.github.io/tag/unreal-engine.html">unreal engine</a>
+      <a href="https://johnjfarrow.github.io/tag/chaos.html">chaos</a>
+      <a href="https://johnjfarrow.github.io/tag/physics.html">physics</a>
+      <a href="https://johnjfarrow.github.io/tag/c.html">c++</a>
+    </p>
+  </div>
+
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2022  - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses//4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+  <span class="footer-separator">|</span>
+  Switch to the <a href="javascript:void(0)" onclick="theme.switch(`dark`)">dark</a> | <a href="javascript:void(0)" onclick="theme.switch(`light`)">light</a> | <a href="javascript:void(0)" onclick="theme.switch(`browser`)">browser</a> theme
+  <script id="dark-theme-script"
+          src="https://johnjfarrow.github.io/theme/dark-theme/dark-theme.min.js"
+          data-enable-auto-detect-theme="True"
+          data-default-theme="dark"
+          type="text/javascript">
+  </script>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses//4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l//4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Unreal Code ",
+  "url" : "https://johnjfarrow.github.io",
+  "image": "",
+  "description": ""
+}
+</script>
+
+  
+</body>
+</html>

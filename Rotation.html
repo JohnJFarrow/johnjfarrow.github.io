@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+    <link id="dark-theme-style" rel="stylesheet" type="text/css"
+          media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+    href="/theme/stylesheet/dark-theme.min.css">
+
+    <link id="pygments-dark-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+          href="/theme/pygments/monokai.min.css">
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: light)"
+          href="/theme/pygments/emacs.min.css">
+
+
+
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/solid.css">
+
+  <link rel="stylesheet" type="text/css" href="/custom.css">
+
+
+
+
+  
+
+
+ 
+
+<meta name="author" content="John Farrow" />
+<meta name="description" content="Creating a blueprint node which rotates an Actor around a pivot point" />
+<meta name="keywords" content="unreal engine, blueprint, c++, rotation">
+
+
+  <meta property="og:site_name" content="Unreal Code"/>
+  <meta property="og:title" content="Creating a Blueprint Node in C++"/>
+  <meta property="og:description" content="Creating a blueprint node which rotates an Actor around a pivot point"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="/Rotation.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2022-07-26 10:27:00+12:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="/author/john-farrow.html">
+  <meta property="article:section" content="unreal"/>
+  <meta property="article:tag" content="unreal engine"/>
+  <meta property="article:tag" content="blueprint"/>
+  <meta property="article:tag" content="c++"/>
+  <meta property="article:tag" content="rotation"/>
+  <meta property="og:image" content="">
+
+  <title>Unreal Code &ndash; Creating a Blueprint Node in C++</title>
+
+</head>
+<body >
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/theme/img/profile.png" alt="Experiments with Unreal Engine" title="Experiments with Unreal Engine">
+      </a>
+
+      <h1>
+        <a href="/">Experiments with Unreal Engine</a>
+      </h1>
+
+<p>John Farrow</p>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/johnjfarrow/" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/johnjfarrow" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">Home</a>
+
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="creating-a-blueprint-node-in-c">Creating a Blueprint Node in&nbsp;C++</h1>
+    <p>
+      Posted on July 26, 2022 in <a href="/category/unreal.html">unreal</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>This post is about creating a new Blueprint node in c++ to rotate an Actor object around
+a pivot&nbsp;point.</p>
+<p>The image below shows a mesh (called SM_Arm) that was imported into Unreal from
+a <span class="caps">FBX</span> file generated in&nbsp;Blender.</p>
+<p><img alt="" src="/images/rotn_001.png"></p>
+<p>The gizmo on the left is at the position of a socket.  The red, green and blue lines near the middle
+indicate the origin of the mesh, which is where the origin was in the Blender&nbsp;model.</p>
+<p>We create a new blueprint actor, add a Static Mesh component, and
+set the mesh to SM_Arm.  If we place this actor in the world, 
+select it in the outliner, and press E to rotate it, the rotation gizmo (which
+indicates the pivot point around which it will rotate) is 
+positioned on the origin of the SM_Arm&nbsp;mesh:</p>
+<p><img alt="" src="/images/rotn_002.png"></p>
+<h2>Manual&nbsp;Rotation</h2>
+<p>If we want to manually rotate around the socket position, we can use <span class="caps">ALT</span>-middle-mouse-click
+to temporarily move the pivot point like&nbsp;so:</p>
+<p><img alt="" src="/images/rotn_003.png"></p>
+<p>Once we have applied a rotation the pivot point will return to the original&nbsp;position.</p>
+<h2>Blueprint&nbsp;Rotation</h2>
+<h3>Header&nbsp;File</h3>
+<p>No existing single blueprint node supports rotating an actor around a specified pivot point, so as an 
+exercise I decided to write&nbsp;one.  </p>
+<p>A blueprint node can be implemented as a static function on a c++ class which is derived from
+the UBlueprintFunctionLibrary class.  To create such a node use the <code>Tools | New C++ Class</code> menu option and create a class
+derived from UBlueprintFunctionLibrary.  In this example the new class is called&nbsp;&#8220;UtilityFunctionLibrary&#8221;.</p>
+<p>Unreal will create the header and implementation files.  The header looks like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#pragma once</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;CoreMinimal.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;Kismet/BlueprintFunctionLibrary.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;UtilityFunctionLibrary.generated.h&quot;</span><span class="cp"></span>
+
+<span class="n">UCLASS</span><span class="p">()</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MYPROJECT8_API</span><span class="w"> </span><span class="n">UUtilityFunctionLibrary</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">UBlueprintFunctionLibrary</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre></div>
+
+<p>There are no methods on the new class.  We can add one like&nbsp;so:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#pragma once</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;CoreMinimal.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;Kismet/BlueprintFunctionLibrary.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;UtilityFunctionLibrary.generated.h&quot;</span><span class="cp"></span>
+
+<span class="n">UCLASS</span><span class="p">()</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MYPROJECT8_API</span><span class="w"> </span><span class="n">UUtilityFunctionLibrary</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">UBlueprintFunctionLibrary</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Utility&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">RotateActorAroundPivot</span><span class="p">(</span><span class="w"> </span>
+<span class="w">        </span><span class="n">AActor</span><span class="o">*</span><span class="w"> </span><span class="n">Actor</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">FVector</span><span class="o">&amp;</span><span class="w"> </span><span class="n">PivotLocation</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">FRotator</span><span class="o">&amp;</span><span class="w"> </span><span class="n">DeltaRotation</span><span class="w"> </span><span class="p">);</span><span class="w">    </span>
+<span class="p">};</span><span class="w"></span>
+</code></pre></div>
+
+<p>The new function RotateActorAroundPivot takes as parameters the actor object we want to rotate, the pivot point 
+we want to rotate it around, and the size of the&nbsp;rotation.</p>
+<h3><span class="caps">UFUNCTION</span>&nbsp;Declaration</h3>
+<p>There are a couple of improvements we can make to the declaration of the RotateActorAroundPivot function, which currently 
+looks like&nbsp;this:</p>
+<p><img alt="" src="/images/rotn_004.png"></p>
+<ul>
+<li>we can make the Actor parameter default to &#8220;self&#8221;, which is the actor which this blueprint is a part of, by adding <code>meta = (DefaultToSelf = "Actor")</code>
+to the <span class="caps">UFUNCTION</span>&nbsp;declaration</li>
+<li>we can make the node easier to use by making the parameters optional (so they will be replaced by default values), by making them values, not&nbsp;references.</li>
+</ul>
+<p>The updated declaration looks this&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">UFUNCTION</span><span class="p">(</span><span class="n">BlueprintCallable</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Utility&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">DefaultToSelf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Actor&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">RotateActorAroundPivot</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">AActor</span><span class="o">*</span><span class="w"> </span><span class="n">Actor</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">FVector</span><span class="w"> </span><span class="n">PivotLocation</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">FRotator</span><span class="w"> </span><span class="n">DeltaRotation</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<p>and the node now looks like&nbsp;this:</p>
+<p><img alt="" src="/images/rotn_005.png"></p>
+<h3>Implementation</h3>
+<p>The implementation of the node contains the maths operations needed to rotate the actor around the pivot&nbsp;point:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">UUtilityFunctionLibrary::RotateActorAroundPivot</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">AActor</span><span class="o">*</span><span class="w"> </span><span class="n">Actor</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">FVector</span><span class="w"> </span><span class="n">PivotLocation</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">FRotator</span><span class="w"> </span><span class="n">DeltaRotation</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Actor</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">Actor</span><span class="o">-&gt;</span><span class="n">AddActorWorldRotation</span><span class="p">(</span><span class="n">DeltaRotation</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">FVector</span><span class="w"> </span><span class="n">NewActorLocation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Actor</span><span class="o">-&gt;</span><span class="n">GetActorLocation</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">NewActorLocation</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">PivotLocation</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">NewActorLocation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">       </span><span class="n">FRotationMatrix</span><span class="p">(</span><span class="n">DeltaRotation</span><span class="p">).</span><span class="n">TransformPosition</span><span class="p">(</span><span class="n">NewActorLocation</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">NewActorLocation</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">PivotLocation</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">NewActorLocation</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">Actor</span><span class="o">-&gt;</span><span class="n">GetActorLocation</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">Actor</span><span class="o">-&gt;</span><span class="n">AddActorWorldOffset</span><span class="p">(</span><span class="n">NewActorLocation</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>This code is very substantially based on the code the editor uses to implement manual&nbsp;rotation.</p>
+<h3>Usage</h3>
+<p>This blueprint shows an example&nbsp;usage:</p>
+<p><img alt="" src="/images/rotn_006.png"></p>
+<p>Every tick&nbsp;it:</p>
+<ul>
+<li>multiplies the tick duration by a factor (the Rotation Step variable) to calculate a rotation&nbsp;amount</li>
+<li>finds the location of the named socket on the Static Mesh component of the&nbsp;actor</li>
+<li>and rotates the actor around the position of that&nbsp;socket.</li>
+</ul>
+<p>(This does not need sockets to work, the pivot location could come from&nbsp;anywhere.)</p>
+<p>If the socket name is left blank, so the socket location is (0,0,0), the mesh rotates around its origin like&nbsp;so:</p>
+<p><img alt="" src="/images/rotn_020.gif"></p>
+<p>Whereas if a socket is chosen which is on the narrow end of the arm mesh, the rotation is like&nbsp;this:</p>
+<p><img alt="" src="/images/rotn_021.gif"></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/unreal-engine.html">unreal engine</a>
+      <a href="/tag/blueprint.html">blueprint</a>
+      <a href="/tag/c.html">c++</a>
+      <a href="/tag/rotation.html">rotation</a>
+    </p>
+  </div>
+
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2022  - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses//4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+  <span class="footer-separator">|</span>
+  Switch to the <a href="javascript:void(0)" onclick="theme.switch(`dark`)">dark</a> | <a href="javascript:void(0)" onclick="theme.switch(`light`)">light</a> | <a href="javascript:void(0)" onclick="theme.switch(`browser`)">browser</a> theme
+  <script id="dark-theme-script"
+          src="/theme/dark-theme/dark-theme.min.js"
+          data-enable-auto-detect-theme="True"
+          data-default-theme="dark"
+          type="text/javascript">
+  </script>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses//4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l//4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Unreal Code ",
+  "url" : "",
+  "image": "",
+  "description": ""
+}
+</script>
+
+  
+</body>
+</html>

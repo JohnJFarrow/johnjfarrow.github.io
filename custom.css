@@ -12,28 +12,19 @@ h2 a
 
 h2
 {
-    margin-top: 1em;
-    margin-bottom: 0.3em;
-    font-size: 1.65em;
     color: #8aa2d3;
     font-weight: 500;
 }
 
 h3
 {
-    margin-top: 2em;
-    margin-bottom: 0.3em;
     color: #8aa2d3;
-    font-size: 1.6em;
     font-weight: 500;
 }
 
 h4
 {
-    margin-top: 1.7em;
-    margin-bottom: 0.1em;
     color: #8aa2d3;
-    font-size: 1.1em;
     font-weight:300;
 }
 
@@ -51,11 +42,13 @@ main article :not(pre) > code {
     border:none;
 }
 
-img {
-    text-align:center;
-}
-
 p, li {
     font-weight:lighter;
     line-height:1.5em;
+}
+
+img.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }

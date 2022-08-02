@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+    <link id="dark-theme-style" rel="stylesheet" type="text/css"
+          media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+    href="/theme/stylesheet/dark-theme.min.css">
+
+    <link id="pygments-dark-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+          href="/theme/pygments/monokai.min.css">
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: light)"
+          href="/theme/pygments/emacs.min.css">
+
+
+
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/solid.css">
+
+  <link rel="stylesheet" type="text/css" href="/custom.css">
+
+
+
+
+  
+
+
+ 
+
+<meta name="author" content="John Farrow" />
+<meta name="description" content="How to use the Sequencer in Unreal Engine to create GIF files" />
+<meta name="keywords" content="unreal engine, gif, ffmpeg">
+
+
+  <meta property="og:site_name" content="Unreal Code"/>
+  <meta property="og:title" content="Making GIF Files with Unreal Engine"/>
+  <meta property="og:description" content="How to use the Sequencer in Unreal Engine to create GIF files"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="/GIFFromUnreal.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2022-07-12 00:00:00+12:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="/author/john-farrow.html">
+  <meta property="article:section" content="unreal"/>
+  <meta property="article:tag" content="unreal engine"/>
+  <meta property="article:tag" content="gif"/>
+  <meta property="article:tag" content="ffmpeg"/>
+  <meta property="og:image" content="">
+
+  <title>Unreal Code &ndash; Making GIF Files with Unreal Engine</title>
+
+</head>
+<body >
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/theme/img/profile.png" alt="Experiments with Unreal Engine" title="Experiments with Unreal Engine">
+      </a>
+
+      <h1>
+        <a href="/">Experiments with Unreal Engine</a>
+      </h1>
+
+<p>John Farrow</p>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/johnjfarrow/" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/johnjfarrow" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">Home</a>
+
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="making-gif-files-with-unreal-engine">Making <span class="caps">GIF</span> Files with Unreal&nbsp;Engine</h1>
+    <p>
+      Posted on July 12, 2022 in <a href="/category/unreal.html">unreal</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h1>Introduction</h1>
+<p>This describes one approach to making <span class="caps">GIF</span> files from Unreal Engine.  This approach
+is used to make the <span class="caps">GIF</span> files on this&nbsp;site.  </p>
+<h3>Tools</h3>
+<p>This approach uses Sequencer and ffmpeg.  Both Sequencer and ffmpeg have many, many 
+functions and options, here we use the bare minimum required to create a <span class="caps">GIF</span>.</p>
+<p>ffmpeg can be downloaded from <a href="https://ffmpeg.org/download.html">https://ffmpeg.org/download.html</a></p>
+<h2>Recording from Unreal&nbsp;Engine</h2>
+<h3>Adding a Master&nbsp;Sequence</h3>
+<p>We will be using a master sequence, which is an object which controls a collection of shots.  For the purposes of this exercise we will have only one&nbsp;shot.</p>
+<p>Assuming you are in the Unreal editor, click on the Cinematics button and select &#8220;Add Master Sequence&#8221;
+like&nbsp;this:</p>
+<p><img alt="" src="/images/gifs_001.png"></p>
+<p>This dialog&nbsp;appears:</p>
+<p><img alt="" src="/images/gifs_002.png"></p>
+<p>Change the Number of Shots to 1 and click the &#8220;Create Master Sequence&#8221;&nbsp;button.</p>
+<p>Adding the master sequence opens the Sequencer tab like&nbsp;so:</p>
+<p><img alt="" src="/images/gifs_003.png"></p>
+<p>and adds a CineCameraActor object to the scene, visible in the Outliner&nbsp;window:</p>
+<p><img alt="" src="/images/gifs_004.png"></p>
+<p>The lightning bolt next to the actor in the outliner window indicates the camera is spawnable and so only exists in the scene
+when sequencer is&nbsp;rendering.</p>
+<h3>Aiming the&nbsp;Camera</h3>
+<p>One way of positioning the camera is to right click it in the outliner and select &#8220;Pilot CineCameraActor&#8221; and then change the view
+to point the camera at scene you want rendered in the <span class="caps">GIF</span>:</p>
+<p><img alt="" src="/images/gifs_005.png"></p>
+<p>Once the camera is pointed where you want right click the camera again and select &#8220;Stop Piloting&nbsp;CineCameraActor&#8221;.</p>
+<h3>Setting the <span class="caps">GIF</span>&nbsp;Duration</h3>
+<p>If it helps you can change the timeline from frame to seconds by clicking on the &#8220;30 fps&#8221;&nbsp;button:</p>
+<p><img alt="" src="/images/gifs_007.png"></p>
+<p>We need to do two things to change the length of the&nbsp;shot</p>
+<p>(1) In the sequencer window click the red line and drag it to the left to shorten the length of the camera&nbsp;cut:</p>
+<p><img alt="" src="/images/gifs_006.png"></p>
+<p>(2) Click the SequenceMaster button shown&nbsp;here:</p>
+<p><img alt="" src="/images/gifs_008.png"></p>
+<p>and drag the rightmost red line to change the length of the&nbsp;shot:</p>
+<p><img alt="" src="/images/gifs_009.png"></p>
+<h3>Rendering to <span class="caps">PNG</span>&nbsp;files</h3>
+<p>We want to render each frame to a separate <span class="caps">PNG</span> file which will serve as the input to&nbsp;ffmpeg.</p>
+<p>Click the render button shown&nbsp;here:</p>
+<p><img alt="" src="/images/gifs_010.png"></p>
+<p>Change the render settings to the ones shown&nbsp;here:</p>
+<p><img alt="" src="/images/gifs_011.png"></p>
+<p>Particularly we changed these values from their&nbsp;defaults:</p>
+<ul>
+<li>Image Output Format to Image&nbsp;Sequence</li>
+<li>Resolution to 1280 x&nbsp;720</li>
+<li>Filename Format to {world}_{frame}, changing the default &#8220;.&#8221; to&nbsp;&#8220;_&#8221;</li>
+<li>Overwrite Existing (In Advanced) to checked, otherwise each time you capture frames the file names will&nbsp;change</li>
+<li>Delay Before Warm Up to 1.0s, otherwise the first frame can be&nbsp;blurred</li>
+</ul>
+<p>Press the Capture Movie button.  Once capture is complete a notification popup appears and you can press &#8220;Open Capture Folder&#8221;
+to open the directory where the <span class="caps">PNG</span> files were&nbsp;generated.</p>
+<h3>Creating the <span class="caps">GIF</span> using&nbsp;ffmpeg</h3>
+<p>Assuming you have ffmpeg installed and on the path, there are two commands to run to create a <span class="caps">GIF</span> from
+the set of image files created by&nbsp;Unreal.</p>
+<p>The example Unreal level used here was called &#8220;MainMap&#8221; - this provides the basis for the file names
+created by the Capture Movie process - you will need to substitute your own map name in these&nbsp;commands.</p>
+<p>These steps&nbsp;are:</p>
+<ul>
+<li>open a command&nbsp;window</li>
+<li>change to the directory containing the image&nbsp;files</li>
+<li>run this command to create a palette from the colours used in the first <span class="caps">PNG</span> file.<br>
+<code>ffmpeg -i MainMap_0001.png -vf palettegen palette.png -y</code></li>
+<li>run this command to create the <span class="caps">GIF</span> file
+  <code>ffmpeg -framerate 24 -i Mainmap_%4d.png -i palette.png -y -filter_complex "paletteuse[v];[v]scale=720:-1" output.gif</code></li>
+</ul>
+<p>The scale value changes the quality of the <span class="caps">GIF</span>, higher values mean better quality but a larger <span class="caps">GIF</span> file.  The framerate
+specified should match the framerate used in the Render Movie Settings dialog.  The <span class="caps">GIF</span> below was recorded at 24fps and
+created by ffmpeg at 12fps so it appears to be in slow&nbsp;motion.</p>
+<p>For example with &#8220;scale=720&#8221; the <span class="caps">GIF</span> below is 18.1&nbsp;Mb:</p>
+<p><img alt="" src="/images/gifs_025.gif"></p>
+<p>Whereas with &#8220;scale=360&#8221; it is only <span class="caps">GIF</span> below was reduced to 4.5&nbsp;Mb:</p>
+<p><img alt="" src="/images/gifs_024.gif"></p>
+<p>If you place these commands into a .bat file, you will need to change the &#8220;%&#8221; character to &#8220;%%&#8221; like so:
+  <code>ffmpeg -framerate 24 -i Mainmap_%4d.png -i palette.png -y -filter_complex "paletteuse[v];[v]scale=720:-1" output.gif</code></p>
+<p>becomes</p>
+<p><code>ffmpeg -framerate 24 -i Mainmap_%%4d.png -i palette.png -y -filter_complex "paletteuse[v];[v]scale=720:-1" output.gif</code></p>
+<h3>References</h3>
+<p><a href="https://www.youtube.com/watch?v=5jHhIah8H7U">Sequencer Tutorial&nbsp;https://www.youtube.com/watch?v=5jHhIah8H7U</a></p>
+<p><a href="https://forums.unrealengine.com/t/using-the-sequencer-bad-first-frame-every-camera-change/447602/2">Sequencer Bad First Frame&nbsp;https://forums.unrealengine.com</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/unreal-engine.html">unreal engine</a>
+      <a href="/tag/gif.html">gif</a>
+      <a href="/tag/ffmpeg.html">ffmpeg</a>
+    </p>
+  </div>
+
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2022  - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses//4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+  <span class="footer-separator">|</span>
+  Switch to the <a href="javascript:void(0)" onclick="theme.switch(`dark`)">dark</a> | <a href="javascript:void(0)" onclick="theme.switch(`light`)">light</a> | <a href="javascript:void(0)" onclick="theme.switch(`browser`)">browser</a> theme
+  <script id="dark-theme-script"
+          src="/theme/dark-theme/dark-theme.min.js"
+          data-enable-auto-detect-theme="True"
+          data-default-theme="dark"
+          type="text/javascript">
+  </script>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses//4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l//4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Unreal Code ",
+  "url" : "",
+  "image": "",
+  "description": ""
+}
+</script>
+
+  
+</body>
+</html>

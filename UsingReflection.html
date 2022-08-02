@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+    <link id="dark-theme-style" rel="stylesheet" type="text/css"
+          media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+    href="/theme/stylesheet/dark-theme.min.css">
+
+    <link id="pygments-dark-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+          href="/theme/pygments/monokai.min.css">
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: light)"
+          href="/theme/pygments/emacs.min.css">
+
+
+
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/solid.css">
+
+  <link rel="stylesheet" type="text/css" href="/custom.css">
+
+
+
+
+  
+
+
+ 
+
+<meta name="author" content="John Farrow" />
+<meta name="description" content="Notes on using the Unreal Engine reflection system" />
+<meta name="keywords" content="unreal engine, reflection, c++">
+
+
+  <meta property="og:site_name" content="Unreal Code"/>
+  <meta property="og:title" content="Using Reflection in Unreal Engine"/>
+  <meta property="og:description" content="Notes on using the Unreal Engine reflection system"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="/UsingReflection.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2022-06-22 10:27:00+12:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="/author/john-farrow.html">
+  <meta property="article:section" content="unreal"/>
+  <meta property="article:tag" content="unreal engine"/>
+  <meta property="article:tag" content="reflection"/>
+  <meta property="article:tag" content="c++"/>
+  <meta property="og:image" content="">
+
+  <title>Unreal Code &ndash; Using Reflection in Unreal Engine</title>
+
+</head>
+<body >
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/theme/img/profile.png" alt="Experiments with Unreal Engine" title="Experiments with Unreal Engine">
+      </a>
+
+      <h1>
+        <a href="/">Experiments with Unreal Engine</a>
+      </h1>
+
+<p>John Farrow</p>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/johnjfarrow/" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/johnjfarrow" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">Home</a>
+
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="using-reflection-in-unreal-engine">Using Reflection in Unreal&nbsp;Engine</h1>
+    <p>
+      Posted on June 22, 2022 in <a href="/category/unreal.html">unreal</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Reflection</h2>
+<p>Reflection is the ability to inspect c++ classes and objects at runtime and gather information about 
+their data types and properties. Normally C++
+does not maintain programmer-accessible information about, say, what members a struct or
+class has.  Unreal Engine uses macros such as <span class="caps">UCLASS</span> and <span class="caps">UPROPERTY</span> to create information
+about classes, structs, methods, properties, and to make
+that information available to C++ at&nbsp;runtime.</p>
+<p>This enables a program to introspect an object and find out, for example, what properties
+that object has, what the types of those properties are, and given an instance of that object,
+what the values of those properties&nbsp;are.  </p>
+<h2>Background</h2>
+<p>The notes here were made in the course of 
+creating a plugin which checks a project configuration
+against a known-good collection of configuration settings, for 
+example to check that all the settings required for hardware 
+raytracing have their correct values, and have to options to display and change
+the current settings, as shown&nbsp;here:</p>
+<p><img alt="" src="/images/reflection_1.png"></p>
+<p>This plugin needs to:
+- identify Unreal Engine classes which are used for project settings
+- identify properties on those classes
+- retrieve the current values of those properties
+- change the current values of those&nbsp;properties </p>
+<p>The classes which Unreal Engine uses for project settings cannot be hard-coded
+because they depend on which plugins the user has loaded; so reflection
+is a good way of retrieving the required&nbsp;information.</p>
+<h2>Creating Reflection&nbsp;Data</h2>
+<p>Unreal Engine uses macros which are embedded in the c++ class declarations to 
+create reflection&nbsp;data.</p>
+<p>A class defined using the <span class="caps">UCLASS</span> macro like the one below will have reflection&nbsp;data:</p>
+<div class="highlight"><pre><span></span><code><span class="n">UCLASS</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">Engine</span><span class="p">,</span><span class="w"> </span><span class="n">defaultconfig</span><span class="p">)</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UWindowsTargetSettings</span><span class="w"> </span>
+<span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">UObject</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>The <span class="caps">UCLASS</span> macro has many parameters which control how Unreal Engine treats the class, for
+example whether it can be accessed using Blueprints.  The parameters are defined 
+in <a href="https://docs.unrealengine.com/5.0/en-US/gameplay-classes-in-unreal-engine/">https://docs.unrealengine.com</a>.  At
+runtime these parameters can be retrieved from using a c++ <span class="caps">API</span>.</p>
+<p>Other c++ objects such as enum declarations, functions and properties have corresponding
+macros (namely <span class="caps">UENUM</span>, <span class="caps">UFUNCTION</span> and <span class="caps">UPROPERTY</span>) which are used in a similar way
+as the <span class="caps">UCLASS</span>&nbsp;macro.</p>
+<h2>Accessing Reflection&nbsp;Data</h2>
+<h3>Class&nbsp;Information</h3>
+<p>The entry point for reflection data is using iterators. To iterate
+over the reflection data for all classes which are derived from UObject 
+you use&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">FThreadSafeObjectIterator</span><span class="w"> </span><span class="n">Itr</span><span class="p">(</span><span class="n">UObject</span><span class="o">::</span><span class="n">StaticClass</span><span class="p">());</span><span class="w"> </span><span class="n">Itr</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">Itr</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">UClass</span><span class="o">*</span><span class="w"> </span><span class="n">Class</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Itr</span><span class="o">-&gt;</span><span class="n">GetClass</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="p">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>To limit the search to classes which are derived from a 
+base class such as UDeveloperSettings you do&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">FThreadSafeObjectIterator</span><span class="w"> </span><span class="n">Itr</span><span class="p">(</span><span class="n">UDeveloperSettings</span><span class="o">::</span><span class="n">StaticClass</span><span class="p">());</span><span class="w"> </span><span class="n">Itr</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">Itr</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">UClass</span><span class="o">*</span><span class="w"> </span><span class="n">Class</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Itr</span><span class="o">-&gt;</span><span class="n">GetClass</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="p">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<h4>UClass</h4>
+<p>Having obtained a UClass* using an  iterator as described above, you can do various useful
+things&nbsp;including:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Action</th>
+<th style="text-align: left;">Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">check if the class is a blueprint or a c++ class</td>
+<td style="text-align: left;">Class-&gt;IsNative()</td>
+</tr>
+<tr>
+<td style="text-align: left;">retrieve the class name</td>
+<td style="text-align: left;">Class-&gt;GetName(ClassName)</td>
+</tr>
+<tr>
+<td style="text-align: left;">retrieve the config file where class settings are saved</td>
+<td style="text-align: left;">Class-&gt;ClassConfigName</td>
+</tr>
+<tr>
+<td style="text-align: left;">retrieve metadata such as the label on the <span class="caps">UI</span> settings screen</td>
+<td style="text-align: left;">Class-&gt;GetMetaDataText(&#8220;DisplayName&#8221;)</td>
+</tr>
+</tbody>
+</table>
+<h4>Properties</h4>
+<p>From a UClass* you can retrieve information about the properties, also using a iterator like&nbsp;so:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">TFieldIterator</span><span class="o">&lt;</span><span class="n">FProperty</span><span class="o">&gt;</span><span class="w"> </span><span class="n">PropIt</span><span class="p">(</span><span class="n">Class</span><span class="p">);</span><span class="w"> </span><span class="n">PropIt</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">PropIt</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">FProperty</span><span class="o">*</span><span class="w"> </span><span class="n">Property</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">PropIt</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>Similar to dealing with a property, you can call various functions on a property:
+|Action|Function|
+|:&#8212;-|:&#8212;-|
+|retrieve the property name|Property-&gt;GetName()|
+|retrieve metadata such as the label on the <span class="caps">UI</span> settings&nbsp;screen|Property-&gt;GetMetaDataText(&#8220;DisplayName&#8221;)|</p>
+<p>You can retrieve elements of the <span class="caps">UPROPERTY</span> declaration. For example given this property&nbsp;declaration:</p>
+<div class="highlight"><pre><span></span><code><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="n">EditAnywhere</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Shadows</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">ConsoleVariable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;r.Shadow.Virtual.Enable&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="n">DisplayName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Shadow Map Method&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">ToolTip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Select the primary shadow mapping method.&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EShadowMapMethod</span><span class="o">::</span><span class="n">Type</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ShadowMapMethod</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+
+<p>you can test if the property is a config property declared with <span class="caps">UPROPERTY</span>(config) like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">EPropertyFlags</span><span class="w"> </span><span class="n">Flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Property</span><span class="o">-&gt;</span><span class="n">PropertyFlags</span><span class="p">;</span><span class="w"></span>
+<span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">Flags</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">EPropertyFlags</span><span class="o">::</span><span class="n">CPF_Config</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p>and retrieve variables from the metadata like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">const</span><span class="w"> </span><span class="n">FText</span><span class="w"> </span><span class="n">DisplayName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Property</span><span class="o">-&gt;</span><span class="n">GetMetaDataText</span><span class="p">(</span><span class="s2">&quot;DisplayName&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="k">const</span><span class="w"> </span><span class="n">FText</span><span class="w"> </span><span class="n">ConsoleVariable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Property</span><span class="o">-&gt;</span><span class="n">GetMetaDataText</span><span class="p">(</span><span class="s2">&quot;ConsoleVariable&quot;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<p>The type of a property can be retrieved by either:
+- calling <code>Property-&gt;GetCPPType()</code> to return the type as a string, or
+- testing it by casting like&nbsp;so:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FEnumProperty</span><span class="o">*</span><span class="w"> </span><span class="n">EnumProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CastField</span><span class="o">&lt;</span><span class="n">FEnumProperty</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Property</span><span class="p">))</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="p">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>Looking at the Unreal Engine source code casting seems to be the preferred&nbsp;way.</p>
+<h3>Reading Property&nbsp;Values</h3>
+<p>The code examples above deal with the static reflection data for properties and classes.  They
+do not need a specific instance of a class object to access that data, it is accessed from
+static instances such as <code>UDeveloperSettings::StaticClass()</code>.</p>
+<p>To extract a property value from an actual instance of a class requires retrieving the
+memory address where that property value is stored.  Given an instance of a class
+and a property pointer retrieved as shown above, we can do this to find the 
+memory address where the property is&nbsp;stored:</p>
+<div class="highlight"><pre><span></span><code><span class="n">FProperty</span><span class="o">*</span><span class="w"> </span><span class="n">Property</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"></span>
+<span class="n">UClass</span><span class="o">*</span><span class="w"> </span><span class="n">Class</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"></span>
+<span class="k">const</span><span class="w"> </span><span class="n">uint8</span><span class="o">*</span><span class="w"> </span><span class="n">PropertyAddr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Property</span><span class="o">-&gt;</span><span class="n">ContainerPtrToValuePtr</span><span class="o">&lt;</span><span class="n">uint8</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Class</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<p>we can then cast the property pointer to its derived property class and retrieve the 
+property value using the data&nbsp;address:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FStrProperty</span><span class="o">*</span><span class="w"> </span><span class="n">StringProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CastField</span><span class="o">&lt;</span><span class="n">FStrProperty</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Property</span><span class="p">))</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">Value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">StringProperty</span><span class="o">-&gt;</span><span class="n">GetPropertyValue</span><span class="p">(</span><span class="n">PropertyAddr</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>Some types of property require more work, for instance numeric properties can be different
+types, as shown&nbsp;here:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FNumericProperty</span><span class="o">*</span><span class="w"> </span><span class="n">NumericProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CastField</span><span class="o">&lt;</span><span class="n">FNumericProperty</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Property</span><span class="p">))</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NumericProperty</span><span class="o">-&gt;</span><span class="n">IsFloatingPoint</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">Value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FString</span><span class="o">::</span><span class="n">SanitizeFloat</span><span class="p">(</span><span class="n">NumericProperty</span><span class="o">-&gt;</span><span class="n">GetFloatingPointPropertyValue</span><span class="p">(</span><span class="n">PropertyAddr</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NumericProperty</span><span class="o">-&gt;</span><span class="n">IsInteger</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">Value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FString</span><span class="o">::</span><span class="n">FromInt</span><span class="p">(</span><span class="n">NumericProperty</span><span class="o">-&gt;</span><span class="n">GetSignedIntPropertyValue</span><span class="p">(</span><span class="n">PropertyAddr</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>Enum properties have functions for getting a string representation derived
+from the enum value, like&nbsp;so:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FEnumProperty</span><span class="o">*</span><span class="w"> </span><span class="n">EnumProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CastField</span><span class="o">&lt;</span><span class="n">FEnumProperty</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Property</span><span class="p">))</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">UEnum</span><span class="o">*</span><span class="w"> </span><span class="n">EnumDef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EnumProperty</span><span class="o">-&gt;</span><span class="n">GetEnum</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">FNumericProperty</span><span class="o">*</span><span class="w"> </span><span class="n">UnderlyingProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EnumProperty</span><span class="o">-&gt;</span><span class="n">GetUnderlyingProperty</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">int32</span><span class="w"> </span><span class="n">IntValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UnderlyingProperty</span><span class="o">-&gt;</span><span class="n">GetSignedIntPropertyValue</span><span class="p">(</span><span class="n">PropertyAddr</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">Value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EnumDef</span><span class="o">-&gt;</span><span class="n">GetAuthoredNameStringByValue</span><span class="p">(</span><span class="n">IntValue</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>For an enum declared like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">enum</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">EDefaultGraphicsRHI</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">uint8</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">DefaultGraphicsRHI_Default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="n">UMETA</span><span class="p">(</span><span class="n">DisplayName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Default&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">DefaultGraphicsRHI_DX11</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">UMETA</span><span class="p">(</span><span class="n">DisplayName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DirectX 11&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">DefaultGraphicsRHI_DX12</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">UMETA</span><span class="p">(</span><span class="n">DisplayName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;DirectX 12&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">DefaultGraphicsRHI_Vulkan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="n">UMETA</span><span class="p">(</span><span class="n">DisplayName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Vulkan&quot;</span><span class="p">),</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre></div>
+
+<p>with a property value of <code>EDefaultGraphicsRHI::DefaultGraphicsRHI_DX11</code> the GetSignedIntPropertyValue() call will return 1
+and the GetAuthoredNameStringByValue(1) call will return the string&nbsp;&#8220;DefaultGraphicsRHI_DX11&#8221;.</p>
+<h3>Writing Property&nbsp;Values</h3>
+<p>The process of writing property values is much the same as reading them, firstly we need to get the address
+where the data is stored like&nbsp;so:</p>
+<div class="highlight"><pre><span></span><code><span class="n">FProperty</span><span class="o">*</span><span class="w"> </span><span class="n">Property</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"></span>
+<span class="n">UClass</span><span class="o">*</span><span class="w"> </span><span class="n">Class</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"></span>
+<span class="k">const</span><span class="w"> </span><span class="n">uint8</span><span class="o">*</span><span class="w"> </span><span class="n">PropertyAddr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Property</span><span class="o">-&gt;</span><span class="n">ContainerPtrToValuePtr</span><span class="o">&lt;</span><span class="n">uint8</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Class</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<p>Again we cast the property pointer to see what type it is and 
+set the value using the&nbsp;address:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FNumericProperty</span><span class="o">*</span><span class="w"> </span><span class="n">NumericProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CastField</span><span class="o">&lt;</span><span class="n">FNumericProperty</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Property</span><span class="p">))</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NumericProperty</span><span class="o">-&gt;</span><span class="n">IsFloatingPoint</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">NumericProperty</span><span class="o">-&gt;</span><span class="n">SetFloatingPointPropertyValue</span><span class="p">(</span><span class="n">PropertyAddr</span><span class="p">,</span><span class="w"> </span><span class="n">NewFloatValue</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>Each type of property has different methods for setting it.  For example
+setting an enum property from a string value involves calling
+GetIndexByNameString() to get the int representation of that&nbsp;string:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FEnumProperty</span><span class="o">*</span><span class="w"> </span><span class="n">EnumProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CastField</span><span class="o">&lt;</span><span class="n">FEnumProperty</span><span class="o">&gt;</span><span class="p">(</span><span class="n">Property</span><span class="p">))</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">UEnum</span><span class="o">*</span><span class="w"> </span><span class="n">EnumDef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EnumProperty</span><span class="o">-&gt;</span><span class="n">GetEnum</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">FNumericProperty</span><span class="o">*</span><span class="w"> </span><span class="n">UnderlyingNumericProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">       </span><span class="n">EnumProperty</span><span class="o">-&gt;</span><span class="n">GetUnderlyingProperty</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">int64</span><span class="w"> </span><span class="n">NewIntValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EnumDef</span><span class="w"></span>
+<span class="w">       </span><span class="o">-&gt;</span><span class="n">GetIndexByNameString</span><span class="p">(</span><span class="n">PushedValue</span><span class="p">,</span><span class="w"> </span><span class="n">EGetByNameFlags</span><span class="o">::</span><span class="n">None</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NewIntValue</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">UnderlyingNumericProperty</span><span class="o">-&gt;</span><span class="n">SetIntPropertyValue</span><span class="p">(</span><span class="n">PropertyAddr</span><span class="p">,</span><span class="w"> </span><span class="n">NewIntValue</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/unreal-engine.html">unreal engine</a>
+      <a href="/tag/reflection.html">reflection</a>
+      <a href="/tag/c.html">c++</a>
+    </p>
+  </div>
+
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2022  - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses//4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+  <span class="footer-separator">|</span>
+  Switch to the <a href="javascript:void(0)" onclick="theme.switch(`dark`)">dark</a> | <a href="javascript:void(0)" onclick="theme.switch(`light`)">light</a> | <a href="javascript:void(0)" onclick="theme.switch(`browser`)">browser</a> theme
+  <script id="dark-theme-script"
+          src="/theme/dark-theme/dark-theme.min.js"
+          data-enable-auto-detect-theme="True"
+          data-default-theme="dark"
+          type="text/javascript">
+  </script>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses//4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l//4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Unreal Code ",
+  "url" : "",
+  "image": "",
+  "description": ""
+}
+</script>
+
+  
+</body>
+</html>

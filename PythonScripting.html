@@ -112,7 +112,8 @@
 
   <div>
     <h2>Introduction</h2>
-<p>The Unreal Editor ships with python 3.9.7 embedded in it.  You do not need to install any other distribution of&nbsp;python.</p>
+<p>The Unreal Editor ships with python 3.9.7 embedded in it.  You do not need to install any other distribution of python, although 
+it could be useful if you are running an external editor like&nbsp;pycharm.</p>
 <p>The Unreal Engine 5.0 python documentation is found at <a href="https://docs.unrealengine.com/5.0/en-US/PythonAPI/">https://docs.unrealengine.com/5.0/en-<span class="caps">US</span>/PythonAPI/</a></p>
 <h2>Basics</h2>
 <p>To use python in Unreal Editor first make sure these plugins are&nbsp;enabled:</p>
@@ -139,7 +140,7 @@ and enter this&nbsp;command:</p>
 </code></pre></div>
 
 <p>to reload&nbsp;it.</p>
-<h3>Entering multple&nbsp;lines</h3>
+<h3>Entering multiple&nbsp;lines</h3>
 <p>To test multiple lines of code you can type them  in the command line by separating them with shift-enter, for example you can&nbsp;type</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">unreal</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">unreal</span><span class="o">.</span><span class="n">LayersSubsystem</span><span class="p">()</span><span class="o">.</span><span class="n">get_world</span><span class="p">())</span>
@@ -361,7 +362,7 @@ we need to object to set properties on&nbsp;it.</p>
 <span class="n">subsystem</span><span class="o">.</span><span class="n">attach_subobject</span><span class="p">(</span> <span class="n">base_handle</span><span class="p">,</span> <span class="n">sub_handle</span> <span class="p">)</span>
 </code></pre></div>
 
-<p>For a Physics Constaint Component we do&nbsp;this:</p>
+<p>For a Physics Constraint Component we do&nbsp;this:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># ArmBaseConstraint</span>
 <span class="n">sub_handle</span><span class="p">,</span> <span class="n">arm_base</span> <span class="o">=</span> <span class="n">add_subobject</span><span class="p">(</span><span class="n">subsystem</span><span class="o">=</span><span class="n">subsystem</span><span class="p">,</span> 
                                      <span class="n">blueprint</span><span class="o">=</span><span class="n">blueprint</span><span class="p">,</span> 
@@ -471,7 +472,7 @@ make those objects like&nbsp;so:</p>
 <p>The python script we have been looking at is divided up in functions both to simplify it and so 
 the functions can be called separately while testing.  The script also contains a 
 single function show below which creates the map, imports the meshes, creates
-a new bluerprint and sets up the scene so all we have to do is press&nbsp;play:</p>
+a new blueprint and sets up the scene so all we have to do is press&nbsp;play:</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">create_everything</span><span class="p">():</span>
     <span class="n">level_name</span> <span class="o">=</span> <span class="s2">&quot;/Game/Levels/NewLevel24&quot;</span>
     <span class="n">package_path</span> <span class="o">=</span> <span class="s2">&quot;/Game/Blueprints&quot;</span>
@@ -488,7 +489,7 @@ a new bluerprint and sets up the scene so all we have to do is press&nbsp;play:<
 
 <p>If we run this script like&nbsp;so:</p>
 <p><img alt="" src="/images/python_012.png"></p>
-<p>The we can see the new level with the terbuchet actor and the&nbsp;lighting:</p>
+<p>The we can see the new level with the trebuchet actor and the&nbsp;lighting:</p>
 <p><img alt="" src="/images/python_013.png"></p>
 <p>And if we press play we can see the blueprint&nbsp;working:</p>
 <p><img alt="" src="/images/python_014.gif"></p>

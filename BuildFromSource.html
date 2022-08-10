@@ -8,7 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="index, follow" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script type="text/javascript">
+  function putEmail() {
+    var domain = 'unrealcode.net';
+    var user = 'john.farrow';
+    element = document.getElementById('email');
+    element.innerHTML = user + '@' + domain;
+  }
+  </script>
+
 
     <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
 
@@ -62,7 +70,7 @@
   <title>Unreal Code &ndash; Building Unreal Engine From Source</title>
 
 </head>
-<body >
+<body onload="putEmail();" >
   <aside>
     <div>
       <a href="/">
@@ -74,8 +82,8 @@
       </h1>
 
 <p>John Farrow</p>
-
-      <ul class="social">
+      <p id="email">EMAIL</p>
+       <ul class="social">
           <li>
             <a  class="sc-github" href="https://github.com/johnjfarrow/" target="_blank">
               <i class="fab fa-github"></i>

@@ -1,0 +1,681 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+
+  <script type="text/javascript">
+  function putEmail() {
+    var domain = 'unrealcode.net';
+    var user = 'john.farrow';
+    element = document.getElementById('email');
+    element.innerHTML = user + '@' + domain;
+  }
+  </script>
+
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+    <link id="dark-theme-style" rel="stylesheet" type="text/css"
+          media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+    href="/theme/stylesheet/dark-theme.min.css">
+
+    <link id="pygments-dark-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+          href="/theme/pygments/monokai.min.css">
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: light)"
+          href="/theme/pygments/emacs.min.css">
+
+
+
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/solid.css">
+
+  <link rel="stylesheet" type="text/css" href="/custom.css">
+
+
+
+
+  
+
+
+ 
+
+<meta name="author" content="John Farrow" />
+<meta name="description" content="Looking at how the Epic Lyra example manages different game modes and handles loading assets for each game mode" />
+<meta name="keywords" content="unreal engine, lyra">
+
+
+  <meta property="og:site_name" content="Unreal Code"/>
+  <meta property="og:title" content="Looking into Lyra - Part 2"/>
+  <meta property="og:description" content="Looking at how the Epic Lyra example manages different game modes and handles loading assets for each game mode"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="/LyraPart2.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2022-08-22 00:00:00+12:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="/author/john-farrow.html">
+  <meta property="article:section" content="unreal"/>
+  <meta property="article:tag" content="unreal engine"/>
+  <meta property="article:tag" content="lyra"/>
+  <meta property="og:image" content="">
+
+  <title>Unreal Code &ndash; Looking into Lyra - Part 2</title>
+
+</head>
+<body onload="putEmail();" >
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/theme/img/profile.png" alt="Experiments with Unreal Engine" title="Experiments with Unreal Engine">
+      </a>
+
+      <h1>
+        <a href="/">Experiments with Unreal Engine</a>
+      </h1>
+
+<p>John Farrow</p>
+      <p id="email">EMAIL</p>
+       <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/johnjfarrow/" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/johnjfarrow" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">Home</a>
+
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="LyraPart2">Looking into Lyra - Part&nbsp;2</h1>
+    <p>
+      Posted on August 22, 2022 in <a href="/category/unreal.html">unreal</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>The aim of this is to examine the source code from the Lyra example provided by Epic Games
+and to try and identify and document practices and approaches for using&nbsp;c++.</p>
+<p>Here we look at use of Gameplay Tags and the Gameplay Ability System (<span class="caps">GAS</span>), and
+try and trace the use of gameplay tags from pressing a button
+to getting a response in the <span class="caps">UI</span> and in&nbsp;gameplay.</p>
+<h3>Overview of How Lyra uses the Gameplay Ability&nbsp;System</h3>
+<p>Lyra&#8217;s design supports multiple game
+modes (such as the Arena and ShooterGame) and different phases within each game mode (such as 
+warmup, play, post-game).  This adds some complexity to Lyra&#8217;s use of the Gameplay Ability&nbsp;System.</p>
+<p>This intent here is that gameplay abilties, gameplay effects, and gameplay attributes are grouped into sets, and that these
+sets can be associated with different game modes, different phases of the game, and 
+different items of equipment.  A player might gain a specific ability (i.e. have a gameplay ability become
+available to his Actor object) by stepping into a room
+or picking up weapon, and lose that ability once he leaves the room or 
+puts down the&nbsp;weapon.</p>
+<p>This approach adds complexity because the gameplay abilities cannot just be added to the classes of player and non-player
+characters; they must be created and maintained separately so that they can be dynamically added and removed as game modes, 
+locations and equipped items changes, and dynamically applied to pawns as they spawn and are&nbsp;deleted.</p>
+<p>In Lyra gameplay abilities have a lifespan which is longer than the player pawn object. 
+The gameplay abilities are owned (via the LyraAbilitySystemComponent)
+by the LyraPlayerState object.  This has a longer lifespan than the pawn object and is used to
+hold gameplay abilities and apply them to the player pawn object whenever the player pawn object&nbsp;respawns.  </p>
+<p>When the play pawn does not exist (e.g. the play might just have died, or the game might not have started)
+the gameplay abilities are owned by the player state like&nbsp;so:</p>
+<p><img alt="" src="/images/lyra_02_020.png"></p>
+<p>Once the player pawn is created, the player state and the player pawn share a reference
+to the same LyraAbilitySystemComponent like&nbsp;so:</p>
+<p><img alt="" src="/images/lyra_02_021.png"></p>
+<p>In the Lyra source code there is support for the player pawn object owning
+its own abilities (see the <code>ALyraCharacterWithAbilities</code> class) but this is not&nbsp;used.  </p>
+<p>This grouping of abilities, effects and attributes requires additonal code outside the normal
+<span class="caps">GAS</span>, but does have&nbsp;benefits:</p>
+<ul>
+<li>it makes it easier to add new game modes with new abilties using a plugins&nbsp;architecture</li>
+<li>separate game modes can be worked on by different developers at the same&nbsp;time</li>
+<li>only the subset of abilties, effects, and attributes relevant to the current game mode or 
+phase or location need to be in memory; so the game uses less memory and loads&nbsp;faster</li>
+<li>game abilities do not reference and are not referenced by input actions so they are not loaded
+into memory when not&nbsp;required</li>
+</ul>
+<h3><span class="dquo">&#8220;</span>Extension&#8221;</h3>
+<p>Lyra labels the concept of separating the player pawn object from the player state (which holds the
+available gameplay abilites) &#8220;Extension&#8221;.  The player pawn object is extended by the LyraPawnExtensionComponent&nbsp;component.  </p>
+<p>An example of  this is forwarding a request for the ability system component from the Lyra character
+to its pawn extension&nbsp;component:</p>
+<div class="highlight"><pre><span></span><code><span class="n">UAbilitySystemComponent</span><span class="o">*</span><span class="w"> </span><span class="nf">ALyraCharacter::GetAbilitySystemComponent</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">PawnExtComponent</span><span class="o">-&gt;</span><span class="n">GetLyraAbilitySystemComponent</span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<h3>About Gameplay&nbsp;Tags</h3>
+<p>Gameplay tags are strings like &#8220;Player.Weapon.Shotgun&#8221; represented by a <code>FGameplayTag</code> type:</p>
+<ul>
+<li>they are a hierarchy of any number of parts separated by&nbsp;&#8220;.&#8221;</li>
+<li><code>FGameplayTag</code> has support for comparison and matching against individual tags and collections of&nbsp;tags</li>
+<li>gameplay tags are stored in the collection class <code>FGameplayTagContainer</code> which has support for searching, matching and filtering&nbsp;tags</li>
+<li>higher parts of the hierarchy implicilty exist - meaning if you create a tag such as &#8220;Player.Weapon.Shotgun&#8221;
+then the tags &#8220;Player.Weapon&#8221; and &#8220;Player&#8221; are also&nbsp;created</li>
+<li>all tags exist in one game-specific global dictionary.  This facilitates mapping them to
+numeric types for fast&nbsp;comparison.</li>
+</ul>
+<p>Gameplay tags can be created&nbsp;by:</p>
+<ul>
+<li>creating and editing .ini files in the &#8220;GameplayTags&#8221;&nbsp;folder.</li>
+<li>manually adding or removing them in the Project Settings menu (which will add them to the chosen .ini&nbsp;file)</li>
+<li>building Data Table&nbsp;Assets</li>
+<li>adding them from c++ by calling <code>UGameplayTagsManager::Get().AddNativeGameplayTag()</code>.  The code comments for this say
+&#8220;This can only be called during engine initialization, the table needs to be locked down before&nbsp;replication&#8221;</li>
+</ul>
+<p>One important thing to note is that gameplay tags exist as a global pool accessible everywhere in the&nbsp;project.</p>
+<h4>Viewing Tags in Project&nbsp;Settings:</h4>
+<p>The project settings window shows all the tags in the project, including tags read from .ini files,
+tags read from data tables (likes the DT_AnimEffectTags shown), and tags created in&nbsp;c++:</p>
+<p><img alt="" src="/images/lyra_012.png"></p>
+<p>If you mouse over a tag in the project settings you can
+see its&nbsp;source:</p>
+<p><img alt="" src="/images/lyra_02_005.png"></p>
+<p>By clicking the drop-down arrow next to a gameplay tag you can see where it is&nbsp;used:</p>
+<p><img alt="" src="/images/lyra_015.png"></p>
+<p>Ticking the &#8220;Show Native Packages&#8221; checkbox will show if there are references from c++ code, but not the actual&nbsp;code.</p>
+<h4>Tags from&nbsp;c++</h4>
+<p>Lyra adds about 30 gameplay tags in the <code>FLyraGameplayTags::AddAllTags()</code> method like&nbsp;so:</p>
+<div class="highlight"><pre><span></span><code><span class="n">AddTag</span><span class="p">(</span><span class="n">Ability_ActivateFail_IsDead</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="s">&quot;Ability.ActivateFail.IsDead&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Ability failed to activate because its owner is dead.&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="n">AddTag</span><span class="p">(</span><span class="n">Ability_ActivateFail_Cooldown</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="s">&quot;Ability.ActivateFail.Cooldown&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Ability failed to activate because it is on cool down.&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="n">AddTag</span><span class="p">(</span><span class="n">Ability_ActivateFail_Cost</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="s">&quot;Ability.ActivateFail.Cost&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Ability failed to activate because it did not pass the cost checks.&quot;</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<h4>Tags from .ini&nbsp;files</h4>
+<p>The .ini files listed here create gameplay tags like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">[/Script/GameplayTags.GameplayTagsList]</span><span class="w"></span>
+<span class="na">GameplayTagList</span><span class="o">=</span><span class="s">(Tag=&quot;Ability.ActivateFail.MagazineFull&quot;,DevComment=&quot;&quot;)</span><span class="w"></span>
+<span class="na">GameplayTagList</span><span class="o">=</span><span class="s">(Tag=&quot;Ability.ActivateFail.NoSpareAmmo&quot;,DevComment=&quot;&quot;)</span><span class="w"></span>
+<span class="na">GameplayTagList</span><span class="o">=</span><span class="s">(Tag=&quot;Event.Movement.ADS&quot;,DevComment=&quot;&quot;)</span><span class="w"></span>
+<span class="na">GameplayTagList</span><span class="o">=</span><span class="s">(Tag=&quot;Event.Movement.Dash&quot;,DevComment=&quot;&quot;)</span><span class="w"></span>
+<span class="na">...</span><span class="w"></span>
+</code></pre></div>
+
+<p>These .ini files are used by&nbsp;Lyra.  </p>
+<ul>
+<li>Plugins\Gamesubtitles\Config\Tags\PluginTags.ini &#8212; 2 gameplay&nbsp;tags  </li>
+<li>Plugins\GameFeatures\TopDownArena\Config\Tags\TopDownArenaTags.ini &#8212; 8&nbsp;gameplaytags  </li>
+<li>Plugins\GameFeatures\ShooterCore\Config\Tags\ShooterCoreTags.ini &#8212; 60 gameplay&nbsp;tags  </li>
+</ul>
+<h4>Tags from Data&nbsp;Tables</h4>
+<p>In the project settings the property &#8220;Gameplay Tag Table List&#8221; is a list of data tables
+such as /Game/ContextEffects/DT_AnimEffectTags and /Game/ContextEffects/DT_SurfaceTypes.  These
+are data tables with the GameplayTagTableRow type and have this&nbsp;structure:</p>
+<p><img alt="" src="/images/lyra_02_006.png"></p>
+<p>Gameplay tag data tables can be maintained or generated by tools outside of Unreal.  For example 
+a file &#8220;fishing.csv&#8221; which has these&nbsp;contents:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">RowName</span>,<span class="nv">Tag</span>
+<span class="nv">StartToFish</span>,<span class="nv">AnimEffect</span>.<span class="nv">Fish</span>.<span class="nv">Start</span>
+<span class="nv">FinishFishing</span>,<span class="nv">AnimEffect</span>.<span class="nv">Fish</span>.<span class="k">End</span>
+</code></pre></div>
+
+<p>can be imported into Unreal to create gameplay tags by clicking the Import button in the content browser.  When the file changes 
+the Reimport button in the data table editor can be used to update Unreal with the&nbsp;changes.</p>
+<h3>FGameplayAbilitySpec and Activatable&nbsp;Abilities</h3>
+<p>As described in the overview above gameplay abilities are assigned to player character (and other characters)
+when they become available due to the game mode, game phase, or equipped items.  The 
+LyraAbilitySystemComponent, which is used as a component of both the part of the player character
+and the player state, maintains a list
+of available gameplay abilities.  Each gameplay ability in the list is associated
+with one gameplay tag.  This pairing of a gameplay ability and a gameplay tag is held in a
+FGameplayAbilitySpec structure.  The LyraAbilitySystemComponent has a list of these FGameplayAbilitySpec objects 
+(in the member <code>ActivatableAbilities</code>), and
+once a user action is translated to a gameplay tag, this list is searched for items
+which match that gameplay&nbsp;tag.</p>
+<h3>Associating Gameplay Tags with Gameplay&nbsp;Abilities</h3>
+<p>In order to trigger a gameplay ability when a specific gameplay tag comes from the input system it
+is necesssary to pair each gameplay abiility with a gameplay tag.
+These data table assets are used to do&nbsp;this:</p>
+<p><img alt="" src="/images/lyra_02_010.png"></p>
+<p>Looking at one of these (AbilitySet_ShooterHero), we can see it is a list of abilities and associated input tags.  This is one of the sources of the activatable activites&nbsp;list:</p>
+<p><img alt="" src="/images/lyra_02_011.png"></p>
+<p>The HeroData_ShooterGame asset is a data table based on the LyraPawnData structure.  It holds data for 
+each type of character, specifically the HeroData_ShooterGame table has a reference to the AbilitySet_ShooterHero 
+set of abilities, so when the ShooterGame mode is running the Lyra pawn will gave the
+abilities listed in the HeroData_ShooterGame&nbsp;table:</p>
+<p><img alt="" src="/images/lyra_02_012.png"></p>
+<h4>Loading activatable activites into the game&nbsp;state</h4>
+<p>When an experience finishes loading
+<code>ULyraExperienceManagerComponent::OnExperienceLoadComplete()</code> is called, which calls
+<code>ALyraPlayerState::OnExperienceLoaded()</code> and this calls <code>ALyraPlayerState::SetPawnData()</code>
+to copy the abilities to the LyraAbilitySystemComponent of the&nbsp;LyraPlayerState.</p>
+<p>Each time  the Lyra pawn is spawned these abilities will be made available to the pawn
+by setting the LyraAbilitySystemComponent of the Lyra pawn to the LyraAbilitySystemComponent
+stored in the player&nbsp;state.</p>
+<h3>How Lyra Uses Gameplay Tags for&nbsp;Input</h3>
+<h4>Input Step 1: From Hardware Inputs to Input&nbsp;Actions</h4>
+<p>Input comes from hardware devices, for example when the user presses a key or uses a&nbsp;gamepad.</p>
+<p>An <em>Input Mapping Context</em> is used to map this keystroke, mouse movements etc. from 
+the hardware input to an <em>Input Action</em>.  There are several Input Mapping Contexts
+which are used either for different physical devices, such as IMC_ShooterGame_Gamepad and IMC_ShooterGame_KBM, or
+for different game modes such as IMC_Default_Gamepad and&nbsp;IMC_ShooterGame_Gamepad:</p>
+<p><img alt="" src="/images/lyra_02_001.png"></p>
+<p>Each Input Mapping Context maps a hardware input to an action, for example in the IMC_Default_KMB pressing
+the left shift key triggers the IA_Ability_Dash input&nbsp;action:</p>
+<p><img alt="" src="/images/lyra_02_002.png"></p>
+<p>More than one Input Mapping Context can be in use at one time, for example the IMC_Default_KBM has actions for player 
+movement and looking, and the IMC_ShooterGame_KMB adds actions for checking the scoreboard
+or using additional special attacks. These additional actions from IMC_ShooterGame_KMB are only in effect when the current
+game mode is the ShooterGame; Unreal dynamically applies IMCs as the game mode&nbsp;changes.</p>
+<p>IMCs can be used dynamically to make small changes to gameplay.  For example in the gameplay ability named GA_ADS (<span class="caps">ADS</span> = Aim Down Sights) we see 
+the IMC_ADS_Speed context being added to the player when the gameplay ability starts and
+removed when the gameplay ability&nbsp;ends:</p>
+<p><img alt="" src="/images/lyra_02_003.png"></p>
+<p>This is the IMC_ADS_Speed input mapping&nbsp;context:</p>
+<p><img alt="" src="/images/lyra_02_004.png"></p>
+<p>What it does is change the sensitivity of inputs when the user is looking down the sights to make the play move more slowly. It&nbsp;demonstrates:</p>
+<ul>
+<li>how modifiers can be added to the a hardware input before it is forwarded to the input&nbsp;action</li>
+<li>the use of custom modifiers such as Lyra Aim Inversion&nbsp;Setting </li>
+</ul>
+<p>The Lyra Aim Inversion Setting is a simple c++ class with one&nbsp;function:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/** Applies an inversion of axis values based on a setting in the Lyra Shared game settings */</span><span class="w"></span>
+<span class="n">UCLASS</span><span class="p">(</span><span class="n">NotBlueprintable</span><span class="p">,</span><span class="w"> </span><span class="n">MinimalAPI</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">DisplayName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Lyra Aim Inversion Setting&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ULyraInputModifierAimInversion</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">UInputModifier</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span><span class="w"></span>
+
+<span class="k">protected</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="k">virtual</span><span class="w"> </span><span class="n">FInputActionValue</span><span class="w"> </span><span class="n">ModifyRaw_Implementation</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">UEnhancedPlayerInput</span><span class="o">*</span><span class="w"> </span><span class="n">PlayerInput</span><span class="p">,</span><span class="w"> </span><span class="n">FInputActionValue</span><span class="w"> </span><span class="n">CurrentValue</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">DeltaTime</span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ULyraLocalPlayer</span><span class="o">*</span><span class="w"> </span><span class="n">LocalPlayer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LyraInputModifiersHelpers</span><span class="o">::</span><span class="n">GetLocalPlayer</span><span class="p">(</span><span class="n">PlayerInput</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">LocalPlayer</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">CurrentValue</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">ULyraSettingsShared</span><span class="o">*</span><span class="w"> </span><span class="n">Settings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalPlayer</span><span class="o">-&gt;</span><span class="n">GetSharedSettings</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="n">ensure</span><span class="p">(</span><span class="n">Settings</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">FVector</span><span class="w"> </span><span class="n">NewValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CurrentValue</span><span class="p">.</span><span class="n">Get</span><span class="o">&lt;</span><span class="n">FVector</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Settings</span><span class="o">-&gt;</span><span class="n">GetInvertVerticalAxis</span><span class="p">())</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">NewValue</span><span class="p">.</span><span class="n">Y</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mf">-1.0f</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Settings</span><span class="o">-&gt;</span><span class="n">GetInvertHorizontalAxis</span><span class="p">())</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">NewValue</span><span class="p">.</span><span class="n">X</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mf">-1.0f</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">NewValue</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre></div>
+
+<h4>Input Step 2: From Input Actions to Gameplay&nbsp;Tags</h4>
+<p>Lyra contains a LyraInputConfig structure which holds a list of LyraInputAction items each of which 
+links an gameplay tag with an Input&nbsp;Action:</p>
+<div class="highlight"><pre><span></span><code><span class="n">USTRUCT</span><span class="p">(</span><span class="n">BlueprintType</span><span class="p">)</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">FLyraInputAction</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span><span class="w"></span>
+<span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditDefaultsOnly</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">UInputAction</span><span class="o">*</span><span class="w"> </span><span class="n">InputAction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditDefaultsOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Categories</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;InputTag&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="n">FGameplayTag</span><span class="w"> </span><span class="n">InputTag</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="n">UCLASS</span><span class="p">(</span><span class="n">BlueprintType</span><span class="p">,</span><span class="w"> </span><span class="n">Const</span><span class="p">)</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ULyraInputConfig</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">UDataAsset</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span><span class="w"></span>
+<span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">ULyraInputConfig</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FObjectInitializer</span><span class="o">&amp;</span><span class="w"> </span><span class="n">ObjectInitializer</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">UInputAction</span><span class="o">*</span><span class="w"> </span><span class="nf">FindNativeInputActionForTag</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayTag</span><span class="o">&amp;</span><span class="w"> </span><span class="n">InputTag</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">bLogNotFound</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">UInputAction</span><span class="o">*</span><span class="w"> </span><span class="nf">FindAbilityInputActionForTag</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayTag</span><span class="o">&amp;</span><span class="w"> </span><span class="n">InputTag</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">bLogNotFound</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="p">;</span><span class="w"></span>
+<span class="k">public</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// List of input actions used by the owner.  These input actions are mapped to a gameplay tag and must be manually bound.</span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditDefaultsOnly</span><span class="p">,</span><span class="w"> </span><span class="n">BlueprintReadOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">TitleProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;InputAction&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FLyraInputAction</span><span class="o">&gt;</span><span class="w"> </span><span class="n">NativeInputActions</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// List of input actions used by the owner.  These input actions are mapped to a gameplay tag and are automatically</span>
+<span class="w">    </span><span class="c1">// bound to abilities with matching input tags.</span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">EditDefaultsOnly</span><span class="p">,</span><span class="w"> </span><span class="n">BlueprintReadOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">TitleProperty</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;InputAction&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FLyraInputAction</span><span class="o">&gt;</span><span class="w"> </span><span class="n">AbilityInputActions</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre></div>
+
+<p>A single <code>ULyraInputConfig</code> contains two lists of Input Action -&gt; Gameplay Tag pairs.  Each pair
+maps one input action to one gameplay&nbsp;tag.  </p>
+<p>There are 5 instances of the <code>ULyraInputConfig</code> used in&nbsp;Lyra:</p>
+<p><img alt="" src="/images/lyra_02_007.png"></p>
+<p>Continuing with the dash action, we can look at the InputData_Hero data asset and see that the Input Action IA_Ability_Dash
+is mapped to the InputTag.Ability.Dash gameplay&nbsp;tag:</p>
+<p><img alt="" src="/images/lyra_02_008.png"></p>
+<p>The <code>ULyraPawnData</code> class is used to define a Lyra pawn.  This class has a reference to a <code>ULyraInputConfig</code>
+like&nbsp;so:</p>
+<p><img alt="" src="/images/lyra_02_009.png"></p>
+<p>There are 5 LyraPawnData assets each of which uses corresponding LyraInputConfig.  This does not mean there is a one-to-one
+correspondence - a pawn of class <code>ULyraHeroComponent</code> can call <code>AddAdditionalInputConfig()</code> to add
+additional input config&nbsp;objects.</p>
+<p>The LyraInputConfig object is used in <code>ULyraHeroComponent::InitializePlayerInput()</code>.  This includes the code&nbsp;below:</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ULyraPawnExtensionComponent</span><span class="o">*</span><span class="w"> </span><span class="n">PawnExtComp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ULyraPawnExtensionComponent</span><span class="o">::</span><span class="n">FindPawnExtensionComponent</span><span class="p">(</span><span class="n">Pawn</span><span class="p">))</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ULyraPawnData</span><span class="o">*</span><span class="w"> </span><span class="n">PawnData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PawnExtComp</span><span class="o">-&gt;</span><span class="n">GetPawnData</span><span class="o">&lt;</span><span class="n">ULyraPawnData</span><span class="o">&gt;</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ULyraInputConfig</span><span class="o">*</span><span class="w"> </span><span class="n">InputConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PawnData</span><span class="o">-&gt;</span><span class="n">InputConfig</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">const</span><span class="w"> </span><span class="n">FLyraGameplayTags</span><span class="o">&amp;</span><span class="w"> </span><span class="n">GameplayTags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FLyraGameplayTags</span><span class="o">::</span><span class="n">Get</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">            </span><span class="c1">// Register any default input configs with the settings so that they will be applied to the </span>
+<span class="w">            </span><span class="c1">// player during AddInputMappings</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FMappableConfigPair</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Pair</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">DefaultInputConfigs</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">FMappableConfigPair</span><span class="o">::</span><span class="n">ActivatePair</span><span class="p">(</span><span class="n">Pair</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">ULyraInputComponent</span><span class="o">*</span><span class="w"> </span><span class="n">LyraIC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CastChecked</span><span class="o">&lt;</span><span class="n">ULyraInputComponent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">PlayerInputComponent</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">LyraIC</span><span class="o">-&gt;</span><span class="n">AddInputMappings</span><span class="p">(</span><span class="n">InputConfig</span><span class="p">,</span><span class="w"> </span><span class="n">Subsystem</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ULyraSettingsLocal</span><span class="o">*</span><span class="w"> </span><span class="n">LocalSettings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ULyraSettingsLocal</span><span class="o">::</span><span class="n">Get</span><span class="p">())</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">LocalSettings</span><span class="o">-&gt;</span><span class="n">OnInputConfigActivated</span><span class="p">.</span><span class="n">AddUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ULyraHeroComponent</span><span class="o">::</span><span class="n">OnInputConfigActivated</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">LocalSettings</span><span class="o">-&gt;</span><span class="n">OnInputConfigDeactivated</span><span class="p">.</span><span class="n">AddUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ULyraHeroComponent</span><span class="o">::</span><span class="n">OnInputConfigDeactivated</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">uint32</span><span class="o">&gt;</span><span class="w"> </span><span class="n">BindHandles</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">LyraIC</span><span class="o">-&gt;</span><span class="n">BindAbilityActions</span><span class="p">(</span><span class="n">InputConfig</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                </span><span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">Input_AbilityInputTagPressed</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">Input_AbilityInputTagReleased</span><span class="p">,</span><span class="w"> </span><span class="cm">/*out*/</span><span class="w"> </span><span class="n">BindHandles</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">LyraIC</span><span class="o">-&gt;</span><span class="n">BindNativeAction</span><span class="p">(</span><span class="n">InputConfig</span><span class="p">,</span><span class="w"> </span><span class="n">GameplayTags</span><span class="p">.</span><span class="n">InputTag_Move</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                    </span><span class="n">ETriggerEvent</span><span class="o">::</span><span class="n">Triggered</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">Input_Move</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bLogIfNotFound=*/</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">LyraIC</span><span class="o">-&gt;</span><span class="n">BindNativeAction</span><span class="p">(</span><span class="n">InputConfig</span><span class="p">,</span><span class="w"> </span><span class="n">GameplayTags</span><span class="p">.</span><span class="n">InputTag_Look_Mouse</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                    </span><span class="n">ETriggerEvent</span><span class="o">::</span><span class="n">Triggered</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">Input_LookMouse</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bLogIfNotFound=*/</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">LyraIC</span><span class="o">-&gt;</span><span class="n">BindNativeAction</span><span class="p">(</span><span class="n">InputConfig</span><span class="p">,</span><span class="w"> </span><span class="n">GameplayTags</span><span class="p">.</span><span class="n">InputTag_Look_Stick</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                    </span><span class="n">ETriggerEvent</span><span class="o">::</span><span class="n">Triggered</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">Input_LookStick</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bLogIfNotFound=*/</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">LyraIC</span><span class="o">-&gt;</span><span class="n">BindNativeAction</span><span class="p">(</span><span class="n">InputConfig</span><span class="p">,</span><span class="w"> </span><span class="n">GameplayTags</span><span class="p">.</span><span class="n">InputTag_Crouch</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                    </span><span class="n">ETriggerEvent</span><span class="o">::</span><span class="n">Triggered</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">Input_Crouch</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bLogIfNotFound=*/</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">LyraIC</span><span class="o">-&gt;</span><span class="n">BindNativeAction</span><span class="p">(</span><span class="n">InputConfig</span><span class="p">,</span><span class="w"> </span><span class="n">GameplayTags</span><span class="p">.</span><span class="n">InputTag_AutoRun</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                    </span><span class="n">ETriggerEvent</span><span class="o">::</span><span class="n">Triggered</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">Input_AutoRun</span><span class="p">,</span><span class="w"> </span><span class="cm">/*bLogIfNotFound=*/</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>This introduces the distinction between native actions, which are implemented in c++ methods, and 
+ability actions which are implemented as gameplay ability objects.  So we can see 
+from the above code that the some actions are implemented natively and some are&nbsp;not.</p>
+<p>One odd part is the call to <code>LyraIC-&gt;AddInputMappings(InputConfig, Subsystem)</code>
+which would seem to be intended to add mappings from the InputConfig to the ULyraInputComponent LyraIC,
+but in fact the code in <code>ULyraInputComponent::AddInputMappings()</code> does not use the InputConfig
+that is passed&nbsp;in.</p>
+<p>The code in <code>ULyraHeroComponent::AddAdditionalInputConfig()</code> actually starts the binding of ability actions.
+An abbreviated version is shown&nbsp;here:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ULyraHeroComponent::AddAdditionalInputConfig</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ULyraInputConfig</span><span class="o">*</span><span class="w"> </span><span class="n">InputConfig</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">uint32</span><span class="o">&gt;</span><span class="w"> </span><span class="n">BindHandles</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">APawn</span><span class="o">*</span><span class="w"> </span><span class="n">Pawn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetPawn</span><span class="o">&lt;</span><span class="n">APawn</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">ULyraInputComponent</span><span class="o">*</span><span class="w"> </span><span class="n">LyraIC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pawn</span><span class="o">-&gt;</span><span class="n">FindComponentByClass</span><span class="o">&lt;</span><span class="n">ULyraInputComponent</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">APlayerController</span><span class="o">*</span><span class="w"> </span><span class="n">PC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetController</span><span class="o">&lt;</span><span class="n">APlayerController</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">ULocalPlayer</span><span class="o">*</span><span class="w"> </span><span class="n">LP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PC</span><span class="o">-&gt;</span><span class="n">GetLocalPlayer</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">UEnhancedInputLocalPlayerSubsystem</span><span class="o">*</span><span class="w"> </span><span class="n">Subsystem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LP</span><span class="o">-&gt;</span><span class="n">GetSubsystem</span><span class="o">&lt;</span><span class="n">UEnhancedInputLocalPlayerSubsystem</span><span class="o">&gt;</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ULyraPawnExtensionComponent</span><span class="o">*</span><span class="w"> </span><span class="n">PawnExtComp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ULyraPawnExtensionComponent</span><span class="o">::</span><span class="n">FindPawnExtensionComponent</span><span class="p">(</span><span class="n">Pawn</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">LyraIC</span><span class="o">-&gt;</span><span class="n">BindAbilityActions</span><span class="p">(</span><span class="n">InputConfig</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">Input_AbilityInputTagPressed</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                   </span><span class="o">&amp;</span><span class="n">ThisClass</span><span class="o">::</span><span class="n">Input_AbilityInputTagReleased</span><span class="p">,</span><span class="w"> </span><span class="cm">/*out*/</span><span class="w"> </span><span class="n">BindHandles</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>ULyraHeroComponent::AddAdditionalInputConfig()</code> then calls <code>LyraIC-&gt;BindAbilityActions()</code> 
+which binds the input actions to&nbsp;delegates:</p>
+<div class="highlight"><pre><span></span><code><span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">UserClass</span><span class="p">,</span><span class="w"> </span><span class="k">typename</span><span class="w"> </span><span class="nc">PressedFuncType</span><span class="p">,</span><span class="w"> </span><span class="k">typename</span><span class="w"> </span><span class="nc">ReleasedFuncType</span><span class="o">&gt;</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="n">ULyraInputComponent</span><span class="o">::</span><span class="n">BindAbilityActions</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ULyraInputConfig</span><span class="o">*</span><span class="w"> </span><span class="n">InputConfig</span><span class="p">,</span><span class="w"> </span><span class="n">UserClass</span><span class="o">*</span><span class="w"> </span><span class="n">Object</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                             </span><span class="n">PressedFuncType</span><span class="w"> </span><span class="n">PressedFunc</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                             </span><span class="n">ReleasedFuncType</span><span class="w"> </span><span class="n">ReleasedFunc</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                             </span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">uint32</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">BindHandles</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">check</span><span class="p">(</span><span class="n">InputConfig</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FLyraInputAction</span><span class="o">&amp;</span><span class="w"> </span><span class="n">Action</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">InputConfig</span><span class="o">-&gt;</span><span class="n">AbilityInputActions</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Action</span><span class="p">.</span><span class="n">InputAction</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">Action</span><span class="p">.</span><span class="n">InputTag</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PressedFunc</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">BindHandles</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">BindAction</span><span class="p">(</span><span class="n">Action</span><span class="p">.</span><span class="n">InputAction</span><span class="p">,</span><span class="w"> </span><span class="n">ETriggerEvent</span><span class="o">::</span><span class="n">Triggered</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                           </span><span class="n">PressedFunc</span><span class="p">,</span><span class="w"> </span><span class="n">Action</span><span class="p">.</span><span class="n">InputTag</span><span class="p">).</span><span class="n">GetHandle</span><span class="p">());</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="p">...</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">template</span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">UserClass</span><span class="p">,</span><span class="w"> </span><span class="k">typename</span><span class="w"> </span><span class="nc">FuncType</span><span class="o">&gt;</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="n">ULyraInputComponent</span><span class="o">::</span><span class="n">BindNativeAction</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ULyraInputConfig</span><span class="o">*</span><span class="w"> </span><span class="n">InputConfig</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayTag</span><span class="o">&amp;</span><span class="w"> </span><span class="n">InputTag</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                           </span><span class="n">ETriggerEvent</span><span class="w"> </span><span class="n">TriggerEvent</span><span class="p">,</span><span class="w"> </span><span class="n">UserClass</span><span class="o">*</span><span class="w"> </span><span class="n">Object</span><span class="p">,</span><span class="w"> </span><span class="n">FuncType</span><span class="w"> </span><span class="n">Func</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">bLogIfNotFound</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">check</span><span class="p">(</span><span class="n">InputConfig</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">UInputAction</span><span class="o">*</span><span class="w"> </span><span class="n">IA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">InputConfig</span><span class="o">-&gt;</span><span class="n">FindNativeInputActionForTag</span><span class="p">(</span><span class="n">InputTag</span><span class="p">,</span><span class="w"> </span><span class="n">bLogIfNotFound</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">BindAction</span><span class="p">(</span><span class="n">IA</span><span class="p">,</span><span class="w"> </span><span class="n">TriggerEvent</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="p">,</span><span class="w"> </span><span class="n">Func</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>The&nbsp;line </p>
+<div class="highlight"><pre><span></span><code><span class="nt">BindHandles</span><span class="p">.</span><span class="nc">Add</span><span class="o">(</span><span class="nt">BindAction</span><span class="o">(</span><span class="nt">Action</span><span class="p">.</span><span class="nc">InputAction</span><span class="o">,</span><span class="w"> </span><span class="nt">ETriggerEvent</span><span class="p">::</span><span class="nd">Triggered</span><span class="o">,</span><span class="w"> </span><span class="nt">Object</span><span class="o">,</span><span class="w"> </span><span class="nt">PressedFunc</span><span class="o">,</span><span class="w"> </span><span class="nt">Action</span><span class="p">.</span><span class="nc">InputTag</span><span class="o">)</span><span class="p">.</span><span class="nc">GetHandle</span><span class="o">());</span><span class="w"></span>
+</code></pre></div>
+
+<p>creates a transient (i.e. it only exists for the life of the function call) BindAction object which binds the&nbsp;action:</p>
+<div class="highlight"><pre><span></span><code><span class="n">template</span><span class="o">&lt;</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="n">FuncType</span><span class="p">,</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="n">UserClass</span><span class="p">,</span><span class="w"> </span><span class="n">typename</span><span class="o">...</span><span class="w"> </span><span class="n">VarTypes</span><span class="w"> </span><span class="o">&gt;</span><span class="w"></span>
+<span class="n">FEnhancedInputActionEventBinding</span><span class="o">&amp;</span><span class="w"> </span><span class="n">BindAction</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">UInputAction</span><span class="o">*</span><span class="w"> </span><span class="n">Action</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                             </span><span class="n">ETriggerEvent</span><span class="w"> </span><span class="n">TriggerEvent</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                             </span><span class="n">UserClass</span><span class="o">*</span><span class="w"> </span><span class="nb nb-Type">Object</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                             </span><span class="n">FuncType</span><span class="w"> </span><span class="n">Func</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                                             </span><span class="n">VarTypes</span><span class="o">...</span><span class="w"> </span><span class="n">Vars</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p>When this is called for the dash action, the parameters look like&nbsp;this:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Action</td>
+<td style="text-align: left;">IA_Abilty_Dash</td>
+</tr>
+<tr>
+<td style="text-align: left;">TriggerEvent</td>
+<td style="text-align: left;">ETriggerEvent::Triggered</td>
+</tr>
+<tr>
+<td style="text-align: left;">Object</td>
+<td style="text-align: left;">Lyra_Hero i.e. the player object, a LyraPawnComponent</td>
+</tr>
+<tr>
+<td style="text-align: left;">PressedFunc</td>
+<td style="text-align: left;">LyraHeroComponent::Input_AbilityInputTagPressed</td>
+</tr>
+<tr>
+<td style="text-align: left;">Action.InputTag</td>
+<td style="text-align: left;">&#8220;InputTag.Ability.Dash&#8221;</td>
+</tr>
+</tbody>
+</table>
+<h4>Input Step 3: From Gameplay Tags to Queueing a Gameplay Ability for&nbsp;Activation</h4>
+<p>When the dash action is initiated by the user and the <code>LyraHeroComponent::Input_AbilityInputTagPressed()</code> method is called, what it does is
+forward the call to the <code>ULyraAbilitySystemComponent</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ULyraHeroComponent::Input_AbilityInputTagPressed</span><span class="p">(</span><span class="n">FGameplayTag</span><span class="w"> </span><span class="n">InputTag</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">APawn</span><span class="o">*</span><span class="w"> </span><span class="n">Pawn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetPawn</span><span class="o">&lt;</span><span class="n">APawn</span><span class="o">&gt;</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ULyraPawnExtensionComponent</span><span class="o">*</span><span class="w"> </span><span class="n">PawnExtComp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ULyraPawnExtensionComponent</span><span class="o">::</span><span class="n">FindPawnExtensionComponent</span><span class="p">(</span><span class="n">Pawn</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ULyraAbilitySystemComponent</span><span class="o">*</span><span class="w"> </span><span class="n">LyraASC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PawnExtComp</span><span class="o">-&gt;</span><span class="n">GetLyraAbilitySystemComponent</span><span class="p">())</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">LyraASC</span><span class="o">-&gt;</span><span class="n">AbilityInputTagPressed</span><span class="p">(</span><span class="n">InputTag</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w">   </span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>The LyraAbilitySystemComponent component which is part of the player class holds a list of <code>FGameplayAbilitySpec</code>
+objects each of which holds (in addition to other things) a pointer to a <code>UGameplayAbility</code> object
+and a collection of one or more gameplay tags.  These are the available abilities
+configured when the pawn was&nbsp;created.</p>
+<p>The code in <code>ULyraAbilitySystemComponent::AbilityInputTagPressed()</code> scans that list 
+and it it finds a <code>FGameplayAbilitySpec</code> with a matching gameplay tag to the one associated
+with the Input Action (such as IA_Ability_Dash) it adds the handle of the <code>FGameplayAbilitySpec</code> to two collections
+of handles InputPressedSpecHandles and InputHeldSpecHandles.  It does not execute the ability, it just
+updates the list of handles of abilties which are currently&nbsp;executing.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ULyraAbilitySystemComponent::AbilityInputTagPressed</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayTag</span><span class="o">&amp;</span><span class="w"> </span><span class="n">InputTag</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">InputTag</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayAbilitySpec</span><span class="o">&amp;</span><span class="w"> </span><span class="n">AbilitySpec</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">ActivatableAbilities</span><span class="p">.</span><span class="n">Items</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">AbilitySpec</span><span class="p">.</span><span class="n">Ability</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">AbilitySpec</span><span class="p">.</span><span class="n">DynamicAbilityTags</span><span class="p">.</span><span class="n">HasTagExact</span><span class="p">(</span><span class="n">InputTag</span><span class="p">)))</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">InputPressedSpecHandles</span><span class="p">.</span><span class="n">AddUnique</span><span class="p">(</span><span class="n">AbilitySpec</span><span class="p">.</span><span class="n">Handle</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">InputHeldSpecHandles</span><span class="p">.</span><span class="n">AddUnique</span><span class="p">(</span><span class="n">AbilitySpec</span><span class="p">.</span><span class="n">Handle</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<h4>Input Step 4: Activating a Queued Gameplay&nbsp;Ability</h4>
+<p>What happens next is that the game executes the tick function for the player controller and
+these functions are&nbsp;called:</p>
+<ul>
+<li><code>APlayerController::TickActor()</code> calls</li>
+<li><code>ALyraPlayerController::PlayerTick()</code> eventually&nbsp;calls</li>
+<li><code>ULyraAbilitySystemComponent::ProcessAbilityInput()</code></li>
+</ul>
+<p>This iterates through all the <code>FGameplayAbilitySpec</code> handles added since last tick (i.e. added in step 3 above) and collects them
+into the <code>AbilitiesToActivate</code> collection:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayAbilitySpecHandle</span><span class="o">&amp;</span><span class="w"> </span><span class="n">SpecHandle</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">InputPressedSpecHandles</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">FGameplayAbilitySpec</span><span class="o">*</span><span class="w"> </span><span class="n">AbilitySpec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FindAbilitySpecFromHandle</span><span class="p">(</span><span class="n">SpecHandle</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">AbilitySpec</span><span class="o">-&gt;</span><span class="n">Ability</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">AbilitySpec</span><span class="o">-&gt;</span><span class="n">InputPressed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">AbilitySpec</span><span class="o">-&gt;</span><span class="n">IsActive</span><span class="p">())</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="c1">// Ability is active so pass along the input event.</span>
+<span class="w">                </span><span class="n">AbilitySpecInputPressed</span><span class="p">(</span><span class="o">*</span><span class="n">AbilitySpec</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="k">const</span><span class="w"> </span><span class="n">ULyraGameplayAbility</span><span class="o">*</span><span class="w"> </span><span class="n">LyraAbilityCDO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CastChecked</span><span class="o">&lt;</span><span class="n">ULyraGameplayAbility</span><span class="o">&gt;</span><span class="p">(</span><span class="n">AbilitySpec</span><span class="o">-&gt;</span><span class="n">Ability</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">LyraAbilityCDO</span><span class="o">-&gt;</span><span class="n">GetActivationPolicy</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">ELyraAbilityActivationPolicy</span><span class="o">::</span><span class="n">OnInputTriggered</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="p">{</span><span class="w"></span>
+<span class="w">                    </span><span class="n">AbilitiesToActivate</span><span class="p">.</span><span class="n">AddUnique</span><span class="p">(</span><span class="n">AbilitySpec</span><span class="o">-&gt;</span><span class="n">Handle</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>Immediately after that the abilities are&nbsp;activated:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayAbilitySpecHandle</span><span class="o">&amp;</span><span class="w"> </span><span class="n">AbilitySpecHandle</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">AbilitiesToActivate</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">TryActivateAbility</span><span class="p">(</span><span class="n">AbilitySpecHandle</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<h3>Reference</h3>
+<p><a href="https://docs.unrealengine.com/5.0/en-US/gameplay-tags-in-unreal-engine/">Epic: Gameplay Tags</a><br>
+<a href="https://docs.unrealengine.com/5.0/en-US/using-gameplay-abilities-in-unreal-engine/">Epic: UsingGas</a><br>
+<a href="https://docs.unrealengine.com/5.0/en-US/gameplay-attributes-and-gameplay-effects-for-the-gameplay-ability-system-in-unreal-engine/">Epic: <span class="caps">GAS</span> Attributes and Effects</a><br>
+<a href="https://docs.unrealengine.com/5.0/en-US/BlueprintAPI/Ability/Async/WaitGameplayEventtoActor/">Epic: <span class="caps">GAS</span></a><br>
+<a href="https://dev.epicgames.com/community/learning/tutorials/aqrD/unreal-engine-enhanced-input-binding-with-gameplay-tags-c">Epic: Games&nbsp;Input</a>  </p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/unreal-engine.html">unreal engine</a>
+      <a href="/tag/lyra.html">lyra</a>
+    </p>
+  </div>
+
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2022  - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses//4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+  <span class="footer-separator">|</span>
+  Switch to the <a href="javascript:void(0)" onclick="theme.switch(`dark`)">dark</a> | <a href="javascript:void(0)" onclick="theme.switch(`light`)">light</a> | <a href="javascript:void(0)" onclick="theme.switch(`browser`)">browser</a> theme
+  <script id="dark-theme-script"
+          src="/theme/dark-theme/dark-theme.min.js"
+          data-enable-auto-detect-theme="True"
+          data-default-theme="dark"
+          type="text/javascript">
+  </script>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses//4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l//4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Unreal Code ",
+  "url" : "",
+  "image": "",
+  "description": ""
+}
+</script>
+
+  
+</body>
+</html>

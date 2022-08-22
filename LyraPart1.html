@@ -118,12 +118,12 @@
 
 
   <div>
-    <h1>Introduction</h1>
+    <h2>Introduction</h2>
 <p>The aim of this is to examine the source code from the Lyra example provided by Epic Games
 and to try and identify and document practices and approaches for using&nbsp;c++.</p>
-<h1>Experiences</h1>
+<h2>Experiences</h2>
 <p><span class="dquo">&#8220;</span>Experience&#8221; is the term Lyra uses for game modes such as first person, top down&nbsp;etc.</p>
-<h2>Data&nbsp;Classes</h2>
+<h3>Data&nbsp;Classes</h3>
 <p>An experience is represented in code by two distinct&nbsp;classes:</p>
 <ul>
 <li><code>ULyraExperienceDefinition</code> which holds data properties and references to objects such as the Lyra pawn, actions and action&nbsp;sets</li>
@@ -134,7 +134,7 @@ the IDs (of type <code>FPrimaryAssetId</code>) of maps and experiences together 
 without loading the experience to which it refers and so without loading other
 assets used by that experience.  This means (a) it is quick to create the opening experience selection <span class="caps">UI</span>
 and (b) it avoids loading experiences and their assets when those assets may not be&nbsp;required.</p>
-<h2>Experience&nbsp;Blueprints</h2>
+<h3>Experience&nbsp;Blueprints</h3>
 <p>Experience blueprints such as B_LyraDefaultExperience extend the c++ class <code>ULyraExperienceDefinition</code>. </p>
 <p>The B_LyraDefaultExperience blueprint is data&nbsp;only:</p>
 <p><img alt="" src="/images/lyra_003.png"></p>
@@ -159,7 +159,7 @@ debugger.  This shows the&nbsp;actions:</p>
 <p><img alt="" src="/images/lyra_010.png"></p>
 <p>And this shows the action&nbsp;sets:</p>
 <p><img alt="" src="/images/lyra_011.png"></p>
-<h2>Default&nbsp;Map</h2>
+<h3>Default&nbsp;Map</h3>
 <p>When starting with the default map (/Game/System/DefaultEditorMap/L_DefaultEditorOverview),
 the level contains a blueprint (/Game/System/DefaultEditorMap/B_ExperienceList3D)
 which creates the display of possible experiences, so the user is presented with <span class="caps">UI</span> for choosing which experience they&nbsp;want:</p>
@@ -179,14 +179,13 @@ the experience&nbsp;type:</p>
 <p>The full blueprint which executes when the B_ExperienceList3D object gets the BeginPlay event is shown&nbsp;here:</p>
 <p><img alt="" src="/images/lyra_008.png"></p>
 <p>The vertical green line shows where the Async Load Primary Asset List is.  Everything to the left side of this line
-happens when the BeginPlay event is triggered, everything on the right side of the line happens asynchronously
-some time after that.  Nothing is waiting on the right side nodes because all they do is populate some <span class="caps">UI</span>&nbsp;elements.</p>
+happens when the BeginPlay event is triggered, everything on the right side of the line happens asynchronously.  Nothing is waiting on the right side nodes because all they do is populate some <span class="caps">UI</span>&nbsp;elements.</p>
 <h3>Discovery</h3>
 <p>If configured to do so, Unreal will discover any objects of type &#8220;LyraUserFacingExperienceDefinition&#8221; which are added
 to the project.  This is done using the <code>Edit | Project Settings...</code> menu option and selecting <code>Asset Manager</code>
 on the left hand side.  The screenshot below shows how the project is&nbsp;configured:</p>
 <p><img alt="" src="/images/lyra_007.png"></p>
-<h1>Starting an&nbsp;Experience</h1>
+<h3>Starting an&nbsp;Experience</h3>
 <p>In Lyra experiences equate to game modes such as the main menu, the core shooter mode, the top down arena mode&nbsp;etc.</p>
 <p>Lyra has a <code>ULyraExperienceManagerComponent</code> component which manages the 
 launching of experiences with methods such as <code>StartExperienceLoad()</code> and <code>OnExperienceFullLoadCompleted()</code></p>

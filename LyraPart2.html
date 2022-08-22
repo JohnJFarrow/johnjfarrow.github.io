@@ -48,13 +48,13 @@
  
 
 <meta name="author" content="John Farrow" />
-<meta name="description" content="Looking at how the Epic Lyra example manages different game modes and handles loading assets for each game mode" />
+<meta name="description" content="Looking at how the Epic Lyra example processes inputs and uses the Gameplay Ability System" />
 <meta name="keywords" content="unreal engine, lyra">
 
 
   <meta property="og:site_name" content="Unreal Code"/>
   <meta property="og:title" content="Looking into Lyra - Part 2"/>
-  <meta property="og:description" content="Looking at how the Epic Lyra example manages different game modes and handles loading assets for each game mode"/>
+  <meta property="og:description" content="Looking at how the Epic Lyra example processes inputs and uses the Gameplay Ability System"/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:url" content="/LyraPart2.html"/>
   <meta property="og:type" content="article"/>
@@ -128,7 +128,7 @@ to getting a response in the <span class="caps">UI</span> and in&nbsp;gameplay.<
 <p>Lyra&#8217;s design supports multiple game
 modes (such as the Arena and ShooterGame) and different phases within each game mode (such as 
 warmup, play, post-game).  This adds some complexity to Lyra&#8217;s use of the Gameplay Ability&nbsp;System.</p>
-<p>This intent here is that gameplay abilties, gameplay effects, and gameplay attributes are grouped into sets, and that these
+<p>This intent here is that gameplay abilities, gameplay effects, and gameplay attributes are grouped into sets, and that these
 sets can be associated with different game modes, different phases of the game, and 
 different items of equipment.  A player might gain a specific ability (i.e. have a gameplay ability become
 available to his Actor object) by stepping into a room
@@ -149,19 +149,19 @@ to the same LyraAbilitySystemComponent like&nbsp;so:</p>
 <p><img alt="" src="/images/lyra_02_021.png"></p>
 <p>In the Lyra source code there is support for the player pawn object owning
 its own abilities (see the <code>ALyraCharacterWithAbilities</code> class) but this is not&nbsp;used.  </p>
-<p>This grouping of abilities, effects and attributes requires additonal code outside the normal
+<p>This grouping of abilities, effects and attributes requires additional code outside the normal
 <span class="caps">GAS</span>, but does have&nbsp;benefits:</p>
 <ul>
-<li>it makes it easier to add new game modes with new abilties using a plugins&nbsp;architecture</li>
+<li>it makes it easier to add new game modes with new abilities using a plugins&nbsp;architecture</li>
 <li>separate game modes can be worked on by different developers at the same&nbsp;time</li>
-<li>only the subset of abilties, effects, and attributes relevant to the current game mode or 
+<li>only the subset of abilities, effects, and attributes relevant to the current game mode or 
 phase or location need to be in memory; so the game uses less memory and loads&nbsp;faster</li>
 <li>game abilities do not reference and are not referenced by input actions so they are not loaded
 into memory when not&nbsp;required</li>
 </ul>
 <h3><span class="dquo">&#8220;</span>Extension&#8221;</h3>
 <p>Lyra labels the concept of separating the player pawn object from the player state (which holds the
-available gameplay abilites) &#8220;Extension&#8221;.  The player pawn object is extended by the LyraPawnExtensionComponent&nbsp;component.  </p>
+available gameplay abilities) &#8220;Extension&#8221;.  The player pawn object is extended by the LyraPawnExtensionComponent&nbsp;component.  </p>
 <p>An example of  this is forwarding a request for the ability system component from the Lyra character
 to its pawn extension&nbsp;component:</p>
 <div class="highlight"><pre><span></span><code><span class="n">UAbilitySystemComponent</span><span class="o">*</span><span class="w"> </span><span class="nf">ALyraCharacter::GetAbilitySystemComponent</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="w"></span>
@@ -176,7 +176,7 @@ to its pawn extension&nbsp;component:</p>
 <li>they are a hierarchy of any number of parts separated by&nbsp;&#8220;.&#8221;</li>
 <li><code>FGameplayTag</code> has support for comparison and matching against individual tags and collections of&nbsp;tags</li>
 <li>gameplay tags are stored in the collection class <code>FGameplayTagContainer</code> which has support for searching, matching and filtering&nbsp;tags</li>
-<li>higher parts of the hierarchy implicilty exist - meaning if you create a tag such as &#8220;Player.Weapon.Shotgun&#8221;
+<li>higher parts of the hierarchy implicitly exist - meaning if you create a tag such as &#8220;Player.Weapon.Shotgun&#8221;
 then the tags &#8220;Player.Weapon&#8221; and &#8220;Player&#8221; are also&nbsp;created</li>
 <li>all tags exist in one game-specific global dictionary.  This facilitates mapping them to
 numeric types for fast&nbsp;comparison.</li>
@@ -223,7 +223,7 @@ see its&nbsp;source:</p>
 <p>These .ini files are used by&nbsp;Lyra.  </p>
 <ul>
 <li>Plugins\Gamesubtitles\Config\Tags\PluginTags.ini &#8212; 2 gameplay&nbsp;tags  </li>
-<li>Plugins\GameFeatures\TopDownArena\Config\Tags\TopDownArenaTags.ini &#8212; 8&nbsp;gameplaytags  </li>
+<li>Plugins\GameFeatures\TopDownArena\Config\Tags\TopDownArenaTags.ini &#8212; 8 gameplay&nbsp;tags  </li>
 <li>Plugins\GameFeatures\ShooterCore\Config\Tags\ShooterCoreTags.ini &#8212; 60 gameplay&nbsp;tags  </li>
 </ul>
 <h4>Tags from Data&nbsp;Tables</h4>
@@ -253,17 +253,17 @@ once a user action is translated to a gameplay tag, this list is searched for it
 which match that gameplay&nbsp;tag.</p>
 <h3>Associating Gameplay Tags with Gameplay&nbsp;Abilities</h3>
 <p>In order to trigger a gameplay ability when a specific gameplay tag comes from the input system it
-is necesssary to pair each gameplay abiility with a gameplay tag.
+is necessary to pair each gameplay ability with a gameplay tag.
 These data table assets are used to do&nbsp;this:</p>
 <p><img alt="" src="/images/lyra_02_010.png"></p>
-<p>Looking at one of these (AbilitySet_ShooterHero), we can see it is a list of abilities and associated input tags.  This is one of the sources of the activatable activites&nbsp;list:</p>
+<p>Looking at one of these (AbilitySet_ShooterHero), we can see it is a list of abilities and associated input tags.  This is one of the sources of the activatable activities&nbsp;list:</p>
 <p><img alt="" src="/images/lyra_02_011.png"></p>
 <p>The HeroData_ShooterGame asset is a data table based on the LyraPawnData structure.  It holds data for 
 each type of character, specifically the HeroData_ShooterGame table has a reference to the AbilitySet_ShooterHero 
 set of abilities, so when the ShooterGame mode is running the Lyra pawn will gave the
 abilities listed in the HeroData_ShooterGame&nbsp;table:</p>
 <p><img alt="" src="/images/lyra_02_012.png"></p>
-<h4>Loading activatable activites into the game&nbsp;state</h4>
+<h4>Loading activatable activities into the game&nbsp;state</h4>
 <p>When an experience finishes loading
 <code>ULyraExperienceManagerComponent::OnExperienceLoadComplete()</code> is called, which calls
 <code>ALyraPlayerState::OnExperienceLoaded()</code> and this calls <code>ALyraPlayerState::SetPawnData()</code>
@@ -506,7 +506,7 @@ which binds the input actions to&nbsp;delegates:</p>
 <tbody>
 <tr>
 <td style="text-align: left;">Action</td>
-<td style="text-align: left;">IA_Abilty_Dash</td>
+<td style="text-align: left;">IA_Ability_Dash</td>
 </tr>
 <tr>
 <td style="text-align: left;">TriggerEvent</td>
@@ -549,10 +549,10 @@ objects each of which holds (in addition to other things) a pointer to a <code>U
 and a collection of one or more gameplay tags.  These are the available abilities
 configured when the pawn was&nbsp;created.</p>
 <p>The code in <code>ULyraAbilitySystemComponent::AbilityInputTagPressed()</code> scans that list 
-and it it finds a <code>FGameplayAbilitySpec</code> with a matching gameplay tag to the one associated
+and if it finds a <code>FGameplayAbilitySpec</code> with a matching gameplay tag to the one associated
 with the Input Action (such as IA_Ability_Dash) it adds the handle of the <code>FGameplayAbilitySpec</code> to two collections
 of handles InputPressedSpecHandles and InputHeldSpecHandles.  It does not execute the ability, it just
-updates the list of handles of abilties which are currently&nbsp;executing.</p>
+updates the list of handles of abilities which are currently&nbsp;executing.</p>
 <div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ULyraAbilitySystemComponent::AbilityInputTagPressed</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FGameplayTag</span><span class="o">&amp;</span><span class="w"> </span><span class="n">InputTag</span><span class="p">)</span><span class="w"></span>
 <span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">InputTag</span><span class="p">.</span><span class="n">IsValid</span><span class="p">())</span><span class="w"></span>
@@ -615,7 +615,7 @@ into the <code>AbilitiesToActivate</code> collection:</p>
 
 <h3>Reference</h3>
 <p><a href="https://docs.unrealengine.com/5.0/en-US/gameplay-tags-in-unreal-engine/">Epic: Gameplay Tags</a><br>
-<a href="https://docs.unrealengine.com/5.0/en-US/using-gameplay-abilities-in-unreal-engine/">Epic: UsingGas</a><br>
+<a href="https://docs.unrealengine.com/5.0/en-US/using-gameplay-abilities-in-unreal-engine/">Epic: Using Gas</a><br>
 <a href="https://docs.unrealengine.com/5.0/en-US/gameplay-attributes-and-gameplay-effects-for-the-gameplay-ability-system-in-unreal-engine/">Epic: <span class="caps">GAS</span> Attributes and Effects</a><br>
 <a href="https://docs.unrealengine.com/5.0/en-US/BlueprintAPI/Ability/Async/WaitGameplayEventtoActor/">Epic: <span class="caps">GAS</span></a><br>
 <a href="https://dev.epicgames.com/community/learning/tutorials/aqrD/unreal-engine-enhanced-input-binding-with-gameplay-tags-c">Epic: Games&nbsp;Input</a>  </p>

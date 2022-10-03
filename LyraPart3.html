@@ -48,13 +48,13 @@
  
 
 <meta name="author" content="John Farrow" />
-<meta name="description" content="Looking at how the Epic Lyra uses delegates" />
-<meta name="keywords" content="unreal engine, lyra, delegates">
+<meta name="description" content="Looking at how the Epic uses delegates" />
+<meta name="keywords" content="unreal engine, delegates, c++">
 
 
   <meta property="og:site_name" content="Unreal Code"/>
-  <meta property="og:title" content="Looking into Lyra - Part 3"/>
-  <meta property="og:description" content="Looking at how the Epic Lyra uses delegates"/>
+  <meta property="og:title" content="Delegates in C++"/>
+  <meta property="og:description" content="Looking at how the Epic uses delegates"/>
   <meta property="og:locale" content="en_US"/>
   <meta property="og:url" content="/LyraPart3.html"/>
   <meta property="og:type" content="article"/>
@@ -63,11 +63,11 @@
   <meta property="article:author" content="/author/john-farrow.html">
   <meta property="article:section" content="unreal"/>
   <meta property="article:tag" content="unreal engine"/>
-  <meta property="article:tag" content="lyra"/>
   <meta property="article:tag" content="delegates"/>
+  <meta property="article:tag" content="c++"/>
   <meta property="og:image" content="">
 
-  <title>Unreal Code &ndash; Looking into Lyra - Part 3</title>
+  <title>Unreal Code &ndash; Delegates in C++</title>
 
 </head>
 <body onload="putEmail();" >
@@ -110,7 +110,7 @@
 <article class="single">
   <header>
       
-    <h1 id="LyraPart3">Looking into Lyra - Part&nbsp;3</h1>
+    <h1 id="LyraPart3">Delegates in&nbsp;C++</h1>
     <p>
       Posted on September 02, 2022 in <a href="/category/unreal.html">unreal</a>
 
@@ -133,12 +133,12 @@
 <div class="highlight"><pre><span></span><code><span class="n">DelegateType</span><span class="w"> </span><span class="n">TheDelegate</span><span class="p">;</span><span class="w"></span>
 </code></pre></div>
 
-<p>There are many macros like DECLARE_DELEGATE used to create different types of delegates with
+<p>There are many macros like <code>DECLARE_DELEGATE</code> and <code>DECLARE_DELEGATE_OneParam</code> used to create different types of delegates with
 different parameters.  See the references at the end of this page for more&nbsp;details.</p>
 <h3>Delegate parameters and payload&nbsp;data</h3>
 <p><em>There is a difference between the number of parameters the bound method takes and the number
 of parameters which are passed when invoking the&nbsp;delegate</em></p>
-<p>The DECLARE_DELEGATE macros such as DECLARE_DELEGATE_OneParam, DECLARE_DELEGATE_TwoParams etc. 
+<p>The delegate declaration macros such as <code>DECLARE_DELEGATE_OneParam</code>, <code>DECLARE_DELEGATE_TwoParams</code> etc. 
 refer to the number and type of parameters <em>passed when invoking the delegate</em>, not
 the number of parameters the bound method actually&nbsp;takes.</p>
 <p>For example we can define a method which takes two parameters and
@@ -212,11 +212,12 @@ to&nbsp;compile:</p>
 <span class="n">note</span><span class="p">:</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="n">trying</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">argument</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="s1">&#39;(TSharedRef&lt;FExample,ESPMode::ThreadSafe&gt;, void (__cdecl FExample::* )(float,float), double)&#39;</span><span class="w"></span>
 </code></pre></div>
 
-<p>all because the value 2.0 passed to the <code>BindSP()</code> method is a double whereas the bound method takes a float.  Changing 2.0 to 2.0f
-will fix&nbsp;this.</p>
+<p>all because the value 2.0 passed to the <code>BindSP()</code> method is a double whereas the bound method takes a float. The 
+usual implicit type conversion which allows a C++ function which takes a double to be called with a float does not
+happen when calling a delegate.  Changing the double to a float (i.e 2.0 to 2.0f) will fix&nbsp;this.</p>
 <h3>Dynamic&nbsp;Delegates</h3>
 <p>Dynamic delegates bind to a specific object by its address but bind the method to be 
-called by the name of that method instead of the address.  These a not used
+called by the name of that method instead of the address.  These are not used
  much in Lyra but are used in the engine to bind
  inputs, for example to bind a particular keystroke to a
  named method on the input component like&nbsp;so:</p>
@@ -230,7 +231,8 @@ called by the name of that method instead of the address.  These a not used
 with the reflection system to find the method by its name. They are also serializable so when they
 are used in a blueprint they get save with that&nbsp;blueprint.</p>
 <h3>Multi-cast&nbsp;delegates</h3>
-<p>A multi-cast delegate can have more than one function bound to&nbsp;it.</p>
+<p>A normal delegate can have only one function bound to it at a time.  A multi-cast delegate can have more than one function bound to it,
+so when the delegate is invoked all the functions bound to it are called, one after the&nbsp;other.</p>
 <p>The delegate type is declared using some variation of <code>DECLARE_MULTICAST_DELEGATE</code>.</p>
 <p>Individual functions are bound one at a time 
 using methods which start with &#8220;Add&#8221;, like&nbsp;this:</p>
@@ -264,7 +266,8 @@ are called in the reverse order in which they were&nbsp;added.</p>
 <p>Note that the declaration is somewhat different to other&nbsp;definitons:</p>
 <ul>
 <li>it must be a dynamic multicast&nbsp;delegate</li>
-<li>the variable names must be listed in the delegate not just the&nbsp;types </li>
+<li>the variable names must be listed in the delegate not just the types; in the above C++ code
+the delegate parameter is called &#8220;value&#8221; and is of type&nbsp;float.</li>
 <li>the name of the delegate type must start with&nbsp;&#8216;F&#8217;</li>
 </ul>
 <p>If we add these lines to&nbsp;LyraCharacter.h</p>
@@ -283,13 +286,13 @@ and see the new delegate in the list of possible&nbsp;events:</p>
 object and, at least historically, have cause problems when interacting with blueprints.  Bind them in 
 <code>BeginPlay()</code> instead.</p>
 <h4>Reference</h4>
-<p><a href="https://docs.unrealengine.com/5.0/en-US/delegates-and-lamba-functions-in-unreal-engine/">Delegates</a></p>
+<p><a href="https://docs.unrealengine.com/5.0/en-US/delegates-and-lamba-functions-in-unreal-engine/">Epic&nbsp;Delegates</a></p>
   </div>
   <div class="tag-cloud">
     <p>
       <a href="/tag/unreal-engine.html">unreal engine</a>
-      <a href="/tag/lyra.html">lyra</a>
       <a href="/tag/delegates.html">delegates</a>
+      <a href="/tag/c.html">c++</a>
     </p>
   </div>
 

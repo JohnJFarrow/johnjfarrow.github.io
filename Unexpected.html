@@ -120,6 +120,15 @@
   <div>
     <h2>Introduction</h2>
 <p>This is notes on Unreal Engine behaviour which might&nbsp;surprise.</p>
+<ol>
+<li>
+<p><a href="#internal_params">The Unreal Header Tool sometimes changes method parameter&nbsp;declarations</a></p>
+</li>
+<li>
+<p><a href="#internal_forward">The Unreal Header Tool is not satisfied by forward&nbsp;declarations</a></p>
+</li>
+</ol>
+<p id="internal_params"/>
 <h3>The Unreal Header Tool sometimes changes method parameter&nbsp;declarations</h3>
 <p>Given a class declared like&nbsp;this:</p>
 <div class="highlight"><pre><span></span><code><span class="n">USTRUCT</span><span class="p">(</span><span class="n">BlueprintType</span><span class="p">)</span><span class="w"></span>
@@ -191,6 +200,51 @@ the way <span class="caps">UHT</span> wants, i.e. using a const reference like&n
 <span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="n">OpenExpandableItemActions</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FActionContainer</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">actions</span><span class="p">);</span><span class="w"></span>
 <span class="p">};</span><span class="w"></span>
 </code></pre></div>
+
+<p id="internal_forward"/>
+<h3>The Unreal Header Tool is not satisfied by forward&nbsp;declarations</h3>
+<p>If you generate a first person game project with C++ from the Unreal Editor you create a file
+called {ProjectName}Character.h.  This contains forward declares the type <code>USkeletalMeshComponent</code>
+and then uses it like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="p">...</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">USkeletalMeshComponent</span><span class="p">;</span><span class="w"></span>
+<span class="p">...</span><span class="w"></span>
+<span class="n">UCLASS</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">Game</span><span class="p">)</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AProjectCharacter</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">ACharacter</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/** Pawn mesh: 1st person view (arms; seen only by self) */</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleDefaultsOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="o">=</span><span class="n">Mesh</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">USkeletalMeshComponent</span><span class="o">*</span><span class="w"> </span><span class="n">Mesh1P</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>This makes it look as though when <span class="caps">UHT</span> processes the <code>UPROPERTY</code> macro it uses the forward
+declaration to resolve the <code>USkeletalMeshComponent</code> type.  But it does not.  If you
+change the <code>USkeletalMeshComponent</code> type to something which does not exist such as <code>NonExistantClass</code> like&nbsp;so:</p>
+<div class="highlight"><pre><span></span><code><span class="p">...</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NonExistantClass</span><span class="p">;</span><span class="w"></span>
+<span class="p">...</span><span class="w"></span>
+<span class="n">UCLASS</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">Game</span><span class="p">)</span><span class="w"></span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AProjectCharacter</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">ACharacter</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GENERATED_BODY</span><span class="p">()</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/** Pawn mesh: 1st person view (arms; seen only by self) */</span><span class="w"></span>
+<span class="w">    </span><span class="n">UPROPERTY</span><span class="p">(</span><span class="n">VisibleDefaultsOnly</span><span class="p">,</span><span class="w"> </span><span class="n">Category</span><span class="o">=</span><span class="n">Mesh</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">NonExistantClass</span><span class="o">*</span><span class="w"> </span><span class="n">Mesh1P</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">...</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>This will not compile, it fails with this&nbsp;error:</p>
+<div class="highlight"><pre><span></span><code><span class="mf">1</span><span class="o">&gt;</span><span class="n">ProjectCharacter</span><span class="mf">.</span><span class="n">h</span><span class="p">(</span><span class="mf">28</span><span class="p">):</span><span class="w"> </span><span class="n">error</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Unrecognized</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="err">&#39;</span><span class="n">NonExistantClass</span><span class="err">&#39;</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="n">must</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">UCLASS</span><span class="p">,</span><span class="w"> </span><span class="n">USTRUCT</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                  </span><span class="n">UENUM</span><span class="p">,</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">global</span><span class="w"> </span><span class="n">delegate</span><span class="mf">.</span><span class="w"></span>
+</code></pre></div>
+
+<p>So the <span class="caps">UHT</span> must be parsing the engine and project code and maintaining a list of <span class="caps">UCLASS</span>, <span class="caps">USTRUCT</span>, <span class="caps">UENUM</span>&nbsp;types.</p>
   </div>
   <div class="tag-cloud">
     <p>

@@ -1,0 +1,514 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+
+  <script type="text/javascript">
+  function putEmail() {
+    var domain = 'unrealcode.net';
+    var user = 'john.farrow';
+    element = document.getElementById('email');
+    element.innerHTML = user + '@' + domain;
+  }
+  </script>
+
+
+    <link rel="stylesheet" type="text/css" href="/theme/stylesheet/style.min.css">
+
+    <link id="dark-theme-style" rel="stylesheet" type="text/css"
+          media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+    href="/theme/stylesheet/dark-theme.min.css">
+
+    <link id="pygments-dark-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: dark), (prefers-color-scheme: no-preference)"
+          href="/theme/pygments/monokai.min.css">
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+              media="(prefers-color-scheme: light)"
+          href="/theme/pygments/emacs.min.css">
+
+
+
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="/theme/font-awesome/css/solid.css">
+
+  <link rel="stylesheet" type="text/css" href="/custom.css">
+
+
+
+
+  
+
+
+ 
+
+<meta name="author" content="John Farrow" />
+<meta name="description" content="Using the Game Features Subsystem to extend an existing project using plugins" />
+<meta name="keywords" content="unreal engine, Lyra, StackOBot, C++">
+
+
+  <meta property="og:site_name" content="Unreal Code"/>
+  <meta property="og:title" content="Understanding the Game Features Subsystem"/>
+  <meta property="og:description" content="Using the Game Features Subsystem to extend an existing project using plugins"/>
+  <meta property="og:locale" content="en_US"/>
+  <meta property="og:url" content="/Modularity.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="article:published_time" content="2022-11-02 00:00:00+13:00"/>
+  <meta property="article:modified_time" content=""/>
+  <meta property="article:author" content="/author/john-farrow.html">
+  <meta property="article:section" content="unreal"/>
+  <meta property="article:tag" content="unreal engine"/>
+  <meta property="article:tag" content="Lyra"/>
+  <meta property="article:tag" content="StackOBot"/>
+  <meta property="article:tag" content="C++"/>
+  <meta property="og:image" content="">
+
+  <title>Unreal Code &ndash; Understanding the Game Features Subsystem</title>
+
+</head>
+<body onload="putEmail();" >
+  <aside>
+    <div>
+      <a href="/">
+        <img src="/theme/img/profile.png" alt="Experiments with Unreal Engine" title="Experiments with Unreal Engine">
+      </a>
+
+      <h1>
+        <a href="/">Experiments with Unreal Engine</a>
+      </h1>
+
+<p>John Farrow</p>
+      <p id="email">EMAIL</p>
+       <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/johnjfarrow/" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/johnjfarrow" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="/">Home</a>
+
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="GameFeaturesSubsystem">Understanding the Game Features&nbsp;Subsystem</h1>
+    <p>
+      Posted on November 02, 2022 in <a href="/category/unreal.html">unreal</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h2>Introduction</h2>
+<p>This is an attempt to understand the Unreal Game Features Subsystem.  The Game Features Subsystem is used
+in the Valley of the Ancient and Lyra examples, and in Fortnite, to distribute game assets and functions as&nbsp;plugins.</p>
+<p>Plugins can contained both code and assets. Once support for the Game Features Subsystem is in place a particular game mode or map (or anything really) can be developed and distributed as a 
+plugin and added to a game without modifying the base game.  This has a lot of benefits including flexibility in
+development and better management of which assets are in memory when.  The Lyra example uses this approach to
+deliver different game modes (such as deathmatch) as different&nbsp;plugins.</p>
+<p>The  Game Features Subsystem makes elements in the base game responsive to plugins being enabled and disabled.  For example
+when a plugin containing a specific game mode is activated the player character  gains
+access to new weapons and abilities, and when that plugin is deactivated they lose those&nbsp;abilities.</p>
+<p>The notes below&nbsp;describe:</p>
+<ul>
+<li>how to add the Game Features Subsystem to an existing project (the Stack-O-Bot example)&nbsp;and </li>
+<li>demonstrates its functionality by adding a plugin which can be dynamically enabled and&nbsp;disabled.</li>
+</ul>
+<h4>Existing&nbsp;Plugins</h4>
+<p>Unreal Engine ships with plugins which support the Game Features Subsystem.  We will be using these and adding new functionality
+to the Stack-O-Bot project using code from the Valley of the Ancient and Lyra&nbsp;projects.</p>
+<p>The <strong>GameFeatures</strong> plugin&nbsp;contains:</p>
+<ul>
+<li>UGameFeatureAction base class<ul>
+<li>UGameFeatureAction_AddCheats&nbsp;class</li>
+<li>UGameFeatureAction_AddComponents&nbsp;class</li>
+<li>UGameFeatureAction_DataRegistry - Specifies a list of Data Registries to load and initialize with this&nbsp;feature </li>
+<li>UGameFeatureAction_DataRegistrySource - Specifies a list of source assets to add to Data Registries when this feature is&nbsp;activated</li>
+</ul>
+</li>
+<li>UGameFeaturesSubsystem&nbsp;class</li>
+<li>IGameFeatureStateChangeObserver&nbsp;interface</li>
+</ul>
+<p>The <strong>ModularGameplay</strong> plugin&nbsp;contains:</p>
+<ul>
+<li>UGameFrameworkComponentManager - A manager to handle  dynamically adding components to actors, and removing components from
+ actors, as plugins are loaded and&nbsp;unloaded.</li>
+<li>UControllerComponent - an actor component used by the AController class which receives controller events such as  ReceivedPlayer,&nbsp;PlayerTick</li>
+<li>UGameStateComponent - an actor component used by the AGameStateBase class which receives GameState events such as&nbsp;HandleMatchHasStarted</li>
+</ul>
+<hr>
+<p id="top"/>
+<h3>Steps</h3>
+<p>These are the steps used to add the Game Features Subsystem to the StackOBot project (or any other project) and to demonstrate
+an working&nbsp;plugin.</p>
+<ol>
+<li><a href="#internal_create_project">Creating the&nbsp;Project</a></li>
+<li><a href="#internal_modular">Making the Project&nbsp;Modular</a></li>
+<li><a href="#internal_plugin">Creating the GameFeatureActions&nbsp;Plugin</a></li>
+<li><a href="#internal_create_test">Creating a Test&nbsp;Content</a></li>
+<li><a href="#internal_test">Testing</a></li>
+<li><a href="#internal_workings">How Does It&nbsp;Work?</a></li>
+</ol>
+<hr>
+<p id="internal_create_project"/>
+<h2>Creating the&nbsp;Project</h2>
+<p>Download the Stack-O-Bot example project using the Epic Game Launcher.  Once it is downloaded it will
+appear in the Library|Vault section of the Epic Game Launcher like&nbsp;this:</p>
+<p><img alt="" src="/images/mod_01_001.png"></p>
+<p>Create a new Stack-O-Bot project by clicking &#8220;Create Project&#8221;, name the project &#8220;StackOBot&#8221;.  Once
+the Epic Game Launcher has finished creating the project exit the&nbsp;launcher.</p>
+<p>We will be using Unreal Engine 5.1 Preview version, so in Windows Explorer find the location of the project you just created
+and right-click the StackOBot.uproject file and chose &#8220;Switch Unreal Engine version&#8221; and change the version to 5.1.  This process
+is shown&nbsp;here:</p>
+<p><img alt="" src="/images/mod_01_003.png"></p>
+<p><img alt="" src="/images/mod_01_002.png"></p>
+<p>Open the project in Unreal by double-clicking the StackOBot.uproject&nbsp;file.</p>
+<p>Depending on which Unreal versions you used, if might see a message like&nbsp;this:</p>
+<p><img alt="" src="/images/mod_01_006.png"></p>
+<p>If so, update the setting as instructed by the&nbsp;message.</p>
+<p><a href="#top">back to&nbsp;top</a></p>
+<hr>
+<p id="internal_modular"/>
+<h2>Making the Project&nbsp;Modular</h2>
+<p>Both the Valley of the Ancient and the Lyra project add classes to make the project behave in a modular way, so plugins can be created which contain content 
+such as Gameplay Abilities and Input Mapping Contexts.  These plugins can be activated to, for example, grant the player abilities which are defined in the plugin, and later deactivated to withdraw those abilities when the plugin is&nbsp;unloaded.</p>
+<p>The Valley of the Ancient and the Lyra project classes (<code>AModularPlayerController</code>, <code>AModularCharacter</code> etc.) used to do this are 
+contained in their own plugin called ModularGameplayActors.  These classes interact with the <code>UGameFrameworkComponentManager</code> allowing them to 
+add and remove components from derived classes in response to plugins being enabled or&nbsp;disabled.</p>
+<h3>GameFeatures&nbsp;Plugin</h3>
+<p>The Game Features plugin which ships with Unreal Engine has the classes shown on the bottom rows of the diagram&nbsp;below:</p>
+<p><img alt="" src="/images/GameFeatureActionsEngine.png"></p>
+<p>These classes all extend <code>UGameFeatureAction</code> to create actions which can be performed when 
+a plugin is enabled, for example UGameFeatureAction_AddComponents adds new components to specified&nbsp;classes.</p>
+<p>When the Game Features plugin is enabled and you create a new plugin and add a new actions, the list of  actions
+you can choose from comes from the classes derived from <code>UGameFeatureAction</code>, as shown&nbsp;here:</p>
+<p><img alt="" src="/images/mod_01_004.png"></p>
+<p>In the next section we will create a new plugin which adds more actions to the&nbsp;list.</p>
+<p><a href="#top">back to&nbsp;top</a></p>
+<hr>
+<p id="internal_plugin"/>
+<h2>Creating the GameFeatureActions&nbsp;Plugin</h2>
+<p>I have created a git repository for the GameFeatureActions plugin which
+contains mostly files from the Valley of the Ancient project.  These
+files, with minor modifications, are also used in the Lyra project.  The repository&nbsp;contains:</p>
+<ul>
+<li>classes for actions which can be done from a plugin, such as
+adding an Input Mapping Context,&nbsp;and</li>
+<li>classes to derive from, such as AModularCharacter, which 
+work with the Game Features Subsystem when adding new components to derived&nbsp;classes. </li>
+</ul>
+<p>I have put them in a git repository purely to make them easier to access for this learning exercise. They remain (c) Epic&nbsp;Games.</p>
+<p>This plugin contains more classes which extend <code>UGameFeatureAction</code>:</p>
+<p><img alt="" src="/images/GameFeatureActions.png"></p>
+<p>When the GameFeatureActions plugin is enabled you can see from the below image that it adds 
+more actions to the dropdown list of action&nbsp;types:</p>
+<p><img alt="" src="/images/mod_01_005.png"></p>
+<p>The process of creating the GameFeatureActions plugin&nbsp;is:</p>
+<ul>
+<li>open the StackOBot project in the Unreal&nbsp;Editor</li>
+<li>
+<p>enable these plugins (if they are not enabled then the new GameFeatureActions plugin will not&nbsp;compile):</p>
+<ul>
+<li><span class="dquo">&#8220;</span>Game&nbsp;Features&#8221; </li>
+<li><span class="dquo">&#8220;</span>Gameplay&nbsp;Abilities&#8221;</li>
+<li><span class="dquo">&#8220;</span>Modular&nbsp;Gameplay&#8221;</li>
+</ul>
+</li>
+<li>
+<p>add a C++ class which we will later delete, this is just to convert it from a blueprint project to a C++ project (use Tools -&gt; New C++ Class, 
+derived from None, any name will&nbsp;do)</p>
+</li>
+<li>
+<p>exit the Unreal&nbsp;editor</p>
+</li>
+<li>
+<p>to clone the git repository which contains the files for the GameFeatureActions plugin&nbsp;either:</p>
+<p>(1) if the StackOBot game is not contained in a git repository, then just clone the GameFeatureActions repository into the Plugins directory like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">cd</span><span class="w"> </span><span class="n">StackOBot</span><span class="err">\</span><span class="n">Plugins</span><span class="w"></span>
+<span class="n">git</span><span class="w"> </span><span class="n">clone</span><span class="w"> </span><span class="n">git</span><span class="nv">@github</span><span class="p">.</span><span class="nl">com</span><span class="p">:</span><span class="n">JohnJFarrow</span><span class="o">/</span><span class="n">GameFeatureActions</span><span class="p">.</span><span class="n">git</span><span class="w"></span>
+</code></pre></div>
+
+<p>(2) if the StackOBot game is contained in a git repository, then add the GameFeatureActions repository as a submodule like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><code><span class="n">cd</span><span class="w"> </span><span class="n">StackOBot</span><span class="err">\</span><span class="n">Plugins</span><span class="w"></span>
+<span class="n">git</span><span class="w"> </span><span class="n">submodule</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="n">git</span><span class="nv">@github</span><span class="p">.</span><span class="nl">com</span><span class="p">:</span><span class="n">JohnJFarrow</span><span class="o">/</span><span class="n">GameFeatureActions</span><span class="p">.</span><span class="n">git</span><span class="w"></span>
+</code></pre></div>
+
+</li>
+<li>
+<p>in Windows Explorer right-click the StackOBot.uproject and Generate Visual Studio project&nbsp;files</p>
+</li>
+<li>open the project in Visual Studio (by double-clicking the .sln&nbsp;file)</li>
+</ul>
+<p><a href="#top">back to&nbsp;top</a></p>
+<hr>
+<p id="internal_create_test"/>
+<h2>Creating a Test&nbsp;Plugin</h2>
+<p>Here we create a new plugin which&nbsp;contains:</p>
+<ol>
+<li>an Input Mapping Context which connects a keyboard input to an Input Action which already exists in the base StackOBot&nbsp;game</li>
+<li>a data asset containing an action which activates the new Input Mapping Context while the plugin is&nbsp;active.</li>
+</ol>
+<p>If it is not already, open the StackOBot game in the Visual Studio and build and run&nbsp;it.</p>
+<p>Create a new plugin by using Edit -&gt; Plugins, click the +Add button near the top left corner, select &#8220;Game Feature (Content Only)&#8221;
+as the type of plugin, and name it &#8220;Test&#8221;, as shown&nbsp;here:</p>
+<p><img alt="" src="/images/mod_01_007.png"></p>
+<p><em>Do not change the path of the plugin, it needs to be in a directory under&nbsp;&#8220;Plugins\GameFeatures&#8221;</em></p>
+<p>Press the &#8220;Create Plugin&#8221; button to create the&nbsp;plugin.</p>
+<p>The plugin editor window should appear like&nbsp;this:</p>
+<p><img alt="" src="/images/mod_01_008.png"></p>
+<p><em>Press the save button now.  With the 5.1 Preview build it is easy to close the editor without saving this&nbsp;asset</em></p>
+<p>Without closing the Test data asset window, go back to the content browser and locate the new plugin, it should look something like&nbsp;this:</p>
+<p><img alt="" src="/images/mod_01_009.png"></p>
+<p>Right click in the content area and select Input -&gt; Input Mapping Context to create a new Input Mapping Context
+<em>in the plugin</em>, name it &#8220;IMC_Test&#8221;.  The content browser should now look like&nbsp;this:</p>
+<p><img alt="" src="/images/mod_01_010.png"></p>
+<p>Edit IMC_Test and add an input mapping so the IA_Jump action is performed when then user presses the &#8220;U&#8221; key.  It should look
+like&nbsp;this:</p>
+<p><img alt="" src="/images/mod_01_011.png"></p>
+<p>Save and close the input&nbsp;mapping.</p>
+<p>Go back to the Test data asset window&nbsp;and </p>
+<ol>
+<li>add an action which will activate the IMC_Test Input Mapping Context when the plugin 
+is&nbsp;activated</li>
+<li>change the Current State property to&nbsp;&#8220;Loaded&#8221;</li>
+</ol>
+<p>It should now look like&nbsp;this:</p>
+<p><img alt="" src="/images/mod_01_012.png"></p>
+<p>Save the Test data&nbsp;asset.</p>
+<p><a href="#top">back to&nbsp;top</a></p>
+<hr>
+<p id="internal_test"/>
+<h2>Testing</h2>
+<p>To test if this works drag the Test data asset window to the right of the main editor window like&nbsp;this:</p>
+<p><img alt="" src="/images/mod_01_013.png"></p>
+<p>You then be able to press Play in the editor and move the robot around.  The spacebar will
+make the robot jump but the &#8220;U&#8221; key will&nbsp;not.</p>
+<p>Alt-Tab to the Test data asset window and change the &#8220;Current State&#8221; property
+from whatever it is to &#8220;Active&#8221;.  This will load the plugin and activate the IMC_Test Input Mapping&nbsp;Context.</p>
+<p>Alt-Tab back to the editor window, the robot should now jump when you press the &#8220;U&#8221;&nbsp;key.</p>
+<p>This shows that the plugin has loaded and the &#8220;Add Input Mapping&#8221; action has been executed to activate the IMC_Test Input Mapping&nbsp;Context.</p>
+<p>Similarly if you change the &#8220;Current State&#8221; property from &#8220;Active&#8221; back to &#8220;Loaded&#8221; the &#8220;U&#8221; key will no longer make the robot&nbsp;jump.</p>
+<p><a href="#top">back to&nbsp;top</a></p>
+<p id="internal_workings"/>
+<h2>How Does It&nbsp;Work?</h2>
+<p>Broadly speaking this is what happens when processing an action to add an Input Mapping Context from a&nbsp;plugin:</p>
+<ul>
+<li>
+<p><code>UGameFeaturePluginStateMachine::UpdateStateMachine()</code> is called by the engine when any plugin is changed to&nbsp;enabled</p>
+</li>
+<li>
+<p><code>UGameFeaturePluginStateMachine::UpdateStateMachine()</code> calls <code>UGameFeaturesSubsystem::OnGameFeatureActivating()</code></p>
+</li>
+<li>
+<p><code>UGameFeaturesSubsystem::OnGameFeatureActivating</code> calls <code>UGameFeatureAction_AddInputContextMapping::OnGameFeatureActivating()</code></p>
+</li>
+</ul>
+<p>The UGameFeaturesSubsystem in the engine knows about our UGameFeatureAction_AddInputContextMapping because it 
+maintains a list of&nbsp;plugins:</p>
+<div class="highlight"><pre><span></span><code><span class="n">TMap</span><span class="o">&lt;</span><span class="n">FGameFeaturePluginIdentifier</span><span class="p">,</span><span class="w"> </span><span class="n">TObjectPtr</span><span class="o">&lt;</span><span class="n">UGameFeaturePluginStateMachine</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">GameFeaturePluginStateMachines</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+
+<p>from which it can retrieve the&nbsp;actions:</p>
+<div class="highlight"><pre><span></span><code><span class="n">UGameFeaturePluginStateMachine</span><span class="o">*</span><span class="w"> </span><span class="n">UGameFeaturesSubsystem</span><span class="p">::</span><span class="n">FindOrCreateGameFeaturePluginStateMachine</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FString</span><span class="o">&amp;</span><span class="w"> </span><span class="n">PluginURL</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UGameFeaturePluginStateMachine</span><span class="o">*</span><span class="w"> </span><span class="n">ExistingStateMachine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FindGameFeaturePluginStateMachine</span><span class="p">(</span><span class="n">PluginURL</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ExistingStateMachine</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">UGameFeaturePluginStateMachine</span><span class="o">*</span><span class="w"> </span><span class="n">NewStateMachine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NewObject</span><span class="o">&lt;</span><span class="n">UGameFeaturePluginStateMachine</span><span class="o">&gt;</span><span class="p">(</span><span class="n">this</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">GameFeaturePluginStateMachines</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">PluginURL</span><span class="p">,</span><span class="w"> </span><span class="n">NewStateMachine</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">NewStateMachine</span><span class="o">-&gt;</span><span class="n">InitStateMachine</span><span class="p">(</span><span class="n">PluginURL</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">NewStateMachine</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<ul>
+<li><code>UGameFeatureAction_AddInputContextMapping::OnGameFeatureActivating()</code> calls it&#8217;s base class to
+loop through all world contexts and call <code>AddToWorld()</code> on each of&nbsp;them:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">UGameFeatureAction_WorldActionBase::OnGameFeatureActivating</span><span class="p">()</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GameInstanceStartHandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FWorldDelegates</span><span class="o">::</span><span class="n">OnStartGameInstance</span><span class="p">.</span><span class="n">AddUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                </span><span class="o">&amp;</span><span class="n">UGameFeatureAction_WorldActionBase</span><span class="o">::</span><span class="n">HandleGameInstanceStart</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Add to any worlds with associated game instances that have already been initialized</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FWorldContext</span><span class="o">&amp;</span><span class="w"> </span><span class="n">WorldContext</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetWorldContexts</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">AddToWorld</span><span class="p">(</span><span class="n">WorldContext</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<ul>
+<li><code>AddToWorld()</code> does&nbsp;this:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">UGameFeatureAction_AddInputContextMapping::AddToWorld</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">FWorldContext</span><span class="o">&amp;</span><span class="w"> </span><span class="n">WorldContext</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">World</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">WorldContext</span><span class="p">.</span><span class="n">World</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">UGameInstance</span><span class="o">*</span><span class="w"> </span><span class="n">GameInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">WorldContext</span><span class="p">.</span><span class="n">OwningGameInstance</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">GameInstance</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">World</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="k">nullptr</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">World</span><span class="o">-&gt;</span><span class="n">IsGameWorld</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UGameFrameworkComponentManager</span><span class="o">*</span><span class="w"> </span><span class="n">ComponentMan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">              </span><span class="n">UGameInstance</span><span class="o">::</span><span class="n">GetSubsystem</span><span class="o">&lt;</span><span class="n">UGameFrameworkComponentManager</span><span class="o">&gt;</span><span class="p">(</span><span class="n">GameInstance</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">InputMapping</span><span class="p">.</span><span class="n">IsNull</span><span class="p">())</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">UGameFrameworkComponentManager</span><span class="o">::</span><span class="n">FExtensionHandlerDelegate</span><span class="w"> </span><span class="n">AddAbilitiesDelegate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">                    </span><span class="n">UGameFrameworkComponentManager</span><span class="o">::</span><span class="n">FExtensionHandlerDelegate</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="w"></span>
+<span class="w">                        </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">UGameFeatureAction_AddInputContextMapping</span><span class="o">::</span><span class="n">HandleControllerExtension</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">                </span><span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="n">FComponentRequestHandle</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ExtensionRequestHandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">                    </span><span class="n">ComponentMan</span><span class="o">-&gt;</span><span class="n">AddExtensionHandler</span><span class="p">(</span><span class="n">APlayerController</span><span class="o">::</span><span class="n">StaticClass</span><span class="p">(),</span><span class="w"> </span><span class="n">AddAbilitiesDelegate</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">                </span><span class="n">ExtensionRequestHandles</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">ExtensionRequestHandle</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>The key line&nbsp;is:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="n">FComponentRequestHandle</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ExtensionRequestHandle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">        </span><span class="n">ComponentMan</span><span class="o">-&gt;</span><span class="n">AddExtensionHandler</span><span class="p">(</span><span class="n">APlayerController</span><span class="o">::</span><span class="n">StaticClass</span><span class="p">(),</span><span class="w"> </span><span class="n">AddAbilitiesDelegate</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<ul>
+<li><code>AddExtensionHandler()</code> does&nbsp;this:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">TSharedPtr</span><span class="o">&lt;</span><span class="n">FComponentRequestHandle</span><span class="o">&gt;</span><span class="w"> </span><span class="n">UGameFrameworkComponentManager</span><span class="o">::</span><span class="n">AddExtensionHandler</span><span class="p">(</span><span class="w"></span>
+<span class="w">            </span><span class="k">const</span><span class="w"> </span><span class="n">TSoftClassPtr</span><span class="o">&lt;</span><span class="n">AActor</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">ReceiverClass</span><span class="p">,</span><span class="w"> </span><span class="n">FExtensionHandlerDelegate</span><span class="w"> </span><span class="n">ExtensionHandler</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">FComponentRequestReceiverClassPath</span><span class="w"> </span><span class="nf">ReceiverClassPath</span><span class="p">(</span><span class="n">ReceiverClass</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">FExtensionHandlerEvent</span><span class="o">&amp;</span><span class="w"> </span><span class="n">HandlerEvent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ReceiverClassToEventMap</span><span class="p">.</span><span class="n">FindOrAdd</span><span class="p">(</span><span class="n">ReceiverClassPath</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// This is a fake multicast delegate using a map</span>
+<span class="w">    </span><span class="n">FDelegateHandle</span><span class="w"> </span><span class="nf">DelegateHandle</span><span class="p">(</span><span class="n">FDelegateHandle</span><span class="o">::</span><span class="n">EGenerateNewHandleType</span><span class="o">::</span><span class="n">GenerateNewHandle</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">HandlerEvent</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">DelegateHandle</span><span class="p">,</span><span class="w"> </span><span class="n">ExtensionHandler</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">UClass</span><span class="o">*</span><span class="w"> </span><span class="n">ReceiverClassPtr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ReceiverClass</span><span class="p">.</span><span class="n">Get</span><span class="p">())</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">UGameInstance</span><span class="o">*</span><span class="w"> </span><span class="n">LocalGameInstance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetGameInstance</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ensure</span><span class="p">(</span><span class="n">LocalGameInstance</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">UWorld</span><span class="o">*</span><span class="w"> </span><span class="n">LocalWorld</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalGameInstance</span><span class="o">-&gt;</span><span class="n">GetWorld</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ensure</span><span class="p">(</span><span class="n">LocalWorld</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">TActorIterator</span><span class="o">&lt;</span><span class="n">AActor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ActorIt</span><span class="p">(</span><span class="n">LocalWorld</span><span class="p">,</span><span class="w"> </span><span class="n">ReceiverClassPtr</span><span class="p">);</span><span class="w"> </span><span class="n">ActorIt</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">ActorIt</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="p">{</span><span class="w"></span>
+<span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ActorIt</span><span class="o">-&gt;</span><span class="n">IsActorInitialized</span><span class="p">())</span><span class="w"></span>
+<span class="w">                    </span><span class="p">{</span><span class="w"></span>
+<span class="w">                        </span><span class="n">ExtensionHandler</span><span class="p">.</span><span class="n">Execute</span><span class="p">(</span><span class="o">*</span><span class="n">ActorIt</span><span class="p">,</span><span class="w"> </span><span class="n">NAME_ExtensionAdded</span><span class="p">);</span><span class="w"></span>
+<span class="w">                    </span><span class="p">}</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">MakeShared</span><span class="o">&lt;</span><span class="n">FComponentRequestHandle</span><span class="o">&gt;</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">ReceiverClass</span><span class="p">,</span><span class="w"> </span><span class="n">DelegateHandle</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>The key line&nbsp;is:</p>
+<div class="highlight"><pre><span></span><code><span class="n">TActorIterator</span><span class="o">&lt;</span><span class="n">AActor</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ActorIt</span><span class="p">(</span><span class="n">LocalWorld</span><span class="p">,</span><span class="w"> </span><span class="n">ReceiverClassPtr</span><span class="p">);</span><span class="w"> </span><span class="n">ActorIt</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">ActorIt</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p>which finds all the actors in the world of the required class.  In the case of adding an Input Mapping Context
+it finds all the actors of the <code>PlayerController</code> class and invokes the ExtensionHandler on each&nbsp;actor:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ExtensionHandler</span><span class="p">.</span><span class="n">Execute</span><span class="p">(</span><span class="o">*</span><span class="n">ActorIt</span><span class="p">,</span><span class="w"> </span><span class="n">NAME_ExtensionAdded</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<p>The invocation of the extension handler calls <code>UGameFeatureAction_AddInputContextMapping::HandleControllerExtension()</code>
+which calls <code>InputSystem-&gt;AddMappingContext()</code> to add the Input Mapping&nbsp;Context</p>
+<h2>Reference</h2>
+<p><a href="https://docs.unrealengine.com/5.0/en-US/gameplay-tags-in-unreal-engine/">Epic Gameplay Tags</a><br>
+<a href="https://nerivec.github.io/old-ue4-wiki/pages/gameplayabilities-and-you.html">Old Wiki Article: GameplayAbilities and You</a><br>
+<a href="https://forums.unrealengine.com/t/comprehensive-gameplayabilities-analysis-series/91086">Unreal Forums: Comprehensive Gameplay Abilities Analysis</a><br>
+<a href="https://forums.unrealengine.com/t/gameplay-abilities-and-weapon-firing/130633/12">Unreal Forums: Gameplay Abilities and Weapon Firing</a><br>
+<a href="https://github.com/tranek/GASDocumentation#concepts-at">Tranek <span class="caps">GAS</span> Documentation</a><br>
+<a href="https://forums.unrealengine.com/docs?topic=265041">Unreal Forums: A holistic look at replicated&nbsp;movement</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="/tag/unreal-engine.html">unreal engine</a>
+      <a href="/tag/lyra.html">Lyra</a>
+      <a href="/tag/stackobot.html">StackOBot</a>
+      <a href="/tag/c.html">C++</a>
+    </p>
+  </div>
+
+
+
+
+
+
+</article>
+
+    <footer>
+<p>
+  &copy; 2022  - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses//4.0/deed.en_US" target="_blank">Creative Commons Attribution-ShareAlike</a>
+</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+  <span class="footer-separator">|</span>
+  Switch to the <a href="javascript:void(0)" onclick="theme.switch(`dark`)">dark</a> | <a href="javascript:void(0)" onclick="theme.switch(`light`)">light</a> | <a href="javascript:void(0)" onclick="theme.switch(`browser`)">browser</a> theme
+  <script id="dark-theme-script"
+          src="/theme/dark-theme/dark-theme.min.js"
+          data-enable-auto-detect-theme="True"
+          data-default-theme="dark"
+          type="text/javascript">
+  </script>
+</p><p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses//4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+           src="https://i.creativecommons.org/l//4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Unreal Code ",
+  "url" : "",
+  "image": "",
+  "description": ""
+}
+</script>
+
+  
+</body>
+</html>

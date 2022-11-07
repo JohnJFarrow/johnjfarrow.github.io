@@ -1,0 +1,6 @@
+
+@startuml
+class UFactory
+class UKLVImgMediaSourceFactoryNew extends UFactory
+UKLVImgMediaSourceFactoryNew -->UKLVMediaSource : creates 
+@enduml

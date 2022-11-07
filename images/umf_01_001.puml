@@ -1,0 +1,8 @@
+
+@startuml
+UObject <|-- UKLVImgMediaSettings
+FKLVImgMediaFactoryModule --> UKLVImgMediaSettings : creates 
+FKLVImgMediaGlobalCache --> UKLVImgMediaSettings : uses 
+FKLVImgMediaScheduler --> UKLVImgMediaSettings : uses 
+
+@enduml

@@ -9,4 +9,14 @@ UGameFeatureAction_WorldActionBase <|-- UGameFeatureAction_AddSpawnedActors
 
 UGameFeatureAction_AddAbilities --> FGameFeatureAbilitiesEntry
 FGameFeatureAbilitiesEntry --> FAncientGameAttributesMapping
+
+UGameFeatureAction_AddLevelInstances --> FGameFeatureLevelInstanceEntry
+
+UGameFeatureAction_AddSpawnedActors --> FSpawningWorldActorsEntry
+FSpawningWorldActorsEntry --> FSpawningActorEntry
+
+UGameFeatureAction_AddWorldSystem --> FGameFeatureWorldSystemEntry
+FGameFeatureWorldSystemEntry --> UGameFeatureWorldSystem 
+
 @enduml
+

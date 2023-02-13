@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[9],{302:function(t,n,e){"use strict";e.r(n);var i=e(14),r=Object(i.a)({},(function(){var t=this.$createElement;return(this._self._c||t)("div",{staticStyle:{"margin-top":"33px"},attrs:{align:"center"}},[this._v("\nMIT Licensed | Copyright © 2021-2023 John Farrow\n    ")])}),[],!1,null,null,null);n.default=r.exports}}]);

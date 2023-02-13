@@ -1,0 +1,11 @@
+@startuml
+UObject <|-- UGameFeatureAction
+UGameFeatureAction <|-- UGameFeatureAction_WorldActionBase
+UGameFeatureAction_WorldActionBase <|-- UGameFeatureAction_AddCheats
+UGameFeatureAction_WorldActionBase <|-- UGameFeatureAction_AddComponents
+UGameFeatureAction_WorldActionBase <|-- UGameFeatureAction_DataRegistry
+UGameFeatureAction_WorldActionBase <|-- UGameFeatureAction_DataRegistrySource
+
+
+@enduml
+

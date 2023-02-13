@@ -1,0 +1,11 @@
+@startuml GameplayAbilityDiagram
+class GameplayAbility
+class AbilitySystemComponent
+class LyraAbilitySystemComponent
+
+class AttributeSet
+class GameplayEffect
+class LyraPlayerState
+
+AbilitySystemComponent <|-- LyraAbilitySystemComponent
+@enduml

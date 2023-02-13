@@ -1,0 +1,14 @@
+
+@startuml
+
+interface IKLVImgMediaReader
+class FKLVImgMediaFrame
+class FKLVGenericImgMediaReader
+
+class FKLVGenericImgMediaReader extends IKLVImgMediaReader
+FKLVGenericImgMediaReader : GetFrameInfo()
+FKLVGenericImgMediaReader : ReadFrame()
+
+FKLVGenericImgMediaReader --> FKLVImgMediaFrame: populates 
+FKLVImgMediaLoader --> FKLVGenericImgMediaReader : uses to read each frame 
+@enduml

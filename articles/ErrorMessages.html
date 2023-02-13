@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Clang has better error messages | unrealcode.net</title>
+    <meta name="generator" content="VuePress 1.9.8">
+    
+    <meta name="description" content="Compared to clang the error messages produced by MSVC are really unhelpful">
+    
+    <link rel="preload" href="/assets/css/0.styles.9e32f251.css" as="style"><link rel="preload" href="/assets/js/app.fa728723.js" as="script"><link rel="preload" href="/assets/js/2.d18040ad.js" as="script"><link rel="preload" href="/assets/js/15.498a49fb.js" as="script"><link rel="prefetch" href="/assets/js/10.d513f581.js"><link rel="prefetch" href="/assets/js/11.96dce664.js"><link rel="prefetch" href="/assets/js/12.1e8efb81.js"><link rel="prefetch" href="/assets/js/13.7563e642.js"><link rel="prefetch" href="/assets/js/14.896442da.js"><link rel="prefetch" href="/assets/js/16.7a78dee2.js"><link rel="prefetch" href="/assets/js/17.9e1f2f79.js"><link rel="prefetch" href="/assets/js/18.224f808b.js"><link rel="prefetch" href="/assets/js/19.c7d83660.js"><link rel="prefetch" href="/assets/js/20.21e4b882.js"><link rel="prefetch" href="/assets/js/21.9ef37962.js"><link rel="prefetch" href="/assets/js/22.e394493f.js"><link rel="prefetch" href="/assets/js/23.65fa8022.js"><link rel="prefetch" href="/assets/js/24.4396cdd8.js"><link rel="prefetch" href="/assets/js/25.6b61ab0f.js"><link rel="prefetch" href="/assets/js/26.0aaf0f5a.js"><link rel="prefetch" href="/assets/js/27.23c819fc.js"><link rel="prefetch" href="/assets/js/3.f15fafe2.js"><link rel="prefetch" href="/assets/js/4.2afedb23.js"><link rel="prefetch" href="/assets/js/5.e5ded578.js"><link rel="prefetch" href="/assets/js/6.c4724d79.js"><link rel="prefetch" href="/assets/js/7.a381c638.js"><link rel="prefetch" href="/assets/js/8.ea236d5c.js"><link rel="prefetch" href="/assets/js/9.467239ba.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.9e32f251.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">unrealcode.net</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Clang has better error messages</span> <!----></p> <!----></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1>Clang has better error messages</h1> <p>Comparing the error messages created by Clang and by MSVC.
+</p> <p>Consider this code:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;memory&gt;</span></span>
+
+<span class="token keyword">struct</span> <span class="token class-name">SPDeleter</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">void</span> <span class="token keyword">operator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token keyword">const</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">using</span> T <span class="token operator">=</span> <span class="token keyword">int</span><span class="token punctuation">;</span>
+    std<span class="token double-colon punctuation">::</span>shared_ptr<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> <span class="token function">X</span><span class="token punctuation">(</span> <span class="token keyword">new</span> <span class="token function">T</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">SPDeleter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br></div></div><p>The problem here is that that <code>operator()()</code> on the <code>SPDeleter</code> should take an <code>int*</code> not just an <code>int</code>.</p> <p>MSVC gives this error message:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>error C2661: 'std::shared_ptr&lt;T&gt;::shared_ptr': no overloaded function takes 2 arguments
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>which is misleading at best.  The constructor of <code>std::shared_ptr</code> does have functions which take two arguments.</p> <p>Compiling with clang gives a much better error message:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>error: no matching constructor for initialization of 'std::shared_ptr&lt;T&gt;' (aka 'shared_ptr&lt;int&gt;')
+    std::shared_ptr&lt;T&gt; X( new T(), SPDeleter() );
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>plus clang lists all the possible matches and explains why they were not chosen:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1526:5: note:
+      candidate template ignored: requirement 'conjunction_v&lt;std::is_move_constructible&lt;SPDeleter&gt;,
+      std::_Can_call_function_object&lt;SPDeleter &amp;, int *&amp;, void&gt;, std::_SP_convertible&lt;int, int&gt;&gt;' was not satisfied
+      [with _Ux = int, _Dx = SPDeleter]
+    shared_ptr(_Ux* _Px, _Dx _Dt) { // construct with _Px, deleter
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1540:5: note:
+      candidate template ignored: requirement 'conjunction_v&lt;std::is_move_constructible&lt;SPDeleter&gt;,
+      std::_Can_call_function_object&lt;SPDeleter &amp;, nullptr_t &amp;, void&gt;&gt;' was not satisfied [with _Dx = SPDeleter]
+    shared_ptr(nullptr_t, _Dx _Dt) { // construct with nullptr, deleter
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1551:5: note:
+      candidate template ignored: could not match 'shared_ptr&lt;type-parameter-0-0&gt;' against 'int *'
+    shared_ptr(const shared_ptr&lt;_Ty2&gt;&amp; _Right, element_type* _Px) noexcept {
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1557:5: note:
+      candidate template ignored: could not match 'shared_ptr&lt;type-parameter-0-0&gt;' against 'int *'
+    shared_ptr(shared_ptr&lt;_Ty2&gt;&amp;&amp; _Right, element_type* _Px) noexcept {
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1506:15: note:
+      candidate constructor not viable: requires 1 argument, but 2 were provided
+    constexpr shared_ptr(nullptr_t) noexcept {} // construct empty shared_ptr
+              ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1512:14: note:
+      candidate constructor template not viable: requires single argument '_Px', but 2 arguments were provided
+    explicit shared_ptr(_Ux* _Px) { // construct shared_ptr object that owns _Px
+             ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1562:5: note:
+      candidate constructor not viable: requires single argument '_Other', but 2 arguments were provided
+    shared_ptr(const shared_ptr&amp; _Other) noexcept { // construct shared_ptr object that owns same resource as _Other
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1567:5: note:
+      candidate constructor template not viable: requires single argument '_Other', but 2 arguments were provided
+    shared_ptr(const shared_ptr&lt;_Ty2&gt;&amp; _Other) noexcept {
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1572:5: note:
+      candidate constructor not viable: requires single argument '_Right', but 2 arguments were provided
+    shared_ptr(shared_ptr&amp;&amp; _Right) noexcept { // construct shared_ptr object that takes resource from _Right
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1577:5: note:
+      candidate constructor template not viable: requires single argument '_Right', but 2 arguments were provided
+    shared_ptr(shared_ptr&lt;_Ty2&gt;&amp;&amp; _Right) noexcept { // construct shared_ptr object that takes resource from _Right
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1582:14: note:
+      candidate constructor template not viable: requires single argument '_Other', but 2 arguments were provided
+    explicit shared_ptr(const weak_ptr&lt;_Ty2&gt;&amp; _Other) { // construct shared_ptr object that owns resource *_Other
+             ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1590:5: note:
+      candidate constructor template not viable: requires single argument '_Other', but 2 arguments were provided
+    shared_ptr(auto_ptr&lt;_Ty2&gt;&amp;&amp; _Other) { // construct shared_ptr object that owns *_Other.get()
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1601:5: note:
+      candidate constructor template not viable: requires single argument '_Other', but 2 arguments were provided
+    shared_ptr(unique_ptr&lt;_Ux, _Dx&gt;&amp;&amp; _Other) {
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1534:5: note:
+      candidate constructor template not viable: requires 3 arguments, but 2 were provided
+    shared_ptr(_Ux* _Px, _Dx _Dt, _Alloc _Ax) { // construct with _Px, deleter, allocator
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1546:5: note:
+      candidate constructor template not viable: requires 3 arguments, but 2 were provided
+    shared_ptr(nullptr_t, _Dx _Dt, _Alloc _Ax) { // construct with nullptr, deleter, allocator
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1504:15: note:
+      candidate constructor not viable: requires 0 arguments, but 2 were provided
+    constexpr shared_ptr() noexcept = default;
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br></div></div></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.fa728723.js" defer></script><script src="/assets/js/2.d18040ad.js" defer></script><script src="/assets/js/15.498a49fb.js" defer></script>
+  </body>
+</html>

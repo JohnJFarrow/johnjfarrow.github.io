@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>unrealcode.net</title>
+    <meta name="generator" content="VuePress 1.9.8">
+    
+    <meta name="description" content="">
+    
+    <link rel="preload" href="/assets/css/0.styles.5fbecda8.css" as="style"><link rel="preload" href="/assets/js/app.767e6ba3.js" as="script"><link rel="preload" href="/assets/js/3.5e27fb36.js" as="script"><link rel="preload" href="/assets/js/2.32bfe7ad.js" as="script"><link rel="preload" href="/assets/js/20.95fc594e.js" as="script"><link rel="prefetch" href="/assets/js/10.49e97280.js"><link rel="prefetch" href="/assets/js/11.6e4ef963.js"><link rel="prefetch" href="/assets/js/12.0d1be04c.js"><link rel="prefetch" href="/assets/js/13.344a1b1b.js"><link rel="prefetch" href="/assets/js/14.73f9dc1c.js"><link rel="prefetch" href="/assets/js/15.abb5f017.js"><link rel="prefetch" href="/assets/js/16.fc316c7e.js"><link rel="prefetch" href="/assets/js/17.1bc7529e.js"><link rel="prefetch" href="/assets/js/18.81aca668.js"><link rel="prefetch" href="/assets/js/19.c591fda9.js"><link rel="prefetch" href="/assets/js/21.4d0aa89e.js"><link rel="prefetch" href="/assets/js/22.68abd372.js"><link rel="prefetch" href="/assets/js/23.fc14dad7.js"><link rel="prefetch" href="/assets/js/24.d13cbd74.js"><link rel="prefetch" href="/assets/js/25.609789b6.js"><link rel="prefetch" href="/assets/js/26.69fef5bb.js"><link rel="prefetch" href="/assets/js/27.6dcc4379.js"><link rel="prefetch" href="/assets/js/28.d2af346e.js"><link rel="prefetch" href="/assets/js/29.c44d1771.js"><link rel="prefetch" href="/assets/js/30.8bffd22f.js"><link rel="prefetch" href="/assets/js/31.c9395a3a.js"><link rel="prefetch" href="/assets/js/32.0db00775.js"><link rel="prefetch" href="/assets/js/4.b728e6f4.js"><link rel="prefetch" href="/assets/js/5.f305d5cb.js"><link rel="prefetch" href="/assets/js/6.9f3d2133.js"><link rel="prefetch" href="/assets/js/7.de88547a.js"><link rel="prefetch" href="/assets/js/8.675e70c4.js"><link rel="prefetch" href="/assets/js/9.876839a1.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.5fbecda8.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">unrealcode.net</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav>  <ul class="sidebar-links"><li><a href="/" aria-current="page" class="sidebar-link">Home</a></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><p>Capturing a viewport including UMG UI elements:</p> <p>try using
+https://dev.epicgames.com/community/learning/tutorials/YD46/unreal-engine-how-to-write-ndisplay-viewports-to-disk-using-media-capture
+or basing code off that</p> <p>nDisplay Media Output has a param for number of texture buffers
+used to transfer texture from GPU to system memory, uses
+(think) a round robin</p> <p>LogMediaIOCore: Error: File media capture only supports tightly packed rows. Expected stride: 7232. Received stride: 7424. It might also mean that output resolution is too small.</p> <p>Works with specified output file size.</p> <p>Needs a
+Media Capture object
+and a File Media Output object
+-- how do they work?</p> <p>Does it capture UI? NO!!!</p> <p>Texture Share: https://docs.unrealengine.com/5.0/en-US/texture-share-in-unreal-engine/</p> <p>In the document of FScreenshotRequest 80, there is a parameter to control whether to show UI.</p> <p>Usng USceneCaptureComponent2d from c++
+https://forums.unrealengine.com/t/using-uscenecapturecomponent2d-to-create-a-snapshot-at-runtime/391155</p> <p>this claims to do it but with low resolution problems
+https://forums.unrealengine.com/t/poor-scene-capture-quality-in-umg-widget/269694
+and remember to set the Material Domain to UI, use the Emmisive and lenght A-B to cancel out the bakground (to give the output opacity)</p> <p>Does NDI code capture  the UI?</p> <p>Owl capture thing is a component, attach to cinecamera component
+specify a render target
+set size and options</p> <ul><li>renders camera viewport to render target</li> <li>texture size responds to changing film back in parent cinecam component</li> <li>need to specify widget to render as hud</li></ul> <p>Composure:</p> <ol><li>performance loss</li> <li>it replaces the Cinecam with a Scene Capture 2D under the hood so you don't benefit from the Cinecam rendering pipeline.
+This is a new method we had to write from scratch but we got guidance from one of the VP team at Epic.
+It uses the Cinecam pipeline so you benefit from the performance optimisation, DLSS and all Cinecam post-processing etc.
+With DLSS on you can get +100FPS output 😃</li></ol> <p>This is Owl output to srt
+https://knowledge.offworld.live/en/unreal-engine-live-streaming-toolkit/how-to-live-stream-srt-from-unreal-engine-to-obs-studio</p> <p>https://forums.unrealengine.com/t/render-target-using-cine-camera/98072/11</p> <ul><li>using composure to capture a cinecamera
+UFUNCTION(BlueprintCallable, Category = &quot;Composure&quot;)
+static void CopyCameraSettingsToSceneCapture(UCameraComponent* SrcCamera, USceneCaptureComponent2D* DstCaptureComponent);
+It is also exposed to Blueprints, so it can be used from Blueprint scripts.</li></ul> <p>https://github.com/TimmHess/UnrealImageCapture
+In this repository I want to condense my findings on how to implement a component to capture images to disk from an arbitrary UE4 (which fortunately apply likewise to UE5) scene from scratch lowering the bar for UE novices. This will include:</p> <div class="language- extra-class"><pre><code>Rendering images at high FPS without blocking the UE rendering thread
+Rendering segmentation (or other graphics buffers) at the same time
+</code></pre></div><p>https://github.com/microsoft/AirSim</p> <p>example c++ code
+https://ikrima.dev/ue4guide/graphics-development/how-to/explicit-render-to-rendertarget/</p> <p>Rendering Outside Normal Render Path# Also take a look at SceneCaptureRenderer: which creates a separate renderer to do captures</p> <p>CopyCameraSettingsToSceneCapture()</p> <p>CHAT
+Yes, you can capture the HUD (Heads Up Display) in a SceneCapture2D component in Unreal Engine.
+By default, the HUD is not included in the SceneCapture2D component, as it is rendered separately and overlaid on top of the scene. However, you can enable the HUD to be captured by setting the &quot;Composite Mode&quot; property of the SceneCapture2D component to &quot;SceneColorHDRSceneDepth&quot; or &quot;SceneColorHDRSceneDepthNoStencil&quot;.
+When the &quot;Composite Mode&quot; property is set to one of these options, the SceneCapture2D component will capture the HUD along with the rest of the scene. The &quot;SceneDepth&quot; component captures the depth information of the scene, which is necessary for correctly rendering the HUD on top of the scene.
+Note that when the HUD is included in the capture, it will appear as part of the captured image, rather than overlaid on top of it. If you want to separate the HUD from the captured image, you can render the HUD to a separate texture and composite it with the captured scene in post-processing.</p> <p>I apologize for the confusion. You are correct that the &quot;Composite Mode&quot; property of the SceneCapture2D component is read-only and cannot be set directly.</p> <p>To capture the HUD in the SceneCapture2D component, you need to use a render target. Here are the steps to do so:</p> <div class="language- extra-class"><pre><code>Create a new render target asset by right-clicking in the Content Browser and selecting &quot;Material &amp; Textures&quot; -&gt; &quot;Render Target&quot;.
+
+Set the size and format of the render target to match the resolution and format of the SceneCapture2D component.
+
+Assign the render target to the &quot;Texture Target&quot; property of the SceneCapture2D component.
+
+In your HUD blueprint, create a new widget component and add your HUD widgets to it.
+
+Set the &quot;Render Target&quot; property of the widget component to the render target you created in step 1.
+
+In the HUD blueprint, call the &quot;Draw Widget&quot; function to draw the HUD widgets to the render target.
+
+When you capture the scene using the SceneCapture2D component, the HUD will be included in the capture as part of the render target texture.
+</code></pre></div><p>I hope this helps! Let me know if you have any further questions.</p></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main> <footer class="f"><div><p>MIT Licensed | Copyright © 2020-2023 John Farrow</p></div></footer></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.767e6ba3.js" defer></script><script src="/assets/js/3.5e27fb36.js" defer></script><script src="/assets/js/2.32bfe7ad.js" defer></script><script src="/assets/js/20.95fc594e.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Prereqs | unrealcode.net</title>
+    <meta name="generator" content="VuePress 1.9.8">
+    
+    <meta name="description" content="">
+    
+    <link rel="preload" href="/assets/css/0.styles.5fbecda8.css" as="style"><link rel="preload" href="/assets/js/app.767e6ba3.js" as="script"><link rel="preload" href="/assets/js/3.5e27fb36.js" as="script"><link rel="preload" href="/assets/js/2.32bfe7ad.js" as="script"><link rel="preload" href="/assets/js/15.abb5f017.js" as="script"><link rel="prefetch" href="/assets/js/10.49e97280.js"><link rel="prefetch" href="/assets/js/11.6e4ef963.js"><link rel="prefetch" href="/assets/js/12.0d1be04c.js"><link rel="prefetch" href="/assets/js/13.344a1b1b.js"><link rel="prefetch" href="/assets/js/14.73f9dc1c.js"><link rel="prefetch" href="/assets/js/16.fc316c7e.js"><link rel="prefetch" href="/assets/js/17.1bc7529e.js"><link rel="prefetch" href="/assets/js/18.81aca668.js"><link rel="prefetch" href="/assets/js/19.c591fda9.js"><link rel="prefetch" href="/assets/js/20.95fc594e.js"><link rel="prefetch" href="/assets/js/21.4d0aa89e.js"><link rel="prefetch" href="/assets/js/22.68abd372.js"><link rel="prefetch" href="/assets/js/23.fc14dad7.js"><link rel="prefetch" href="/assets/js/24.d13cbd74.js"><link rel="prefetch" href="/assets/js/25.609789b6.js"><link rel="prefetch" href="/assets/js/26.69fef5bb.js"><link rel="prefetch" href="/assets/js/27.6dcc4379.js"><link rel="prefetch" href="/assets/js/28.d2af346e.js"><link rel="prefetch" href="/assets/js/29.c44d1771.js"><link rel="prefetch" href="/assets/js/30.8bffd22f.js"><link rel="prefetch" href="/assets/js/31.c9395a3a.js"><link rel="prefetch" href="/assets/js/32.0db00775.js"><link rel="prefetch" href="/assets/js/4.b728e6f4.js"><link rel="prefetch" href="/assets/js/5.f305d5cb.js"><link rel="prefetch" href="/assets/js/6.9f3d2133.js"><link rel="prefetch" href="/assets/js/7.de88547a.js"><link rel="prefetch" href="/assets/js/8.675e70c4.js"><link rel="prefetch" href="/assets/js/9.876839a1.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.5fbecda8.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">unrealcode.net</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav>  <ul class="sidebar-links"><li><a href="/" aria-current="page" class="sidebar-link">Home</a></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h2 id="prereqs"><a href="#prereqs" class="header-anchor">#</a> Prereqs</h2> <p>Already had:
+cmake
+git
+visual studio</p> <h2 id="vcpkg"><a href="#vcpkg" class="header-anchor">#</a> vcpkg</h2> <p>mkdir d:\tools
+cd d:\tools
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+.\bootstrap-vcpkg.bat
+set VCPKG_ROOT=%cd%</p> <h2 id="openssl"><a href="#openssl" class="header-anchor">#</a> openssl</h2> <p>set VCPKG_ROOT=d:\tools\vcpkg
+cd %VCPKG_ROOT%
+vcpkg install openssl --triplet x64-windows
+vcpkg integrate install</p> <p>// CMake will be able to find openssl given the following option is provided:
+// -DCMAKE_TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake</p> <h2 id="srt"><a href="#srt" class="header-anchor">#</a> SRT</h2> <p>cd d:\tools
+git clone https://github.com/haivision/srt.git
+cd srt
+set SRT_ROOT=%cd%</p> <h3 id="generate-srt-build-files"><a href="#generate-srt-build-files" class="header-anchor">#</a> generate SRT build files</h3> <p>cd %SRT_ROOT%
+mkdir build
+cd build
+cmake ..\ -G&quot;Visual Studio 16 2019&quot; -A x64 -DCMAKE_TOOLCHAIN_FILE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake</p> <h3 id="build-srt"><a href="#build-srt" class="header-anchor">#</a> build srt</h3> <h1 id="add-config-release-for-release-build-else-will-be-debug"><a href="#add-config-release-for-release-build-else-will-be-debug" class="header-anchor">#</a> add &quot;--config Release&quot; for release build else will be debug</h1> <p>cmake --build . --config Release</p> <h2 id="smoke-test"><a href="#smoke-test" class="header-anchor">#</a> smoke test</h2> <p>from https://github.com/Haivision/srt/blob/master/docs/apps/srt-live-transmit.md</p> <p>IN RECV WINDOW
+build\debug\srt-live-transmit udp://:1234 srt://:4201 -v
+IN TRANS WINDOW
+ffmpeg -f lavfi -re -i smptebars=duration=300:size=1280x720:rate=30 -f lavfi -re -i sine=frequency=1000:duration=60:sample_rate=44100 -pix_fmt yuv420p -c:v libx264 -b:v 1000k -g 30 -keyint_min 120 -profile:v baseline -preset veryfast -f mpegts &quot;udp://127.0.0.1:1234?pkt_size=1316&quot;</p> <h2 id="testing-using-vlc"><a href="#testing-using-vlc" class="header-anchor">#</a> testing using VLC</h2> <p>from https://get.videolan.org/vlc/3.0.18/win64/vlc-3.0.18-win64.exe
+run VLC
+use Media|OpenNetworkStream &quot;srt://127.0.0.1:4201&quot;
+-- do this while the above smoke test is running, get colors in VLC screen</p> <p>ffmpeg -&gt; srt-live-transmit -&gt; VLC</p> <h1 id="testing-owl-to-srt"><a href="#testing-owl-to-srt" class="header-anchor">#</a> Testing OWL to SRT</h1> <p>Extract https://offworld-plugins.s3.amazonaws.com/owl-livestreaming-toolkit.v0.156.0-ue_5.1.zip to d:\tools</p> <p>Setup license by running D:\tools\OWLLivestreamingToolkit\Utils\owl-licensing-utility.exe
+paste in the key NBO71hUqbbaKSD2JDWOpjUszXzhQhNT91IAfB6ROUo3QCbWHGINbjCOJf9yk5m6Fzl2FC7CFLzft2fhsjzzycMJQKl</p> <p>Setup a project with a CineCam:
+Games, Third Person, Blueprint
+d:\work\intan\ThirdP</p> <blockquote><p>install plugin
+mkdir d:\work\intan\ThirdP\Plugins
+robocopy d:\tools\OWLLivestreamingToolkit d:\work\intan\ThirdP\Plugins\OWLLivestreamingToolkit /E
+open the project, the Off World plugin should be enabled already</p></blockquote> <blockquote><p>try OWLCapture component</p></blockquote> <p>open Content/ThirdPerson/Blueprints/BP_ThirdPersonCharacter
+add OWLCapture component called &quot;OWLCapture&quot;
+drag to under the FollowCamera component
+in details panel of OWLCapture click dropdown for Texture Target property
+create new Render Target called &quot;RT_TextureRenderTarget2D&quot; in Content/ThirdPerson/Blueprints
+Run the game, this has made the main window rendering very jerky, reduced frame rate from 100 to 41</p> <blockquote><p>try OWLViewport Capture actor</p></blockquote> <p>In the Place Actors tab find the OWL section, drop a OWLViewport Capture object into the map
+Select the OWLViewportCapture actor and set the Texture Target to the RT_TextureRenderTarget2D
+Open the RT_TextureRenderTarget2D in another window
+Run the game, updates the RT_TextureRenderTarget2D render target still does 100 fps</p> <blockquote><p>try OWLMediaOutput</p></blockquote> <p>Add an OWLMediaOutput actor to the world map
+set properties:
+Output Type = Stream to SRT
+SRT Settings - Stream URL = srt://127.0.0.1:4201    (which is what VLC is listening on)
+Input Render Target = RT_TextureRenderTarget2D</p> <ul><li>docs says it integrates ffmpeg into Unreal - might be only save to disk part</li></ul> <p>logs this
+LogOWLMedia: Error: Failed to find valid API key or licence for the metered output. Output will have a watermark
+LogOWLImageInput: Warning: Cropping input texture to even resolution. New output resolution: 1808x860px
+LogOWLMedia: Display: Starting recording to: srt://127.0.0.1:4201
+LogOWLMedia: Error: [ffmpeg]: Connection to srt://127.0.0.1:4201?transtype=live failed: I/O error
+LogOWLMedia: Error: Failed open file handle: srt://127.0.0.1:4201?transtype=live
+LogOWLMedia: Error: Failed to start new FFmpeg Output</p> <p>Logs to file ok when start button is pressed in editor when game is not running?</p> <blockquote><p>try srt toolkit listening</p></blockquote> <p>cd d:\tools\srt
+-- listen on 4201 and forward to non-existant 4202
+build\debug\srt-live-transmit srt://:4201 srt://:4202 -v
+-- pressing start on the OWLMediaOutput object, this is received</p> <blockquote><p>add VLC listening to the forwarded data on srt://:4202</p></blockquote> <ul><li>this works</li></ul> <blockquote><p>try OWLMediaOutput directly to VLC</p></blockquote> <p>LogOWLMedia: Error: [ffmpeg]: Connection to srt://127.0.0.1:4201?transtype=live failed: I/O error</p> <p>SO streaming srt to srt-live-transmit works, to VLC fails</p> <p>tried:
+VLC      srt://127.0.0.1:4201?transtype=live
+Unreal   srt://127.0.0.1:4201?mode=caller
+srt://127.0.0.1:4201?mode=caller&amp;transtype=live</p> <p>reading https://obsproject.com/kb/srt-protocol-streaming-guide tried
+VLC      srt://127.0.0.1:4201
+Unreal   srt://127.0.0.1:4201?mode=caller</p> <p>-- tryy OBS??</p> <blockquote><p>streaming to OBS is documented</p></blockquote> <p>If you want to live-stream on the same machine then use the SRT address: srt://127.0.0.1:4700?mode=caller</p> <p>If you want to live-stream over the network then use the SRT address: srt://192.168.xxx.xxx:4700?mode=caller and replace the xxx with your IP address</p> <p>In OBS Studio add a media source:
+Input: srt://127.0.0.1:4202?mode=listener
+Input format: mpegts</p> <p>OBS WORKS - they both listen to 4202 at the same time
+still no luck with VLC</p> <p>https://knowledge.offworld.live/en/unreal-engine-live-streaming-toolkit/how-to-live-stream-srt-from-unreal-engine-to-obs-studio</p> <p>Moved Plugin\OWLLivestreamingToolkit to engine C:\Program Files\Epic Games\UE_5.1\Engine\Plugins\Marketplace</p> <p>FFPMG SRT errors:
+also using libsrt ?? could we use that ??
+do we need to convert the texture to a video stream format??
+https://github.com/Haivision/srt/issues/1404</p> <blockquote><p>try ffmpeg direct to VLC</p></blockquote> <p>ffmpeg -f lavfi -re -i smptebars=duration=300:size=1280x720:rate=30 -f lavfi -re -i sine=frequency=1000:duration=60:sample_rate=44100 -pix_fmt yuv420p -c:v libx264 -b:v 1000k -g 30 -keyint_min 120 -profile:v baseline -preset veryfast -f mpegts &quot;srt://127.0.0.1:4202?pkt_size=1316&quot;</p> <p>-- same error as unreal:
+[srt @ 0000022f9da88200] Connection to srt://127.0.0.1:4202?pkt_size=1316 failed: I/O error
+srt://127.0.0.1:4202?pkt_size=1316: I/O error</p> <p>VLC try:
+srt://127.0.0.1:4202?mode=listener
+srt://127.0.0.1:4202              &lt;-- works with data from haivision srt
+srt://127.0.0.1:4202?mode=caller</p> <p>FFmpeg srt cookbook:
+https://srtlab.github.io/srt-cookbook/apps/ffmpeg.html</p> <p>Does ffmpeg use the srt codebase ?</p> <p>Search VLC issues?
+https://code.videolan.org/videolan/vlc/-/issues</p> <p>VLC repo is ahead of public download v 3 / v 4</p> <p>Configuring VLC for SRT
+https://github.com/SRTLab/srt-cookbook/blob/master/docs/apps/vlc-media-player.md</p> <p>Wireshark SRT
+https://github.com/SRTLab/srt-cookbook/blob/master/docs/how-to-articles/using-tshark-wireshark-to-analyse-srt-traffic.md</p> <p>ffmpeg direct works with
+VLC:      srt://:4202
+fails: srt://127.0.0.1:4202
+ffmpeg:  ffmpeg -f lavfi -re -i smptebars=duration=300:size=1280x720:rate=30 -f lavfi -re -i sine=frequency=1000:duration=60:sample_rate=44100 -pix_fmt yuv420p -c:v libx264 -b:v 1000k -g 30 -keyint_min 120 -profile:v baseline -preset veryfast -f mpegts &quot;srt://:4202?mode=listener&quot;</p> <p>Fails with 127.0.0.1 on either end, works with srt://:4202</p> <ul><li>ffmpeg end needs mode=listener</li></ul> <blockquote><p>try Unreal with srt://:4202?mode=listener
+Fails to connect to srt://:4202?transtype=live so it eats the mode option, but this works!
+srt://:4202?mode=listener?transtype=live</p></blockquote> <p>huge ~3 second latency</p> <ul><li>packaging ?</li></ul> <p>Has the watermark problem:
+try moving OWL plugin to Engine</p> <p>robocopy d:\tools\OWLLivestreamingToolkit &quot;C:\Program Files\Epic Games\UE_5.1\Engine\Plugins\Marketplace\OWLLivestreamingToolkit&quot; /E
+rd /s /q d:\work\intan\ThirdP\Plugins\OWLLivestreamingToolkit
+Do the offline license thing for node-locked license
+= needs whatever account got the license to log into the offworld page</p> <h2 id="building-ffmpeg"><a href="#building-ffmpeg" class="header-anchor">#</a> Building ffmpeg</h2> <p>Following http://ffmpeg.org/platform.html for MSVC build</p> <p>Install msys2 from https://www.msys2.org/ to d:\tools\msys64</p> <p>Install nasm from https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/win64/ to d:\tools\nasm</p> <p>Build based on this:
+https://www.roxlu.com/2019/062/compiling-ffmpeg-with-x264-on-windows-10-using-msvc</p> <p>code d:\tools\msys64\msys2_shell.cmd
+change</p> <blockquote><p>rem set MSYS2_PATH_TYPE=inherit
+to
+set MSYS2_PATH_TYPE=inherit</p></blockquote> <p>execute d:\tools\msys64\msys2_shell.cmd, this opens a shell window
+run these commands one at a time:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>pacman -Syu
+pacman -S make
+pacman -S diffutils
+pacman -S yasm
+pacman -S nasm
+mv /usr/bin/link.exe /usr/bin/link.exe.bak
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br></div></div><p>Might need to close the window and reopen it by re-running d:\tools\msys64\msys2_shell.cmd  -msys -use-full-path</p> <p>Execute these commands:
+pacman -S git
+mkdir tmp
+cd tmp
+mkdir sources
+mkdir build
+cd sources
+git clone --depth 1 https://code.videolan.org/videolan/x264.git
+git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git</p> <h4 id="fix-build-scripts"><a href="#fix-build-scripts" class="header-anchor">#</a> fix build scripts</h4> <p>cd ~/tmp/sources/x264
+curl &quot;http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD&quot; &gt; config.guess</p> <h4 id="build-x264-not"><a href="#build-x264-not" class="header-anchor">#</a> build  x264 [not]</h4> <p>cd ~/tmp/build
+mkdir x264
+cd x264</p> <p>CC=cl ./../../sources/x264/configure --prefix=./../../installed --enable-shared
+make -j 8
+make install
+mv ./../../installed/lib/libx264.dll.lib ./../../installed/lib/libx264.lib</p> <h4 id="build-ffmpeg"><a href="#build-ffmpeg" class="header-anchor">#</a> build ffmpeg</h4> <p>mkdir ~/tmp/build/ffmpeg
+cd ~/tmp/build/ffmpeg
+export CC=cl</p> <p>../../sources/ffmpeg/configure <br>
+--prefix=./../../installed <br>
+--toolchain=msvc <br>
+--arch=x86_64 <br>
+--enable-x86asm  <br>
+--enable-asm <br>
+--enable-shared <br>
+--disable-static <br>
+--extra-ldflags=&quot;-LIBPATH:./../../installed/lib/&quot; <br>
+--extra-cflags=&quot;-I./../../installed/include/&quot;</p> <p>adding one at a time:</p> <p>../../sources/ffmpeg/configure <br>
+--prefix=./../../installed <br>
+--toolchain=msvc <br>
+--arch=x86_64 <br>
+--enable-x86asm  <br>
+--enable-asm <br>
+--enable-shared <br>
+--disable-static <br>
+--extra-ldflags=&quot;-LIBPATH:./../../installed/lib/&quot; <br>
+--extra-cflags=&quot;-I./../../installed/include/&quot;<br>
+--enable-libsrt</p> <p>config matching the download version:</p> <p>../../sources/ffmpeg/configure <br>
+--prefix=./../../installed <br>
+--toolchain=msvc <br>
+--arch=x86_64 <br>
+--enable-x86asm  <br>
+--enable-asm <br>
+--enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-libxml2  --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq  --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-libass --enable-libfreetype --enable-libfribidi --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-ffnvcodec --enable-nvdec --enable-nvenc --enable-d3d11va --enable-dxva2 --enable-libmfx --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband <br>
+--extra-ldflags=&quot;-LIBPATH:./../../installed/lib/&quot; <br>
+--extra-cflags=&quot;-I./../../installed/include/&quot;</p> <p>these are built download options:
+--enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-libass --enable-libfreetype --enable-libfribidi --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-ffnvcodec --enable-nvdec --enable-nvenc --enable-d3d11va --enable-dxva2 --enable-libmfx --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband</p> <p>-- cant build with these:
+--enable-avisynth
+--enable-gmp
+--enable-gnutls</p> <p>make -j 10 install</p> <h1 id="owloutput-is-buggy"><a href="#owloutput-is-buggy" class="header-anchor">#</a> OWLOutput is buggy</h1> <p>press Start, Unreal hangs if VLC is not running, waits on the game thread</p> <h1 id="linking-srt-into-unreal"><a href="#linking-srt-into-unreal" class="header-anchor">#</a> Linking srt into Unreal</h1> <p>d:\work\intan\ThirdP2 - no OWL plugin for srt, with OWL plugin for capture camera-&gt;texture</p> <p>Discord: stage 1 will be just getting a standard SRT output running without the use of OWL plugin</p> <p>Will there be problems with having two srt implementations linked if we use Owl as well?</p> <p>Make a plugin as per
+https://docs.unrealengine.com/4.26/en-US/ProductionPipelines/BuildTools/UnrealBuildTool/ThirdPartyLibraries/</p> <p>rd /s /q d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\x64
+rd /s /q d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\include</p> <p>mkdir d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\x64
+mkdir d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\x64\debug
+mkdir d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\x64\release
+mkdir d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\include
+mkdir d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\include\win</p> <p>copy d:\tools\srt\build\debug\srt.dll  d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\x64\debug
+copy d:\tools\srt\build\debug\srt.lib  d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\x64\debug
+copy d:\tools\srt\build\debug\libcrypto-3-x64.dll  d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\x64\debug
+copy d:\tools\srt\build\release\srt.dll  d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\x64\release
+copy d:\tools\srt\build\release\srt.lib  d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\x64\release
+copy d:\tools\srt\build\release\libcrypto-3-x64.dll  d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\x64\release
+copy d:\tools\srt\srtcore*.h  d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\include
+copy d:\tools\srt\build*.h  d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\include
+copy d:\tools\srt\common\win*.h  d:\work\intan\ThirdP2\Plugins\SRT\Source\ThirdParty\SRTLibrary\include\win</p> <h1 id="video-intro-to-srt"><a href="#video-intro-to-srt" class="header-anchor">#</a> Video intro to SRT</h1> <p>https://www.youtube.com/watch?v=VrE3dJej5IE</p></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main> <footer class="f"><div><p>MIT Licensed | Copyright © 2020-2023 John Farrow</p></div></footer></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.767e6ba3.js" defer></script><script src="/assets/js/3.5e27fb36.js" defer></script><script src="/assets/js/2.32bfe7ad.js" defer></script><script src="/assets/js/15.abb5f017.js" defer></script>
+  </body>
+</html>

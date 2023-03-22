@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Building ffmpeg 6 on Windows 11 | unrealcode.net</title>
+    <meta name="generator" content="VuePress 1.9.8">
+    
+    <meta name="description" content="Notes on building ffmpeg from source so we can use it as a basis for creating a Unreal Engine plugin">
+    
+    <link rel="preload" href="/assets/css/0.styles.8a4ca9a4.css" as="style"><link rel="preload" href="/assets/js/app.cd67cee3.js" as="script"><link rel="preload" href="/assets/js/3.5e27fb36.js" as="script"><link rel="preload" href="/assets/js/2.32bfe7ad.js" as="script"><link rel="preload" href="/assets/js/16.a09663fa.js" as="script"><link rel="prefetch" href="/assets/js/10.49e97280.js"><link rel="prefetch" href="/assets/js/11.6e4ef963.js"><link rel="prefetch" href="/assets/js/12.0d1be04c.js"><link rel="prefetch" href="/assets/js/13.cc995969.js"><link rel="prefetch" href="/assets/js/14.73f9dc1c.js"><link rel="prefetch" href="/assets/js/15.a4a2b57b.js"><link rel="prefetch" href="/assets/js/17.e0ff5e9b.js"><link rel="prefetch" href="/assets/js/18.f43cd212.js"><link rel="prefetch" href="/assets/js/19.3655039f.js"><link rel="prefetch" href="/assets/js/20.f28f42b4.js"><link rel="prefetch" href="/assets/js/21.1d19a77c.js"><link rel="prefetch" href="/assets/js/22.cf33510c.js"><link rel="prefetch" href="/assets/js/23.35bc8d89.js"><link rel="prefetch" href="/assets/js/24.6d08f35b.js"><link rel="prefetch" href="/assets/js/25.609789b6.js"><link rel="prefetch" href="/assets/js/26.3dce86d0.js"><link rel="prefetch" href="/assets/js/27.1811b27d.js"><link rel="prefetch" href="/assets/js/28.bcdb9006.js"><link rel="prefetch" href="/assets/js/29.c44d1771.js"><link rel="prefetch" href="/assets/js/30.d895a9cf.js"><link rel="prefetch" href="/assets/js/31.7dc9532a.js"><link rel="prefetch" href="/assets/js/32.f7b9fb0f.js"><link rel="prefetch" href="/assets/js/4.b728e6f4.js"><link rel="prefetch" href="/assets/js/5.c579aa6b.js"><link rel="prefetch" href="/assets/js/6.5aa171c8.js"><link rel="prefetch" href="/assets/js/7.592d144b.js"><link rel="prefetch" href="/assets/js/8.675e70c4.js"><link rel="prefetch" href="/assets/js/9.876839a1.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.8a4ca9a4.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">unrealcode.net</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Building ffmpeg 6 on Windows 11</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/content/BuildingFFMPEGWSL.html#introduction" class="sidebar-link">Introduction</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/BuildingFFMPEGWSL.html#approaches-to-building-ffmpeg" class="sidebar-link">Approaches to building ffmpeg</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/BuildingFFMPEGWSL.html#using-wsl2" class="sidebar-link">Using WSL2</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/BuildingFFMPEGWSL.html#using-the-right-compiler" class="sidebar-link">Using the right compiler</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/BuildingFFMPEGWSL.html#wsl-prerequisites" class="sidebar-link">WSL Prerequisites</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/BuildingFFMPEGWSL.html#setup-directories" class="sidebar-link">Setup directories</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/BuildingFFMPEGWSL.html#building-x264" class="sidebar-link">Building x264</a><ul class="sidebar-sub-headers"></ul></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1>Building ffmpeg 6 on Windows 11</h1> <h2 id="introduction"><a href="#introduction" class="header-anchor">#</a> Introduction</h2> <p>ffmpeg is a cross-platform solution to record, convert, and stream audio and video. It can be used from Unreal Engine
+to change image formats, to record gameplay, and to convert content to and from various video formats.  Here
+I am using it just to show how an Unreal Engine plugin can be developed.</p> <p>ffmpeg can be downloaded from the <a href="https://ffmpeg.org/" target="_blank" rel="noopener noreferrer">https://ffmpeg.org/<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a> or from <a href="https://git.ffmpeg.org/ffmpeg.git" target="_blank" rel="noopener noreferrer">https://git.ffmpeg.org/ffmpeg.git<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>. Here
+we download the source as part of the build process.</p> <p>ffmpeg is cross-platform meaning it can be compiled for Windows, Linux, Macs and other
+operating systems and architectures.  It has a Linux-based build system which
+uses Linux tools for configuring the build and finding and building dependent libraries.  ffmpeg
+supports many different video encoders and decoders, some of which are
+downloaded separately from different websites if they are needed for the version you are building.</p> <h2 id="approaches-to-building-ffmpeg"><a href="#approaches-to-building-ffmpeg" class="header-anchor">#</a> Approaches to building ffmpeg</h2> <p>We will be using a Unix-like terminal emulation approach to build ffmpeg.  There are many alternative approaches to building ffmpeg from different sites including:</p> <ul><li><a href="https://github.com/rdp/ffmpeg-windows-build-helpers" target="_blank" rel="noopener noreferrer">building in docker<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li> <li><a href="https://github.com/ShiftMediaProject/FFVS-Project-Generator" target="_blank" rel="noopener noreferrer">parsing the Linux configure files to generate a Visual Studio .sln file<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li> <li><a href="https://github.com/m-ab-s/media-autobuild_suite" target="_blank" rel="noopener noreferrer">downloading one big script that configures the build, downloads all the build tools, and builds in one go<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul> <p>None of the above tools worked for me, whether because they were out of date or
+my development system was not compatible I don't know.  I didn't have time to dig into them in any depth.</p> <h2 id="using-wsl2"><a href="#using-wsl2" class="header-anchor">#</a> Using WSL2</h2> <p>WSL is a command line terminal which looks and behaves like a Linux terminal and
+supports a collection  development tools.  It is not a VM like VMWare, in that
+VMWare typically has its own disk space, whereas WSL shares its file system with Windows, so you can
+compile using the WSL terminal and create executables and libraries are visible in the Windows
+file system.</p> <p>See <a href="https://learn.microsoft.com/en-us/windows/wsl/install" target="_blank" rel="noopener noreferrer">https://learn.microsoft.com/en-us/windows/wsl/install<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>
+for instructions on installing WSL and upgrading it to version 2.</p> <p>While you are inside the WSL terminal you can use both Linux-style commands
+and Windows commands. We will be using:</p> <ul><li>a Linux-style &quot;configure&quot; command to create a makefile</li> <li>followed by a Linux-style &quot;make&quot; comand which</li> <li>executes the Visual Studio C++ compiler from Windows</li></ul> <p>All this makes package management and diagnosing problems much more confusing then just using one operating system.</p> <h2 id="using-the-right-compiler"><a href="#using-the-right-compiler" class="header-anchor">#</a> Using the right compiler</h2> <p>WSL uses the Microsoft C/C++ compiler which is configured by the environment.  To create a 64 bit version
+of ffmpeg we need to open the 64 bit command line specifically the &quot;x86_x64 Cross Tools Command Prompt&quot;<br>
+which is an option under Visual Studio 2022 on the start menu:</p> <p><img src="/images/plugin_002.png" alt=""></p> <p>If you open the &quot;x64_x86 Cross Tools Command Prompt&quot; everything below will work but you will end up with
+a 32 bit version of ffmpeg which will not work with Unreal.</p> <h2 id="wsl-prerequisites"><a href="#wsl-prerequisites" class="header-anchor">#</a> WSL Prerequisites</h2> <p>At the command prompt open WSL</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>wsl
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>Enter these commands to get necessary tools:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>sudo apt-get update -qq 
+
+sudo apt-get -y install \
+  autoconf \
+  automake \
+  build-essential \
+  cmake \
+  git-core \
+  libass-dev \
+  libfreetype6-dev \
+  libgnutls28-dev \
+  libmp3lame-dev \
+  libsdl2-dev \
+  libtool \
+  libva-dev \
+  libvdpau-dev \
+  libvorbis-dev \
+  libxcb1-dev \
+  libxcb-shm0-dev \
+  libxcb-xfixes0-dev \
+  meson \
+  ninja-build \
+  pkg-config \
+  texinfo \
+  wget \
+  yasm \
+  zlib1g-dev
+
+sudo apt -y install libunistring-dev libaom-dev 
+
+sudo apt-get -y install nasm
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br></div></div><h2 id="setup-directories"><a href="#setup-directories" class="header-anchor">#</a> Setup directories</h2> <p>Execute these commands:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>cd /mnt/d/tools
+mkdir ffmpeg7
+cd ffmpeg7
+mkdir build sources
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><h2 id="building-x264"><a href="#building-x264" class="header-anchor">#</a> Building x264</h2> <p>Many encoders or decoders which  can be included in an  ffmpeg build come from different projects and vendors.
+If you want them to be part of your ffmpeg they might need to
+be downloaded and built separately.</p> <p>The x264 encoder is an example of one such module. To build it execute the commands below.
+The configure command on line 9 sets the CC environment variable to tell the build process to use the Microsoft &quot;cl&quot; compiler command</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>cd /mnt/d/tools/ffmpeg7/sources
+git clone --depth 1 https://code.videolan.org/videolan/x264.git
+cd x264
+curl &quot;http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD&quot; &gt; config.guess
+## sed -i 's/host_os = mingw/host_os = msys/' configure
+cd ../../build
+mkdir x264
+cd x264
+CC=cl.exe ../../sources/x264/configure --prefix=./../../installed --enable-shared
+
+make -j 16
+make install
+mv ../../installed/lib/libx264.dll.lib ../../installed/lib/libx264.lib
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br></div></div><p>If the configure command has this error:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>conftest.c
+endian test failed
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>There is a problem with nasm.  Do this to build a different version of nasm:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>cd /mnt/d/tools/ffmpeg7/sources
+wget https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.bz2 
+tar xjvf nasm-2.15.05.tar.bz2 
+cd nasm-2.15.05 
+./autogen.sh 
+mkdir ~/bin
+./configure --prefix=&quot;/mnt/d/tools/ffmpeg7/build&quot; --bindir=&quot;$HOME/bin&quot; 
+make 
+make install
+
+hash -d nasm
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br></div></div><p>and build x246 like this:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>cd /mnt/d/tools/ffmpeg7/build/x264
+CC=cl.exe PATH=$HOME/bin:$PATH ../../sources/x264/configure --prefix=./../../installed --enable-shared
+
+
+#### Checking the build is 64 bits
+
+Execute this command:
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>file ../../installed/bin/libx264-164.dll</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>you should see something like:
+&gt; ../../installed/bin/libx264-164.dll: PE32+ executable (DLL) (GUI) x86-64, for MS Windows,
+
+which indicates it is a 64 bit build.
+
+If you see this:
+&gt; ../../installed/bin/libx264-164.dll: PE32 executable (DLL) (GUI) Intel 80386, for MS Windows
+
+You have accidently build a 32 bit version, probably because you have the wrong command prompt open.
+
+## Building ffmpeg
+
+Do these steps to build ffpmeg command tools (ffmpeg, ffplay, ffprobe) and shared libraries which can be loaded
+into Unreal Engine.
+
+#### Get the source:
+
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br></div></div><p>cd /d/tools/ffmpeg7/sources
+git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>
+#### Make a build directory:
+
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div><p>cd ../build
+mkdir ffmpeg
+cd ffmpeg</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>
+#### Configure the build
+
+
+Running a separate configuration pre-pass is a common approach in cross-platform software.  This step
+uses all the WSL packages we installed using the pacman command earlier.
+
+The command line below also:
+
+- sets the CC environment variable to tell the build process to use the Microsoft cl compiler command 
+- adds a directory (../../installed/lib/pkgconfig) to the PKG_CONFIG_PATH environment variable so that the configure command can find the
+``x264.pc`` package configuration file which was created when we built the x264 project.
+
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br></div></div><p>CC=cl PKG_CONFIG_PATH=$PKG_CONFIG_PATH:../../installed/lib/pkgconfig <br>
+../../sources/ffmpeg/configure --prefix=../../installed <br>
+--toolchain=msvc --target-os=win64 --arch=x86_64 <br>
+--enable-x86asm --enable-asm --enable-shared  <br>
+--enable-gpl --enable-libx264 --enable-nonfree --enable-debug --disable-optimizations <br>
+--extra-ldflags=&quot;-LIBPATH:../../installed/lib&quot; <br>
+--extra-cxxflags=&quot;-I../../installed/include/ -MTd -Od -Zi&quot; <br>
+--extra-cflags=&quot;-I../../installed/include/ -MTd -Od -Zi&quot;</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>
+This configure command can take quite a while to run, sometime longer than the build itself.
+
+#### Build
+
+Execute these make commands to do the build and install the libraries and commands.
+
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>make -j 14
+make install</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>
+The libraries which we built will be in /d/tools/ffmpeg7/installed/bin directory.
+
+## References
+
+- [ffmpeg compilation guide](https://trac.ffmpeg.org/wiki/CompilationGuide)
+- [ffmpeg build guide](https://www.youtube.com/watch?v=OIYGjzmJ2GI&amp;t=2598s)
+
+## vcpkg
+
+Assuming vcpkg is installed in \tools\vckpg
+
+This command will download and build in one step:
+
+\tools\vcpkg\vcpkg install ffmpeg[core,ffmpeg,swresample,swscale,avdevice]:x64-windows
+\tools\vcpkg\vcpkg install ffmpeg:x64-windows-release
+
+Using msys root at D:/tools/vcpkg/downloads/tools/WSL/893f8801e7c30cbd
+
+-- Getting CMake variables for x64-windows-release
+-- Building Options: --toolchain=msvc --enable-pic --disable-doc --enable-debug --enable-runtime-cpudetect --disable-autodetect --pkg-config=D:/tools/vcpkg/installed/x64-windows/tools/pkgconf/pkgconf.exe --target-os=win32 --enable-w32threads --enable-d3d11va --enable-dxva2 --enable-mediafoundation --disable-inline-asm --cc=cl.exe --cxx=cl.exe --windres=rc.exe --ld=link.exe --ar='ar-lib lib.exe' --disable-ffmpeg --disable-ffplay --disable-ffprobe --enable-avcodec --enable-avdevice --enable-avformat --enable-avfilter --disable-postproc --enable-swresample --enable-swscale --disable-alsa --disable-amf --disable-libaom --disable-libass --disable-avisynth --disable-bzlib --disable-libdav1d --disable-libfdk-aac --disable-libfontconfig --disable-libfreetype --disable-libfribidi --disable-iconv --disable-libilbc --disable-lzma --disable-libmp3lame --disable-libmodplug --disable-cuda --disable-nvenc --disable-nvdec  --disable-cuvid --disable-ffnvcodec --disable-opencl --disable-opengl --disable-libopenh264 --disable-libopenjpeg --disable-libopenmpt --disable-openssl --enable-schannel --disable-libopus --disable-sdl2 --disable-libsnappy --disable-libsoxr --disable-libspeex --disable-libssh --disable-libtensorflow --disable-libtesseract --disable-libtheora --disable-libvorbis --disable-libvpx --disable-libwebp --disable-libx264 --disable-libx265 --disable-libxml2 --disable-zlib --disable-libsrt --disable-libmfx  --enable-cross-compile --disable-static --enable-shared --extra-cflags=-DHAVE_UNISTD_H=0
+
+--cc=cl.exe --cxx=cl.exe --windres=rc.exe --ld=link.exe
+
+ D:\tools\vcpkg\packages\ffmpeg_x64-windows-release\lib\avcodec.lib</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br></div></div></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main> <footer class="f"><div><p>MIT Licensed | Copyright © 2020-2023 John Farrow</p></div></footer></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.cd67cee3.js" defer></script><script src="/assets/js/3.5e27fb36.js" defer></script><script src="/assets/js/2.32bfe7ad.js" defer></script><script src="/assets/js/16.a09663fa.js" defer></script>
+  </body>
+</html>

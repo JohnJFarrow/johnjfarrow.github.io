@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Unexpected Unreal Behaviour | unrealcode.net</title>
+    <meta name="generator" content="VuePress 1.9.8">
+    
+    <meta name="description" content="Unexpected Unreal Behaviour">
+    
+    <link rel="preload" href="/assets/css/0.styles.8a4ca9a4.css" as="style"><link rel="preload" href="/assets/js/app.cd67cee3.js" as="script"><link rel="preload" href="/assets/js/3.5e27fb36.js" as="script"><link rel="preload" href="/assets/js/2.32bfe7ad.js" as="script"><link rel="preload" href="/assets/js/30.d895a9cf.js" as="script"><link rel="prefetch" href="/assets/js/10.49e97280.js"><link rel="prefetch" href="/assets/js/11.6e4ef963.js"><link rel="prefetch" href="/assets/js/12.0d1be04c.js"><link rel="prefetch" href="/assets/js/13.cc995969.js"><link rel="prefetch" href="/assets/js/14.73f9dc1c.js"><link rel="prefetch" href="/assets/js/15.a4a2b57b.js"><link rel="prefetch" href="/assets/js/16.a09663fa.js"><link rel="prefetch" href="/assets/js/17.e0ff5e9b.js"><link rel="prefetch" href="/assets/js/18.f43cd212.js"><link rel="prefetch" href="/assets/js/19.3655039f.js"><link rel="prefetch" href="/assets/js/20.f28f42b4.js"><link rel="prefetch" href="/assets/js/21.1d19a77c.js"><link rel="prefetch" href="/assets/js/22.cf33510c.js"><link rel="prefetch" href="/assets/js/23.35bc8d89.js"><link rel="prefetch" href="/assets/js/24.6d08f35b.js"><link rel="prefetch" href="/assets/js/25.609789b6.js"><link rel="prefetch" href="/assets/js/26.3dce86d0.js"><link rel="prefetch" href="/assets/js/27.1811b27d.js"><link rel="prefetch" href="/assets/js/28.bcdb9006.js"><link rel="prefetch" href="/assets/js/29.c44d1771.js"><link rel="prefetch" href="/assets/js/31.7dc9532a.js"><link rel="prefetch" href="/assets/js/32.f7b9fb0f.js"><link rel="prefetch" href="/assets/js/4.b728e6f4.js"><link rel="prefetch" href="/assets/js/5.c579aa6b.js"><link rel="prefetch" href="/assets/js/6.5aa171c8.js"><link rel="prefetch" href="/assets/js/7.592d144b.js"><link rel="prefetch" href="/assets/js/8.675e70c4.js"><link rel="prefetch" href="/assets/js/9.876839a1.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.8a4ca9a4.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">unrealcode.net</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Unexpected Unreal Behaviour</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/content/Unexpected.html#introduction" class="sidebar-link">Introduction</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/Unexpected.html#the-unreal-header-tool-sometimes-changes-method-parameter-declarations" class="sidebar-link">The Unreal Header Tool sometimes changes method parameter declarations</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/Unexpected.html#the-unreal-header-tool-is-not-fully-satisfied-by-forward-declarations" class="sidebar-link">The Unreal Header Tool is not fully satisfied by forward declarations</a><ul class="sidebar-sub-headers"></ul></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1>Unexpected Unreal Behaviour</h1> <h2 id="introduction"><a href="#introduction" class="header-anchor">#</a> Introduction</h2> <p>This is notes on Unreal Engine behaviour which might surprise.</p> <ol><li><p><a href="#internal_params">The Unreal Header Tool sometimes changes method parameter declarations</a></p></li> <li><p><a href="#internal_forward">The Unreal Header Tool is not fully satisfied by forward declarations</a></p></li></ol> <p id="internal_params"></p> <h2 id="the-unreal-header-tool-sometimes-changes-method-parameter-declarations"><a href="#the-unreal-header-tool-sometimes-changes-method-parameter-declarations" class="header-anchor">#</a> The Unreal Header Tool sometimes changes method parameter declarations</h2> <p>Given a class declared like this:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token function">USTRUCT</span><span class="token punctuation">(</span>BlueprintType<span class="token punctuation">)</span>
+<span class="token keyword">struct</span> <span class="token class-name">EXAMPLE_API</span> FActionContainer
+<span class="token punctuation">{</span>
+	<span class="token function">GENERATED_BODY</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token function">UCLASS</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">EXAMPLE_API</span> AMyCharacter <span class="token operator">:</span> <span class="token keyword">public</span> ACharacter
+<span class="token punctuation">{</span>
+	<span class="token function">GENERATED_BODY</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">public</span><span class="token operator">:</span>
+	<span class="token comment">// Sets default values for this character's properties</span>
+	<span class="token function">AMyCharacter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	<span class="token function">UFUNCTION</span><span class="token punctuation">(</span>BlueprintImplementableEvent<span class="token punctuation">,</span> Category <span class="token operator">=</span> <span class="token string">&quot;Interaction&quot;</span><span class="token punctuation">)</span>
+	<span class="token keyword">void</span> <span class="token function">OpenExpandableItemActions</span><span class="token punctuation">(</span>TArray<span class="token operator">&lt;</span>FActionContainer<span class="token operator">&gt;</span> actions<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br></div></div><p>The above code will not compile.  In the output window we get this error:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>1&gt;MyCharacter.gen.cpp(71): error C2511: 
+	'void AMyCharacter::OpenExpandableItemActions(const TArray&lt;FActionContainer,FDefaultAllocator&gt; &amp;)': 
+	overloaded member function not found in 'AMyCharacter'
+1&gt;MyCharacter.h(19): 
+	note: see declaration of 'AMyCharacter'
+1&gt;MyCharacter.gen.cpp(75): 
+	error C2352: 'UObject::FindFunctionChecked': a call of a non-static member function requires an object
+1&gt;Object.h: 
+	see declaration of 'UObject::FindFunctionChecked'
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br></div></div><p>What is happening here is that the Unreal Header Tool (UHT)
+is generating code into the file MyCharacter.gen.cpp, and the code it is
+generating has different parameter types than the code
+in our class declaration.  The code in the generated .cpp file looks like this:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token keyword">static</span> FName NAME_AMyCharacter_OpenExpandableItemActions <span class="token operator">=</span> <span class="token function">FName</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;OpenExpandableItemActions&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token class-name">AMyCharacter</span><span class="token double-colon punctuation">::</span><span class="token function">OpenExpandableItemActions</span><span class="token punctuation">(</span><span class="token keyword">const</span> TArray<span class="token operator">&lt;</span>FActionContainer<span class="token operator">&gt;</span><span class="token operator">&amp;</span> actions<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+	MyCharacter_eventOpenExpandableItemActions_Parms Parms<span class="token punctuation">;</span>
+	Parms<span class="token punctuation">.</span>actions<span class="token operator">=</span>actions<span class="token punctuation">;</span>
+	<span class="token function">ProcessEvent</span><span class="token punctuation">(</span><span class="token function">FindFunctionChecked</span><span class="token punctuation">(</span>NAME_AMyCharacter_OpenExpandableItemActions<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>Parms<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>This code is generated to support the <code>BlueprintImplementableEvent</code> aspect of the
+<code>OpenExpandableItemActions</code> method, so that the method can be implemented
+in a blueprint rather than in c++.</p> <p>The UHT generates code which uses the types which blueprint supports, which in this
+example are different from the types we used when declaring <code>OpenExpandableItemActions</code>.
+Specifically UHT changes the type of the <code>actions</code> parameter
+from <code>TArray&lt;FActionContainer&gt;</code> to <code>const TArray&lt;FActionContainer&gt;&amp;</code>, i.e.
+it changes a value type to a const reference type.</p> <p>The solution to this error is to change our header to define the method
+the way UHT wants, i.e. using a const reference like this:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token function">UCLASS</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">GARBAGECOLLECTION_API</span> AMyCharacter <span class="token operator">:</span> <span class="token keyword">public</span> ACharacter
+<span class="token punctuation">{</span>
+	<span class="token function">GENERATED_BODY</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">public</span><span class="token operator">:</span>
+	<span class="token comment">// Sets default values for this character's properties</span>
+	<span class="token function">AMyCharacter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	<span class="token function">UFUNCTION</span><span class="token punctuation">(</span>BlueprintImplementableEvent<span class="token punctuation">,</span> Category <span class="token operator">=</span> <span class="token string">&quot;Interaction&quot;</span><span class="token punctuation">)</span>
+	<span class="token keyword">void</span> <span class="token function">OpenExpandableItemActions</span><span class="token punctuation">(</span><span class="token keyword">const</span> TArray<span class="token operator">&lt;</span>FActionContainer<span class="token operator">&gt;</span><span class="token operator">&amp;</span> actions<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br></div></div><p id="internal_forward"></p> <h2 id="the-unreal-header-tool-is-not-fully-satisfied-by-forward-declarations"><a href="#the-unreal-header-tool-is-not-fully-satisfied-by-forward-declarations" class="header-anchor">#</a> The Unreal Header Tool is not fully satisfied by forward declarations</h2> <p>If you generate a first person game project with C++ from the Unreal Editor you create a file
+called {ProjectName}Character.h.  This contains forward declares the type <code>USkeletalMeshComponent</code>
+and then uses it like this:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token keyword">class</span> <span class="token class-name">USkeletalMeshComponent</span><span class="token punctuation">;</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token function">UCLASS</span><span class="token punctuation">(</span>config<span class="token operator">=</span>Game<span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">AProjectCharacter</span> <span class="token operator">:</span> <span class="token base-clause"><span class="token keyword">public</span> <span class="token class-name">ACharacter</span></span>
+<span class="token punctuation">{</span>
+	<span class="token function">GENERATED_BODY</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">/** Pawn mesh: 1st person view (arms; seen only by self) */</span>
+	<span class="token function">UPROPERTY</span><span class="token punctuation">(</span>VisibleDefaultsOnly<span class="token punctuation">,</span> Category<span class="token operator">=</span>Mesh<span class="token punctuation">)</span>
+	USkeletalMeshComponent<span class="token operator">*</span> Mesh1P<span class="token punctuation">;</span>
+	<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br></div></div><p>This makes it look as though when UHT processes the <code>UPROPERTY</code> macro it uses the forward
+declaration to resolve the <code>USkeletalMeshComponent</code> type.  But it does not.  If you
+change the <code>USkeletalMeshComponent</code> type to something which does not exist such as <code>NonExistantClass</code> like so:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token keyword">class</span> <span class="token class-name">NonExistantClass</span><span class="token punctuation">;</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token function">UCLASS</span><span class="token punctuation">(</span>config<span class="token operator">=</span>Game<span class="token punctuation">)</span>
+<span class="token keyword">class</span> <span class="token class-name">AProjectCharacter</span> <span class="token operator">:</span> <span class="token base-clause"><span class="token keyword">public</span> <span class="token class-name">ACharacter</span></span>
+<span class="token punctuation">{</span>
+	<span class="token function">GENERATED_BODY</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">/** Pawn mesh: 1st person view (arms; seen only by self) */</span>
+	<span class="token function">UPROPERTY</span><span class="token punctuation">(</span>VisibleDefaultsOnly<span class="token punctuation">,</span> Category<span class="token operator">=</span>Mesh<span class="token punctuation">)</span>
+	NonExistantClass<span class="token operator">*</span> Mesh1P<span class="token punctuation">;</span>
+	<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br></div></div><p>This will not compile, it fails with this error:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>1&gt;ProjectCharacter.h(28): error : Unrecognized type 'NonExistantClass' - type must be a UCLASS, USTRUCT, 
+                  UENUM, or global delegate.
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>Using a forward declaration to a non-existant class would work in straight C++, but
+the UHT must be parsing the engine and project code and maintaining a list of UCLASS, USTRUCT, UENUM types and
+failing if it does not find the specified type.</p></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main> <footer class="f"><div><p>MIT Licensed | Copyright © 2020-2023 John Farrow</p></div></footer></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.cd67cee3.js" defer></script><script src="/assets/js/3.5e27fb36.js" defer></script><script src="/assets/js/2.32bfe7ad.js" defer></script><script src="/assets/js/30.d895a9cf.js" defer></script>
+  </body>
+</html>

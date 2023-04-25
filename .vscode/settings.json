@@ -1,0 +1,7 @@
+{
+    "python.analysis.typeCheckingMode": "basic",
+    "python.autoComplete.extraPaths": [
+        "d:/work/learn/PythonTestVeh/Intermediate/PythonStub"
+    ],
+
+}

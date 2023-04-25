@@ -1,6 +1,7 @@
 import unreal
 from pprint import pprint
 from pathlib import Path
+from typing import Tuple
 
 # set this dir in project settings, filter python, add to additional paths
 #
@@ -62,7 +63,7 @@ def import_static_meshes():
 
     options: unreal.FbxImportUI = build_options()
 
-    tasks: list[Unreal.task] = [
+    tasks: list[unreal.task] = [
         build_import_task(mesh_name=mesh_name, filename=path, destination_path="/Game/Meshes", options=options) for
         mesh_name, path in mesh_data.items()]
 
@@ -78,7 +79,7 @@ def import_static_meshes():
 def add_subobject(subsystem: unreal.SubobjectDataSubsystem,
                   blueprint: unreal.Blueprint,
                   new_class,
-                  name: str ) -> ( unreal.SubobjectDataHandle, unreal.Object ):
+                  name: str ) -> Tuple[unreal.SubobjectDataHandle, unreal.Object]:
 
     root_data_handle: unreal.SubobjectDataHandle = subsystem.k2_gather_subobject_data_for_blueprint(context=blueprint)[0]
 
@@ -94,7 +95,7 @@ def add_subobject(subsystem: unreal.SubobjectDataSubsystem,
     # subsystem.attach_subobject(owner_handle=root_data_handle, child_to_add_handle=sub_handle)
 
     BFL = unreal.SubobjectDataBlueprintFunctionLibrary
-    obj: Object = BFL.get_object(BFL.get_data(sub_handle))
+    obj: object = BFL.get_object(BFL.get_data(sub_handle))
     return sub_handle, obj
 
 
@@ -106,7 +107,7 @@ def make_component_name(name: str) -> unreal.ConstrainComponentPropName:
 
 def load_mesh(path: str) -> unreal.StaticMesh:
     EAL = unreal.EditorAssetLibrary
-    asset: Object = EAL.load_asset(path)
+    asset: object = EAL.load_asset(path)
     if not isinstance(asset, unreal.StaticMesh):
         raise Exception("Failed to load StaticMesh from {path}")
     return asset
@@ -124,7 +125,7 @@ def make_blueprint(package_path: str, asset_name: str):
     # make the blueprint
     asset_tools: unreal.AssetTools = unreal.AssetToolsHelpers.get_asset_tools()
 
-    asset: Object = asset_tools.create_asset(asset_name=asset_name, package_path=package_path, asset_class=None, factory=factory)
+    asset: object = asset_tools.create_asset(asset_name=asset_name, package_path=package_path, asset_class=None, factory=factory)
     if not isinstance(asset, unreal.Blueprint):
         raise Exception("Failed to create blueprint asset")
     blueprint: unreal.Blueprint = asset # noqa
@@ -179,7 +180,7 @@ def make_blueprint(package_path: str, asset_name: str):
     # BALL
     sub_handle, ball = add_subobject(subsystem=subsystem, blueprint=blueprint, new_class=unreal.SphereComponent, name="Ball")
     # mesh: unreal.StaticMesh = EAL.load_asset("/Game/Meshes/SM_Arm")
-    assert isinstance(arm, unreal.StaticMeshComponent)
+    assert isinstance(ball, unreal.StaticMeshComponent)
     ball.set_editor_property(name="mobility", value=unreal.ComponentMobility.MOVABLE)
     ball.set_editor_property(name="relative_location", value=unreal.Vector(0.0, 190.0, 140.0))
     ball.set_mass_override_in_kg(unreal.Name("NAME_None"), 15)

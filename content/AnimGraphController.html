@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>AnimGraphController - an object to update an animation graph from python | unrealcode.net</title>
+    <meta name="generator" content="VuePress 1.9.8">
+    
+    <meta name="description" content="Describes the design and implementation of a blueprint function library callable from python which provides functions for updating an animation graph">
+    
+    <link rel="preload" href="/assets/css/0.styles.8a4ca9a4.css" as="style"><link rel="preload" href="/assets/js/app.a85c9206.js" as="script"><link rel="preload" href="/assets/js/3.5e27fb36.js" as="script"><link rel="preload" href="/assets/js/2.32bfe7ad.js" as="script"><link rel="preload" href="/assets/js/13.75239821.js" as="script"><link rel="prefetch" href="/assets/js/10.49e97280.js"><link rel="prefetch" href="/assets/js/11.6e4ef963.js"><link rel="prefetch" href="/assets/js/12.0d1be04c.js"><link rel="prefetch" href="/assets/js/14.273b9c9e.js"><link rel="prefetch" href="/assets/js/15.8fbca2bd.js"><link rel="prefetch" href="/assets/js/16.55a6646b.js"><link rel="prefetch" href="/assets/js/17.818ba3a6.js"><link rel="prefetch" href="/assets/js/18.08b75dd9.js"><link rel="prefetch" href="/assets/js/19.92c314df.js"><link rel="prefetch" href="/assets/js/20.b27c6697.js"><link rel="prefetch" href="/assets/js/21.cd412d8a.js"><link rel="prefetch" href="/assets/js/22.cc2d5517.js"><link rel="prefetch" href="/assets/js/23.5864e050.js"><link rel="prefetch" href="/assets/js/24.f5bbc596.js"><link rel="prefetch" href="/assets/js/25.e229f812.js"><link rel="prefetch" href="/assets/js/26.d134e6f1.js"><link rel="prefetch" href="/assets/js/27.38556b30.js"><link rel="prefetch" href="/assets/js/28.10083c68.js"><link rel="prefetch" href="/assets/js/29.749c2424.js"><link rel="prefetch" href="/assets/js/30.289bdc5a.js"><link rel="prefetch" href="/assets/js/31.5d18c39e.js"><link rel="prefetch" href="/assets/js/32.f1a226c3.js"><link rel="prefetch" href="/assets/js/33.a8f87d51.js"><link rel="prefetch" href="/assets/js/34.9c635b24.js"><link rel="prefetch" href="/assets/js/35.f49ef5ff.js"><link rel="prefetch" href="/assets/js/36.b094eca7.js"><link rel="prefetch" href="/assets/js/37.f56a4792.js"><link rel="prefetch" href="/assets/js/4.b728e6f4.js"><link rel="prefetch" href="/assets/js/5.2f436e88.js"><link rel="prefetch" href="/assets/js/6.5aa171c8.js"><link rel="prefetch" href="/assets/js/7.592d144b.js"><link rel="prefetch" href="/assets/js/8.675e70c4.js"><link rel="prefetch" href="/assets/js/9.876839a1.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.8a4ca9a4.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">unrealcode.net</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>AnimGraphController - an object to update an animation graph from python</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/content/AnimGraphController.html#what-we-want-to-be-able-to-do" class="sidebar-link">What we want to be able to do</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/AnimGraphController.html#approach" class="sidebar-link">Approach</a><ul class="sidebar-sub-headers"></ul></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1>AnimGraphController - an object to update an animation graph from python</h1> <p>Updated for Unreal Engine 5.1.1</p> <p>During the course of creating chaos vehicles from a python script I needed to
+create and add nodes to an animation graph.  In UE 5.1 animation graphs
+can be created from python but there are no exposed functions for
+adding nodes to the graph.</p> <p>The code to create an animation graph looks like this.</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>import unreal
+
+EAS: unreal.EditorAssetSubsystem = unreal.EditorAssetSubsystem()
+factory: unreal.AnimBlueprintFactory = unreal.AnimBlueprintFactory()
+
+car_asset_path: str = &quot;/Game/Meshes/SM_Car&quot;
+
+# get the skeleton of the car
+loaded = EAS.load_asset( asset_path=car_asset_path )
+if loaded == None:
+    raise Exception(f&quot;Could not load newly created asset {car_asset_path}&quot;) 
+    
+assert isinstance( loaded, unreal.SkeletalMesh )
+skm: unreal.SkeletalMesh = loaded
+
+factory.set_editor_property(name=&quot;target_skeleton&quot;, value=skm.skeleton )
+factory.set_editor_property(name=&quot;parent_class&quot;, value=unreal.VehicleAnimationInstance )
+        
+asset = asset_tools.create_asset(
+    asset_name=&quot;APB_Car&quot;, 
+    package_path=&quot;/Game/Meshes&quot;, 
+    asset_class=unreal.AnimBlueprint, 
+    factory=factory ) 
+
+assert isinstance( asset, unreal.AnimBlueprint )
+anim_bp: unreal.AnimBlueprint = asset
+graphs: unreal.Array[unreal.AnimationGraph] = anim_bp.get_animation_graphs()
+assert( len(graphs) == 1 )
+graph: unreal.AnimationGraph = graphs[0]
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br></div></div><p>This uses an existing vehicle skeletal mesh &quot;/Game/Blueprints/SM_Car&quot; which has a reference
+to an existing skeletal mesh.  The code above loads that skeletal mesh and uses it
+when constructing the animation graph.</p> <p>The code above retrieves the animation graph from the animation blueprint.  This
+is a far as we can go in python without exposing more graph manipulation functions
+to python.</p> <h2 id="what-we-want-to-be-able-to-do"><a href="#what-we-want-to-be-able-to-do" class="header-anchor">#</a> What we want to be able to do</h2> <p>There is an existing UE module called &quot;ControlRigDeveloper&quot; which allows you to
+manipulate a control rig using python like so:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>rig = unreal.load_object(name = '/Game/ControlRig/Samples/Mannequin_ControlRig', outer = None)
+
+# access to the controller to perform changes
+controller = rig.get_controller()
+
+# get the unit - you might also get this by path or similar
+unit = unreal.RigUnit_MathFloatAdd.static_struct()
+ 
+# add a couple of nodes to the graph provided the unit struct, the method (is always Execute)
+node1 = controller.add_unit_node(script_struct = unit, method_name = &quot;Execute&quot;)
+# this one also sets the 2D position in the graph
+node2 = controller.add_unit_node(script_struct = unit, method_name = &quot;Execute&quot;, position = unreal.Vector2D(50, 100))
+ 
+# find the pins
+pin1 = node1.find_pin('result')
+pin2 = node2.find_pin('a')
+ 
+# create the link
+success = controller.add_link(pin1.get_pin_path(), pin2.get_pin_path())
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br></div></div><p>This pretty much shows what we want to be able to do with an animation graph</p> <ol><li>add nodes to the graph</li> <li>connect these nodes using specified pins</li></ol> <h2 id="approach"><a href="#approach" class="header-anchor">#</a> Approach</h2> <p>The functionality to add nodes to an anim graph and connect them will be:</p> <ul><li>implemented in a c++ class which extends UBlueprintFunctionLibrary</li> <li>using UFUNCTION macros so the functions can be called from python</li></ul></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main> <footer class="f"><div><p>MIT Licensed | Copyright © 2020-2023 John Farrow</p></div></footer></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.a85c9206.js" defer></script><script src="/assets/js/3.5e27fb36.js" defer></script><script src="/assets/js/2.32bfe7ad.js" defer></script><script src="/assets/js/13.75239821.js" defer></script>
+  </body>
+</html>

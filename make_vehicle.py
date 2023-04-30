@@ -724,20 +724,35 @@ def create_vehicle(
             spring_arm_handle, spring_arm = add_subobject(subsystem=subsystem, blueprint=vehicle_blueprint, new_class=unreal.SpringArmComponent, name="SpringArm")
             assert isinstance( spring_arm, unreal.SpringArmComponent)
 
+            spring_arm_handle1, spring_arm1 = add_subobject(subsystem=subsystem, blueprint=vehicle_blueprint, new_class=unreal.SpringArmComponent, name="SpringArm1")
+            assert isinstance( spring_arm1, unreal.SpringArmComponent)
+
             spring_arm.set_editor_property(name="do_collision_test", value=False)
+            spring_arm1.set_editor_property(name="do_collision_test", value=False)
+            
+            # make them the same as the SportsCar_Pawn so we can just copy the inputs blueprint nodes
+            spring_arm.set_relative_location( unreal.Vector(0.0,0.0,75.0), False, True )
+            spring_arm1.set_relative_location( unreal.Vector(-30.0,0.0,120.0), False, True )
+
+            spring_arm.set_editor_property(name="target_arm_length", value=650.0)
 
             if len(cameras) < 1:
-                camera_handle, camera = add_subobject(subsystem=subsystem, blueprint=vehicle_blueprint, new_class=unreal.CameraComponent, name="Camera")
-                assert isinstance( camera, unreal.CameraComponent)
+                camera_handle, front_camera = add_subobject(subsystem=subsystem, blueprint=vehicle_blueprint, new_class=unreal.CameraComponent, name="FrontCamera")
+                assert isinstance( front_camera, unreal.CameraComponent)
+
+                camera_handle1, camera1 = add_subobject(subsystem=subsystem, blueprint=vehicle_blueprint, new_class=unreal.CameraComponent, name="BackCamera")
+                assert isinstance( camera1, unreal.CameraComponent)
                 
                 # camera is child of spring arm
-                subsystem.attach_subobject( spring_arm_handle, camera_handle )     
+                subsystem.attach_subobject( spring_arm_handle, camera_handle1 )     
+                subsystem.attach_subobject( spring_arm_handle1, camera_handle )     
                 # spring arm is child of vehicle mesh   
                 subsystem.attach_subobject( handles[0], spring_arm_handle )        
+                subsystem.attach_subobject( handles[0], spring_arm_handle1 )        
     
                 # move the camera
-                camera.set_relative_location( unreal.Vector(-400.0,0.0,340.0), False, True )
-                camera.set_relative_rotation( unreal.Rotator(  0.0, -20.0, 0.0 ), False, True )
+                #front_camera.set_relative_location( unreal.Vector(-400.0,0.0,340.0), False, True )
+                #front_camera.set_relative_rotation( unreal.Rotator(  0.0, -20.0, 0.0 ), False, True )
                 
 
     movement_components = [ i for i in components if i.get_class().get_name() == "ChaosWheeledVehicleMovementComponent" ]
@@ -831,6 +846,9 @@ def create_vehicle(
         vtc.set_editor_property(name="use_automatic_gears", value=True ) # (bool):  [Read-Write] Whether to use automatic transmission
 
         vmc.set_editor_property(name="transmission_setup", value=vtc )
+        
+        # stop the front end coming up
+        vmc.set_editor_property(name="legacy_wheel_friction_position", value=True )
 
         
         
@@ -1076,11 +1094,17 @@ def connect_existing_IMC(blueprint_asset_path):
     return
 
 def create_everything():
+    with unreal.ScopedSlowTask(work=20, desc="creating vehicle") as slow_task:
+        slow_task.make_dialog(True)  
+        create_everything_slow_task(slow_task)
+           
+
+def create_everything_slow_task( slow_task:unreal.ScopedSlowTask ):
     level_package_path: str = "/Game/Levels"
     level_name: str = "NewLevel"
 
-    blueprint_path : str = "/Game/Vehicles/Porsche_911_GT3"
-    mesh_package_path : str = "/Game/Vehicles/Porsche_911_GT3"
+    blueprint_path : str = "/Game/Experimental/Porsche_911_GT3"
+    mesh_package_path : str = "/Game/Experimental/Porsche_911_GT3"
     input_package_path : str = "/Game/Inputs"
     
     create_all = True 
@@ -1095,6 +1119,8 @@ def create_everything():
     
     try:
         check_plugins_loaded()
+        slow_task.enter_progress_frame()
+        
 
         base_name: str = "Car"
         blueprint_asset_path: str = blueprint_path + "/" + "BP_" + base_name
@@ -1117,6 +1143,7 @@ def create_everything():
             return
         
         if create_wheels:
+            slow_task.enter_progress_frame(4)
             front_wheel_blueprint_asset_path = create_wheel_blueprint( 
                 asset_path = front_wheel_blueprint_asset_path,
                 axle_type = unreal.AxleType.FRONT,
@@ -1141,14 +1168,17 @@ def create_everything():
                 )
             
         if create_torque_curve:
+            slow_task.enter_progress_frame()
             torque_curve_name, max_torque, max_rpm = create_engine_torque_curve(asset_path=torque_curve_asset_path, make_unique_name=False, overwrite=True)
 
         if import_vehicle:
+            slow_task.enter_progress_frame(10)
             source:str = "https://raw.github.com/JohnJFarrow/public/dev/Porsche.fbx"
             skeletal_mesh_asset_path, physics_asset_path, skeleton_asset_path = import_vehicle_mesh(asset_path=skeletal_mesh_asset_path, fbx_file_path=source, make_unique_name=False, overwrite=True)
             edit_existing_physics_asset( asset_path=physics_asset_path )
 
         if create_anim_bp:
+            slow_task.enter_progress_frame()
             # for now put the anim blueprint in same dir as car
             anim_blueprint_asset_path = create_anim_blueprint( 
                     asset_path=anim_blueprint_asset_path, 
@@ -1158,6 +1188,7 @@ def create_everything():
                     make_unique_name=True )
             
         if create_vehicle_bp:
+            slow_task.enter_progress_frame()
             blueprint_asset_path = create_vehicle( 
                            asset_path=blueprint_asset_path, 
                            skeletal_mesh_asset_path=skeletal_mesh_asset_path,
@@ -1172,6 +1203,7 @@ def create_everything():
                            )
 
         if create_enhanced_input:
+            slow_task.enter_progress_frame()
             create_enhanced_input_setup(
                 input_action_asset_path=input_action_asset_path,
                 input_mapping_asset_path=input_mapping_asset_path
@@ -1180,6 +1212,7 @@ def create_everything():
         connect_existing_IMC(blueprint_asset_path=blueprint_asset_path)
 
         EAL = unreal.EditorAssetLibrary()
+        slow_task.enter_progress_frame()
         EAL.save_asset( asset_to_save=blueprint_asset_path, only_if_is_dirty=False )
             
     except (BaseException,AttributeError) as ae:
@@ -1204,76 +1237,4 @@ def create_everything():
         traceback.print_exc()
 
 
-    #create_wheel_blueprints()
 
-def compare_CollisionResponseContainer(value0:unreal.CollisionResponseContainer,value1:unreal.CollisionResponseContainer):
-    pass
-
-def compare_vehicles():
-    
-    subsystem: unreal.SubobjectDataSubsystem = cast(unreal.SubobjectDataSubsystem,unreal.get_engine_subsystem(unreal.SubobjectDataSubsystem))
-    library: unreal.SubobjectDataBlueprintFunctionLibrary = unreal.SubobjectDataBlueprintFunctionLibrary()
-
-    paths:list [str] = ["/Game/Vehicles/Porsche_911_GT3/BP_Car", "/Game/VehicleTemplate/Blueprints/SportsCar/SportsCar_Pawn"]
-    EAL = unreal.EditorAssetLibrary
-    assets: list[object] = [EAL.load_asset(path) for path in paths]
-    
-    movements: list[object] = []
-    meshes: list[object] = []
-
-    for blueprint in assets:
-        if blueprint:
-            # get subobjects
-            
-            #print("BLUEPRINT", blueprint.get_name() )
-            #print("+++++++++++++++++++++++++++++++++++++++" )
-            
-            handles: unreal.Array[unreal.SubobjectDataHandle] = subsystem.k2_gather_subobject_data_for_blueprint(context=blueprint)
-    
-            if len(handles) < 1:
-                raise Exception("Could not get subobjects (i.e. components) for blueprint " + ap.asset_path())
-
-            # find data for handles
-            object_data: unreal.Array[unreal.SubobjectData] = [ subsystem.k2_find_subobject_data_from_handle(i) for i in handles ]
-
-            # find all components
-            components: list[unreal.Object] = [ library.get_object(i) for i in object_data ]
-            
-            # filter for vehicle movement only    
-            tmp: list[unreal.Object] = [ i for i in components if i.get_class().get_name() == "ChaosWheeledVehicleMovementComponent" ]
-            movements.extend(tmp)
-            
-            # filter for vehicle mesh only VehicleMesh
-            tmp = [ i for i in components if i.get_class().get_name() == "SkeletalMeshComponent" ]
-            meshes.extend(tmp)
-
-    assert(len(movements) == 2 )
-    assert(len(meshes) == 2 )
-
-    values = [ OrderedDict({}), OrderedDict({}) ]
-        
-    for i in range(0,2):
-        comp = movements[i]
-        #print("COMPONENT", comp.get_name() )
-        #print("--------------------------------")
-        names = unreal.BlueprintTool.get_all_property_names(comp.get_class())
-        for n in names:
-            # here don't use comp.get_default_object() we want the value off this 
-            # component not the default values for all vehicle comp
-            values[i][n] = comp.get_editor_property(n)
-
-    #print(values[0])      
-    #print(values[1])      
-    for p in values[0].keys():
-        value0 = values[0][p]
-        if p in values[1]:
-            value1 = values[1][p]
-        else:
-            value1 = "**MISSING**"
-        
-        if value1 != value0:
-            #if isinstance(value1,unreal.CollisionResponseContainer) and isinstance(value0,unreal.CollisionResponseContainer):
-            #    compare_CollisionResponseContainer(value0,value1)
-            #else:
-            print(p, "list1=", value0, "list2=", value1, "class=", type(value0) )              
-    

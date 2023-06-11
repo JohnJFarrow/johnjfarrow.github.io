@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Mass 001 Cache Concepts | unrealcode.net</title>
+    <meta name="generator" content="VuePress 1.9.8">
+    
+    <meta name="description" content="Why Mass is a good idea, or a quick background on CPU memory caching">
+    
+    <link rel="preload" href="/assets/css/0.styles.8a4ca9a4.css" as="style"><link rel="preload" href="/assets/js/app.64510b8b.js" as="script"><link rel="preload" href="/assets/js/3.5e27fb36.js" as="script"><link rel="preload" href="/assets/js/2.32bfe7ad.js" as="script"><link rel="preload" href="/assets/js/25.c3065073.js" as="script"><link rel="prefetch" href="/assets/js/10.49e97280.js"><link rel="prefetch" href="/assets/js/11.6e4ef963.js"><link rel="prefetch" href="/assets/js/12.0d1be04c.js"><link rel="prefetch" href="/assets/js/13.75239821.js"><link rel="prefetch" href="/assets/js/14.c548a38f.js"><link rel="prefetch" href="/assets/js/15.138b018f.js"><link rel="prefetch" href="/assets/js/16.9994777c.js"><link rel="prefetch" href="/assets/js/17.555bef63.js"><link rel="prefetch" href="/assets/js/18.954adcd7.js"><link rel="prefetch" href="/assets/js/19.c4ba1c17.js"><link rel="prefetch" href="/assets/js/20.1d68ae7f.js"><link rel="prefetch" href="/assets/js/21.27cfaef1.js"><link rel="prefetch" href="/assets/js/22.281de799.js"><link rel="prefetch" href="/assets/js/23.dd706ab5.js"><link rel="prefetch" href="/assets/js/24.d27ef46b.js"><link rel="prefetch" href="/assets/js/26.4b8ed2a8.js"><link rel="prefetch" href="/assets/js/27.1dadcad6.js"><link rel="prefetch" href="/assets/js/28.08e04724.js"><link rel="prefetch" href="/assets/js/29.ccc7e84e.js"><link rel="prefetch" href="/assets/js/30.95efa1f7.js"><link rel="prefetch" href="/assets/js/31.a5b7e11b.js"><link rel="prefetch" href="/assets/js/32.f3d55ed0.js"><link rel="prefetch" href="/assets/js/33.3b5efaa9.js"><link rel="prefetch" href="/assets/js/34.93aae654.js"><link rel="prefetch" href="/assets/js/35.6feb19ba.js"><link rel="prefetch" href="/assets/js/36.a0c5dd3a.js"><link rel="prefetch" href="/assets/js/37.56fa83de.js"><link rel="prefetch" href="/assets/js/38.1ec014f8.js"><link rel="prefetch" href="/assets/js/39.3a893d37.js"><link rel="prefetch" href="/assets/js/4.b728e6f4.js"><link rel="prefetch" href="/assets/js/40.19e1d8f9.js"><link rel="prefetch" href="/assets/js/5.a48e27bc.js"><link rel="prefetch" href="/assets/js/6.5aa171c8.js"><link rel="prefetch" href="/assets/js/7.592d144b.js"><link rel="prefetch" href="/assets/js/8.675e70c4.js"><link rel="prefetch" href="/assets/js/9.876839a1.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.8a4ca9a4.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">unrealcode.net</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Mass 001 Cache Concepts</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/content/MASS_001.html#about-entity-component-systems" class="sidebar-link">About Entity Component Systems</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/MASS_001.html#cpu-memory-caching" class="sidebar-link">CPU Memory Caching</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/MASS_001.html#cache-lines" class="sidebar-link">Cache Lines</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/MASS_001.html#entity-component-systems" class="sidebar-link">Entity Component Systems</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/MASS_001.html#a-simple-example" class="sidebar-link">A simple example</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/MASS_001.html#data-types-and-sizes" class="sidebar-link">Data Types and Sizes</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/MASS_001.html#terminology" class="sidebar-link">Terminology</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/MASS_001.html#threading-and-false-sharing" class="sidebar-link">Threading and False Sharing</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/MASS_001.html#references" class="sidebar-link">References</a><ul class="sidebar-sub-headers"></ul></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1>Mass 001 Cache Concepts</h1> <h2 id="about-entity-component-systems"><a href="#about-entity-component-systems" class="header-anchor">#</a> About Entity Component Systems</h2> <p>This is the first of a series of articles documenting what I know about the Unreal Mass framework.</p> <p>Mass is an Unreal Engine module which implements an <a href="https://en.wikipedia.org/wiki/Entity_component_system" target="_blank" rel="noopener noreferrer">Entity Component System<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a> or ECS.</p> <p>An entity component system is an architectural pattern where data related to objects, such as their velocity or position, is stored in a specific
+way in memory to speed up access to that data.  The way an entity component system stores data in memory is influenced by the memory caching architecture of the CPU it is running on.</p> <h2 id="cpu-memory-caching"><a href="#cpu-memory-caching" class="header-anchor">#</a> CPU Memory Caching</h2> <p>This is a very high-level view of caching.  When the CPU wants to operate on a value (say to increment it or to add it to another value) that value first must be copied from main memory to the CPU.</p> <p>If there was no memory caching (like we are back in 1980), every time the CPU needed to access a value it would have to be copied
+from main memory. To avoid this CPUs have cache memory, which is a small amount of memory
+physically either in the CPU or close by it.  When a value is required by the CPU,
+the CPU checks to see if the value is already in the cache - if it is then
+it is copied from the cache to the CPU, if it is not it is copied from the
+memory to the CPU and also stored in the cache so it might be found if it is
+required again.</p> <p>This image shows the cache layout on a Ryzen 8 core CPU:</p> <p><img src="/images/Zen3_arch_20.jpg" alt=""></p> <p>From this we can see aspects of this specific memory architecture:</p> <ul><li>there are 3 levels of cache L1, L2, L3 (some chips have more)</li> <li>the L1 cache consists of two separate parts the I Cache (instruction) and the D Cache (data).  When considering
+entity component s
+ystems we only care about the data cache.</li> <li>each level is larger than the previous one - L1 is 32K, L2 is 512K, L3 is 32M</li> <li>each core has its own L1 and L2 cache</li> <li>the L3 cache is shared between all cores</li></ul> <p>When a value is required by the CPU:</p> <ul><li>if it is in the L1 cache it is copied from L1, otherwise</li> <li>if it is in the L2 cache it is copied from L2, otherwise</li> <li>if it is in the L3 cache it is copied from L3, otherwise</li> <li>it is copied from memory</li></ul> <p>Each successive level of cache is slower to access than the previous one - it has a higher latency.  To copy a value
+(ignoring the size of the value for now) to the CPU takes increasing time.  Note that the timings vary
+from system to system depending on CPU type and memory speed, but the general trend is the same.</p> <p>This image shows values for a 12 core Ryzen CPU:</p> <p><img src="/images/mass_001_002.PNG" alt=""></p> <p>Fetching data from:</p> <ul><li>L1 cache to CPU register - 4 cycles - 0.8ns</li> <li>L2 cache to CPU register - 12 cycles - 2.4ns</li> <li>L3 cache to CPU register - 52 cycles - 10.6ns</li> <li>memory to CPU register - 52.7 ns</li></ul> <p>So comparatively, fetching data from:</p> <ul><li>L2 cache takes 3 times as long as from L1</li> <li>L3 cache takes 13 times as long as from L1</li> <li>memory takes 66 times as long as from L1</li></ul> <p>So in the extreme case a calculation could be done 66 times faster if all the required data was in the L1 cache
+as opposed to only being in memory.</p> <h2 id="cache-lines"><a href="#cache-lines" class="header-anchor">#</a> Cache Lines</h2> <p>Values are not copied from main memory to cache memory one at a time.  They are
+copied in cache lines.  The size of a cache line depends on the CPU model but is typically 64 bytes.  The CoreInfo
+program listed in references at the end of this page can be used to print the cache line size for your CPU.</p> <p>Assunming a cache line size of 64 bytes, and an integer size of 4 bytes, one cache line can fit 16 integer
+values - this means that ideally we want to write a program so that each time we copy values from
+main memory into the L1 cache we move 16 integer values at a time.  The first time we
+need one of the values we pay the 52.7ns cost of copying a cache line from main memory to the
+L1 cache, but for the remaining 15 integer values we only pay the 0.8ns for each value.</p> <h2 id="entity-component-systems"><a href="#entity-component-systems" class="header-anchor">#</a> Entity Component Systems</h2> <p>An entity component system tries to group data which will be used into contiguous arrays so
+that every value used in a calculation is on a cache line with other values which will also
+be used, and also that no data is copied from main memory to the CPU which is not used.</p> <h2 id="a-simple-example"><a href="#a-simple-example" class="header-anchor">#</a> A simple example</h2> <p>Say we have a Robot class and each instance of the Robot class robot has a position, a velocity,
+a size and an active flag like this:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>struct FRobot
+{
+	FVector Position;   // 3x8 = 24 bytes
+	FVector Velocity;   // 3x8 = 24 bytes
+	FVector Size;       // 3x8 = 24 bytes
+	bool bActive;       // 1 byte
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>We have a array of 1 million Robots, and we want to set the bActive property to true on every tick event.  This code will do that:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>namespace
+{
+	struct FRobot
+	{
+		FVector Position;   // 3x8 = 24 bytes
+		FVector Velocity;   // 3x8 = 24 bytes
+		FVector Size;       // 3x8 = 24 bytes
+		bool bActive;
+	};
+
+	TArray&lt;FRobot&gt; RobotArray;
+
+	void ActivateRobots()
+	{
+		TRACE_CPUPROFILER_EVENT_SCOPE(ActivateRobots)
+		{
+			for (FRobot&amp; Robot : RobotArray)
+			{
+				Robot.bActive = true;
+			}
+		}
+	}
+}
+
+void AMyCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	// initialize array
+	size_t N = 1024 * 1024;
+	RobotArray.AddDefaulted(N);
+}
+
+void AMyCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	ActivateRobots();
+}
+
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br></div></div><p>Using Unreal Insights we can see the ActivateRobots call takes 7.38ms (2400ms for 325 calls):</p> <p><img src="/images/mass_001_004.PNG" alt=""></p> <p>If we restuctured the code to save each Robot property in a separate array, so we have one
+array for Ages, one for Positions etc. we have this:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>namespace {
+
+	struct FRobots
+	{
+		TArray&lt;FVector&gt; Positions;
+		TArray&lt;FVector&gt; Velocities;
+		TArray&lt;FVector&gt; Sizes;
+		TArray&lt;bool&gt; Actives;
+
+		void AddDefaulted(const size_t N)
+		{
+			Positions.AddDefaulted(N);
+			Velocities.AddDefaulted(N);
+			Sizes.AddDefaulted(N);
+			Actives.AddDefaulted(N);
+		}
+	};
+
+	FRobots Robots;
+
+	void ActivateRobots_SOA()
+	{
+		TRACE_CPUPROFILER_EVENT_SCOPE(ActivateRobots_SOA)
+		{
+			for( bool&amp; bActive : Robots.Actives)
+			{
+				bActive = true;
+			}
+		}
+	}
+}
+
+void AMyCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	size_t N = 1024 * 1024;
+	Robots.AddDefaulted(N);
+}
+
+void AMyCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	ActivateRobots_SOA(Robots);
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br></div></div><p>Here the _SOA appended to the name to distinguish the two approaches
+refers to Structure-of-Arrays.  This terminology comes from the fact that the first approach uses an Array-of-Structures, the
+second approach as a single structure which contains the data in arrays.</p> <p>Using Unreal Insights we can see the ActivateRobots_SOA call takes 1.18ms (385ms for 325 calls):</p> <p><img src="/images/mass_001_006.PNG" alt=""></p> <p>So by changing to storing the data in arrays we have made the function  go 6 times faster.  This
+is what the Mass entity component system tries to do for objects in Unreal Engine, it
+enables support for much larger numbers of objects than would be support by a strictly
+object oriented approach.</p> <h2 id="data-types-and-sizes"><a href="#data-types-and-sizes" class="header-anchor">#</a> Data Types and Sizes</h2> <p>Storing data in arrays not only increases performance but it also saves memory:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>struct FRobot
+{
+	FVector Position;   // 3x8 = 24 bytes
+	FVector Velocity;   // 3x8 = 24 bytes
+	FVector Size;       // 3x8 = 24 bytes
+	bool bActive;
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br></div></div><p>When an array is filled with FRobot objects they align according to c++ alignment rules.  The alignment
+of a struct is usually the maximum alignment of each of its members, so in this case  the alignment
+alignof(FRobot) is alignof(FVector) which is 24 bytes - so we waste 23 bytes for each
+FRobot object.</p> <p>Changing the bool to an int32 type has an observable effect:</p> <p><img src="/images/mass_001_007.PNG" alt=""></p> <p>The ActivateRobots call changes takes 7.41ms (2500ms for 337 calls), an insigificant change from 7.38.</p> <p>The ActivateRobots_SOA call changes takes 0.87ms (295ms for 337 calls), an 26% improvement from 1.18ms.  This
+is probably due to the int32 property having better alignment than the single byte bool property.</p> <h2 id="terminology"><a href="#terminology" class="header-anchor">#</a> Terminology</h2> <p>&quot;cache locality&quot; refers to the position of one thing with regard to another.  If an algorithm
+uses two variables it is good if they are near each other in memory so when the first
+one is copied from main memory to a cache line, the second one will also be in
+the samea cache line and will be copied as well.  So when it is needed by the CPU
+it will already be in the cache.</p> <h2 id="threading-and-false-sharing"><a href="#threading-and-false-sharing" class="header-anchor">#</a> Threading and False Sharing</h2> <p>Cache lines need to be considered when using threading to speed up tasks.</p> <p>We can create a background task which counts the  number of active robots like so:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>class FCountActiveRobotsTask : public FNonAbandonableTask
+{
+public:
+	FCountActiveRobotsTask(const int32 InStart, const int32 InNum, int32&amp; InCount )
+		: Start(InStart), Num(InNum), Count(InCount)
+	{
+	}
+
+	void DoWork()
+	{
+		for (int i = Start; i &lt; Start + Num; ++i)
+		{
+			if (Robots.Actives[i])
+			{
+				Count++;
+			}
+		}
+	}
+
+	TStatId GetStatId() const { return TStatId(); }
+
+private:
+	int32 Start;
+	int32 Num;
+	int32&amp; Count;
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br></div></div><p>We launch this background task for one thread only like this:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>void Count_Robots_Background_Thread()
+{
+	int32 Count = 0;
+	TRACE_CPUPROFILER_EVENT_SCOPE(Count_Robots_Background_Thread)
+	{
+		auto Task = 
+		  MakeUnique&lt;FAsyncTask&lt;FCountActiveRobotsTask&gt;&gt;( 0, Robots.Actives.Num(), Count );
+		if (Task)
+		{
+			Task-&gt;StartBackgroundTask();
+			Task-&gt;EnsureCompletion(true, true);
+		}
+	}
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br></div></div><p>Comparing running on the main thread with doing the same task on a single background thread we see these
+timings:</p> <p><img src="/images/mass_001_008.PNG" alt=""></p> <p>Running on the background thread is very slightly slower because of the overhead if starting and managing the thread.</p> <p>We can change from running on one background thread to four like this:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>void Count_Robots_Background_Threads()
+{
+	int32 Count = 0;
+	TRACE_CPUPROFILER_EVENT_SCOPE(Count_Robots_Background_Threads)
+	{
+		constexpr int NumTasks = 4;
+		std::array&lt;int32, NumTasks&gt; Counts;
+		std::fill(Counts.begin(), Counts.end(), 0);
+		std::array&lt; TUniquePtr&lt; FAsyncTask&lt;FCountActiveRobotsTask&gt; &gt;, NumTasks &gt; Tasks;
+
+		int32 StepSize = Robots.Actives.Num() / NumTasks;
+
+		// create
+		for (int i = 0; i &lt; NumTasks; ++i)
+		{
+			Tasks[i] = 
+			  MakeUnique&lt;FAsyncTask&lt;FCountActiveRobotsTask&gt;&gt;(StepSize * i, StepSize, Counts[i]);
+		}
+		// launch
+		for (int i = 0; i &lt; NumTasks; ++i)
+		{
+			Tasks[i]-&gt;StartBackgroundTask();
+		}
+		// wait
+		for (int i = 0; i &lt; NumTasks; ++i)
+		{
+			Tasks[i]-&gt;EnsureCompletion(true, true);
+		}
+
+		Count = std::accumulate(Counts.begin(), Counts.end(), 0);
+	}
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br></div></div><p>In this code we:</p> <ul><li>allocate 4 bacground task objects which will run on background threads</li> <li>divide the array of robots into 4 sections and pass each task the start and length of their section</li> <li>allocate an array of 4 int32 objects, each task accumulates their count into one element of this array</li> <li>after all the threads are finished we accumulate the 4 count objects into one value</li></ul> <p>Now we get these timings:</p> <p><img src="/images/mass_001_009.PNG" alt=""></p> <p>Running on four background threads takes 4 times longer than running on one.  What is happening
+here is an issue of cache coherency and false sharing.</p> <p>Here is the diagram of the cache layout on a Ryzen 8 core CPU again:</p> <p><img src="/images/Zen3_arch_20.jpg" alt=""></p> <p>We see that each core has its own L1 and L2 cache.  When a value is in main memory
+each CPU core that refers to that value has its own copy of that value in its L1 cache.  Cache
+coherency is the mechanism by which changes to these cached values are synchronized - typically
+by using a protocol like <a href="https://en.wikipedia.org/wiki/MESI_protocol" target="_blank" rel="noopener noreferrer">MISE<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>.</p> <p>When one core changes a value in its cache, that value becomes invalid in every other core's cache which holds that value, and
+the next time one of those other cores accesses that value it is copied from the cache of the core
+which changed it.  This mechanism make sure all the cores only ever see the same
+value, which make programming much easier, but it does mean that operations on the second core are stalled while value is
+retrieved from the core which changed it.</p> <p>The MISE protocol which synchronizes values between cores does not work by copying individual
+values between core - it copies whole cache lines at a time.</p> <p>Why we see a problem here, causing the mutithreaded implementation to be so much slower, is not that
+we are updating the same value, but that the each thread is updating a value
+in the Counts array and all those values are on the same cache line.  This problem
+is referred to as &quot;false sharing&quot; because  while the threads are not actually sharing
+count values, synchronizing the core caches using whole cache lines makes it appear as if they were.</p> <p>This problem can be fixed in a number of ways:</p> <ul><li>we could give each task its own Count value to accumulate to accumulate into and only
+update the Count array once at the end</li> <li>we could make the Count array 16 times as large and have each thread
+use every 16th value - this would ensure that the used values are more 64 bytes apart
+so thet are not on the cache line</li> <li>we could accumulate the values into property in a structure which was padded to be
+64 bytes long, so that the values are not on the same cache line, like:</li></ul> <div class="language- line-numbers-mode"><pre class="language-text"><code>struct PaddedValue
+{
+	int32 Value = 0;
+	char Padding[ 64-sizeof(int32)];
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><ul><li>we could accumulate the values into property in a structure which was aligned
+to 64 bytes long, so that the values are not on the same cache line, like:</li></ul> <div class="language- line-numbers-mode"><pre class="language-text"><code>struct alignas(64) AlignedValue
+{
+	int32 Value = 0;
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br></div></div><p>The code to accumulate into a local variable looks like this:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>class FCountActiveRobotsTaskLocalCount : public FNonAbandonableTask
+{
+public:
+	FCountActiveRobotsTaskLocalCount(const int32 InStart, const int32 InNum, int32&amp; InCount)
+		: Start(InStart), Num(InNum), Count(InCount)
+	{
+	}
+
+	void DoWork()
+	{
+		int32 LocalCount = 0;
+		for (int i = Start; i &lt; Start + Num; ++i)
+		{
+			if (Robots.Actives[i])
+			{
+				LocalCount++;
+			}
+		}
+		Count = LocalCount;
+	}
+
+	TStatId GetStatId() const { return TStatId(); }
+private:
+	int32 Start;
+	int32 Num;
+	int32&amp; Count;
+};
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br></div></div><p>and the code to pad the Counts array and only use every 16th element looks like this:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>void Count_Robots_Background_Threads_Padding()
+{
+	int32 Count = 0;
+	TRACE_CPUPROFILER_EVENT_SCOPE(Count_Robots_Background_Threads_Padding)
+	{
+		constexpr int NumTasks = 4;
+		std::array&lt;int32, NumTasks * 16 &gt; Counts;
+		std::fill(Counts.begin(), Counts.end(), 0);
+		std::array&lt; TUniquePtr&lt; FAsyncTask&lt;FCountActiveRobotsTask&gt; &gt;, NumTasks &gt; Tasks;
+
+		int32 StepSize = Robots.Actives.Num() / NumTasks;
+
+		// create
+		for (int i = 0; i &lt; NumTasks; ++i)
+		{
+			Tasks[i] =
+			 MakeUnique&lt;FAsyncTask&lt;FCountActiveRobotsTask&gt;&gt;(StepSize*i, StepSize, Counts[i*16]);
+		}
+		// launch
+		for (int i = 0; i &lt; NumTasks; ++i)
+		{
+			Tasks[i]-&gt;StartBackgroundTask();
+		}
+		// wait
+		for (int i = 0; i &lt; NumTasks; ++i)
+		{
+			Tasks[i]-&gt;EnsureCompletion(true, true);
+		}
+		Count = std::accumulate(Counts.begin(), Counts.end(), 0);
+	}
+}
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br></div></div><p>This picture shows the results:</p> <p><img src="/images/mass_001_010.PNG" alt=""></p> <p>We can see that either using local variables or using padding eliminates the false sharing
+and reduces the time from 1,300ms to 140ms.</p> <h2 id="references"><a href="#references" class="header-anchor">#</a> References</h2> <p><a href="https://learn.microsoft.com/en-us/sysinternals/downloads/coreinfo" target="_blank" rel="noopener noreferrer">CoreInfo<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></p></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main> <footer class="f"><div><p>MIT Licensed | Copyright © 2020-2023 John Farrow</p></div></footer></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.64510b8b.js" defer></script><script src="/assets/js/3.5e27fb36.js" defer></script><script src="/assets/js/2.32bfe7ad.js" defer></script><script src="/assets/js/25.c3065073.js" defer></script>
+  </body>
+</html>

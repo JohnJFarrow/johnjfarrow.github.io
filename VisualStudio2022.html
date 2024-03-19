@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Installing and Configuring Visual Studio 2022 for Unreal Engine | unrealcode.net</title>
+<meta name="description" content="Installing and Configuring Visual Studio 2022 for Unreal Engine">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Installing and Configuring Visual Studio 2022 for Unreal Engine
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#installing-visual-studio-2022">
+Installing Visual Studio 2022
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#configuring-visual-studio-2022">
+Configuring Visual Studio 2022
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#disabling-the-error-list">
+Disabling the Error List
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#disabling-hot-reload">
+Disabling Hot Reload
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#set-solution-configurations-dropdown-width">
+Set Solution Configurations dropdown width
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#turn-on-indexing">
+Turn on Indexing
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#turn-on-macro-formatting-">
+Turn on Macro Formatting 
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#configuring-your-project">
+Configuring your project
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#the-naming-convention-checker">
+The Naming Convention Checker
+</a>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Installing and Configuring Visual Studio 2022 for Unreal Engine</h1>
+<p>Updated for Unreal Engine 5.1.1</p>
+<p>Updated for Visual Studio 2022 Version 17.7.3</p>
+<h2 id="installing-visual-studio-2022">Installing Visual Studio 2022</h2>
+<p>If you do not already have Visual Studio 2022 installed, install it from <a href="https://visualstudio.microsoft.com/vs/">visualstudio.microsoft.com</a>.</p>
+<p>Install at least these options:</p>
+<p><img src="/images/vsinstall_1.png" alt="" /></p>
+<p>and</p>
+<p><img src="/images/vsinstall_010.png" alt="" /></p>
+<p>and</p>
+<p><img src="/images/vsinstall_2.png" alt="" /></p>
+<p>For the &quot;Game Development with C++&quot; workload, these are the options I use:</p>
+<p><img src="/images/vsinstall_011.png" alt="" /></p>
+<h2 id="configuring-visual-studio-2022">Configuring Visual Studio 2022</h2>
+<p>Some useful options you might like to set are:</p>
+<h3 id="disabling-the-error-list">Disabling the Error List</h3>
+<p>The error list is a sort of summary generated from the build output.  It contains <em>less</em> information
+than appears in the output window, and more information is always better, so just use the
+output window.</p>
+<p>In Tools | Options | Projects and Solutions | General you can turn off the first option shown 
+here:</p>
+<p><img src="/images/vsinstall_008.png" alt="" /></p>
+<p>If you do use the error list make sure you are only seeing errors from the build, not from other
+sources like intellisense by checking the dropdown shown below is set up &quot;Build Only&quot;:</p>
+<p><img src="/images/vsinstall_009.png" alt="" /></p>
+<h3 id="disabling-hot-reload">Disabling Hot Reload</h3>
+<p>In Tools|Options|Debugging|.NET/C++ Hot Reload disable all the Hot Reload options:</p>
+<p><img src="/images/vsinstall_3.png" alt="" /></p>
+<h3 id="set-solution-configurations-dropdown-width">Set Solution Configurations dropdown width</h3>
+<p>Change the width of the Solution Configurations dropdown to handle the longer names used by 
+UE:</p>
+<ul>
+<li> right-click on the toolbar shown below, select &quot;Customize&quot;
+<img src="/images/vsinstall_4.png" alt="" /></li>
+<li> change to the &quot;Commands&quot; tab</li>
+<li> select &quot;Toolbar&quot; in the top radio button group</li>
+<li> change the toolbar value from &quot;Build&quot; to &quot;Standard&quot; like so:</li>
+</ul>
+<p><img src="/images/vsinstall_5.png" alt="" /></p>
+<ul>
+<li> in the preview panel select &quot;System Configurations&quot; </li>
+<li> click the &quot;Modify Selection&quot; button</li>
+<li> change the width to 130 </li>
+<li> press &quot;OK&quot; and &quot;Close&quot;.</li>
+</ul>
+<p>The toolbar will now have changed to:</p>
+<p><img src="/images/vsinstall_6.png" alt="" /></p>
+<h3 id="turn-on-indexing">Turn on Indexing</h3>
+<p>To make sure indexed searching is enabled, go to Tools &gt; Options &gt; Environment &gt; Preview Features and verify that “Enable indexing for faster find experience” is checked.</p>
+<p>See <a href="https://devblogs.microsoft.com/visualstudio/code-search-in-visual-studio-is-about-to-get-much-faster/">devblogs.microsoft.com</a>.</p>
+<h3 id="turn-on-macro-formatting">Turn on Macro Formatting </h3>
+<p>Visual Studio has an option to enable special code formatting when using Unreal Engine reflection and slate macros.</p>
+<p>In the Tools | Options window search for &quot;unreal&quot; and select the &quot;Unreal Engine&quot;
+line as shown here and turn the option on:</p>
+<p><img src="/images/vsinstall_012.png" alt="" /></p>
+<p>See <a href="https://devblogs.microsoft.com/visualstudio/visual-studio-2022-17-7-now-available/#unreal-engine-macros-formatting-for-c">Unreal Engine Macros Formatting for C++</a> for more
+information</p>
+<h2 id="configuring-your-project">Configuring your project</h2>
+<p>Some features of Visual Studio integration with Unreal Engine require
+a plugin to be part of either your engine installation or your project.</p>
+<p>The steps to install this plugin for a project (after you have created the project) are:</p>
+<ul>
+<li> if the Plugins directory does not exist in the project root folder, create it</li>
+<li> cd Plugins</li>
+<li> git clone <a href="https://github.com/microsoft/vc-ue-extensions.git">https://github.com/microsoft/vc-ue-extensions.git</a></li>
+<li> edit the .uproject file and add the &quot;VisualStudioTools&quot; plugin to the
+list of enabled plugins, so it looks similar to this:</li>
+</ul>
+<div class="csharp"><pre>
+	<span class="string">&quot;Plugins&quot;</span>: [
+		{
+			<span class="string">&quot;Name&quot;</span>: <span class="string">&quot;ModelingToolsEditorMode&quot;</span>,
+			<span class="string">&quot;Enabled&quot;</span>: <span class="keyword">true</span>,
+			<span class="string">&quot;TargetAllowList&quot;</span>: [
+				<span class="string">&quot;Editor&quot;</span>
+			]
+		},
+		{
+			<span class="string">&quot;Name&quot;</span>: <span class="string">&quot;VisualStudioTools&quot;</span>,
+			<span class="string">&quot;Enabled&quot;</span>: <span class="keyword">true</span>
+		}
+	]
+</pre></div>
+<ul>
+<li> run Explorer, right click on the .uproject files and &quot;Generate Visual Studio project files&quot;</li>
+<li> if Visual Studio is running it should detect the project files have been changed,
+select the &quot;Reload All&quot; option if prompted</li>
+<li> in Visual Studio recompile the project</li>
+</ul>
+<h3 id="the-naming-convention-checker">The Naming Convention Checker</h3>
+<p>Visual Studio has an option to warn when class naming does not conform
+to the Unreal Engine standard. </p>
+<p>In the Tools | Options window search for &quot;linter&quot; and change the
+&quot;Naming Convention(experimental)&quot; option to &quot;Warning&quot;:</p>
+<p><img src="/images/vsinstall_013.png" alt="" /></p>
+<p>In addition to enabling this warning you need to copy a file from
+the VisualStudioTools plugin and add it to the project:</p>
+<pre><code>copy Plugins\vc-ue-extensions\Source\.editorconfig Source
+</code></pre>
+<p>The rules in the .editorconfig file apply to files lower
+in the directory tree, so it needs to be in the Source directory.</p>
+<p>This will make the compilation process emit an error or warning
+if it finds a class name which does not conform to Unreal standards. For example
+this code:</p>
+<div class="cplusplus"><pre>
+UCLASS()
+<span class="keyword">class</span> MYPROJECT23_API Derived : <span class="keyword">public</span> UObject
+{
+	GENERATED_BODY()
+};
+</pre></div>
+<p>will cause this message:</p>
+<pre><code>Warning	lnt-naming-convention	Identifier does not follow the naming convention.
+</code></pre>
+<p>This message is part of the linter output and is only generated in the
+Error List window with the filter set to &quot;Build + Intellisense&quot;.  As such
+it is not very useful because:</p>
+<ul>
+<li> above we suggested not using the Error List window because it 
+contains spurious error messages </li>
+<li> intellisense can fail with messages like:</li>
+</ul>
+<pre><code>E2998	PCH warning: an unknown error occurred.  An IntelliSense PCH file was not generated.
+</code></pre>
+<pre><code>E2996	There are too many errors for the IntelliSense engine to function properly, some of which may not be 
+visible in the editor.	
+</code></pre>
+<p>Note that <a href="https://stackoverflow.com/questions/18289936/refreshing-the-auto-complete-intellisense-database-in-visual-studio">rebuilding the intellense database</a> does not fix this</p>
+<ul>
+<li> in this particular case the compiler will emit an error anyway, failing to
+compile and displaying this error:</li>
+</ul>
+<pre><code>Error Class 'Derived' has an invalid Unreal prefix, expecting 'UDerived'
+</code></pre>
+<p>However this feature might have some use.  With the linter options
+configured like this:</p>
+<p><img src="/images/vsinstall_014.png" alt="" /></p>
+<p>messages about naming conventions appear in the code window as 
+code is edited, like this:</p>
+<p><img src="/images/vsinstall_015.png" alt="" /></p>
+<p>and suggested code corrections are available:</p>
+<p><img src="/images/vsinstall_016.png" alt="" /></p>
+<p>I also had difficulty working out whether the .editorconfig file needed
+to be actually added to the project or just needed to be placed in 
+the Source directory.  This <a href="https://learn.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options?view=vs-2022">article</a> shows it being explicitly added
+to the project, which would be disapointing because every time
+you use the Unreal .uproject &quot;Generate Visual Studio project files&quot;
+function the .editorconfig file gets removed from the project.</p>
+<p>See <a href="https://devblogs.microsoft.com/visualstudio/visual-studio-2022-17-7-now-available/#unreal-engine-naming-convention-checker-for-c">Unreal Engine Naming Convention Checker for C++</a> for more information.</p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

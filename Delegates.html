@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delegates in C++ | unrealcode.net</title>
+<meta name="description" content="Delegates in C++">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Delegates in C++
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#delegate-parameters-and-payload-data">
+Delegate parameters and payload data
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#binding">
+Binding
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#type-conversion">
+Type conversion
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#dynamic-delegates">
+Dynamic Delegates
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#multi-cast-delegates">
+Multi-cast delegates
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#delegates-and-blueprints">
+Delegates and Blueprints
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#binding-delegates-in-constructors">
+Binding Delegates in Constructors
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#reference">
+Reference
+</a>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Delegates in C++ </h1>
+<h2 id="introduction">Introduction</h2>
+<p>A delegate is a object which can be used to call:</p>
+<ul>
+<li> a specific method on a specific object</li>
+<li> a static function</li>
+</ul>
+<p>A delegate type is declared like this:</p>
+<div class="cplusplus"><pre>
+DECLARE_DELEGATE( DelegateType );
+</pre></div>
+<p>This creates the delegate type (not the actual delegate) and that type is then used to create the delegate like so:</p>
+<div class="cplusplus"><pre>
+DelegateType TheDelegate;
+</pre></div>
+<p>There are many macros like <code>DECLARE_DELEGATE</code> and <code>DECLARE_DELEGATE_OneParam</code> used to create different types of delegates with
+different parameters.  See the references at the end of this page for more details.</p>
+<h3 id="delegate-parameters-and-payload-data">Delegate parameters and payload data</h3>
+<p><em>There is a difference between the number of parameters the bound method takes and the number
+of parameters which are passed when invoking the delegate</em></p>
+<p>The delegate declaration macros such as <code>DECLARE_DELEGATE_OneParam</code>, <code>DECLARE_DELEGATE_TwoParams</code> etc. 
+refer to the number and type of parameters <em>passed when invoking the delegate</em>, not
+the number of parameters the bound method actually takes.</p>
+<p>For example we can define a method which takes two parameters and
+then say we want the delegate to be invoked with only one parameter, like so:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">struct</span> FExample
+{
+	<span class="keyword">void</span> Method( <span class="keyword">float</span> F1, <span class="keyword">float</span> F2 )
+	{
+	}
+};
+
+DECLARE_DELEGATE_OneParam( DelegateType, <span class="keyword">float</span> );
+DelegateType TheDelegate;
+TSharedRef Example = MakeShared&lt;FExample&gt;();
+TheDelegate.BindSP( Example, &amp;FExample::Method, 2.0f );
+TheDelegate.ExecuteIfBound(1.0f);
+</pre></div>
+<p>While the delegate is invoked with one parameter the method will actually
+be called with two parameters: the one passed to the <code>ExecuteIfBound()</code> function
+and the one passed to the <code>BindSP()</code> function.  The parameters passed to the <code>BindSP()</code> method
+are refered to as <em>payload</em> parameters:</p>
+<ul>
+<li> payload parameters are passed to the bound method <em>after</em> the parameters from <code>ExecuteIfBound()</code></li>
+<li> payload parameters are specified when the delegate is bound, not when it is invoked, so
+they are like values captured by a lambda in that they are carried around by the delegate</li>
+</ul>
+<h3 id="binding">Binding</h3>
+<p>When an delegate is created it is <em>unbound</em>, that is to say it does not refer to any method.</p>
+<p>Once it has been created it can be bound to a specific function or a method on a specific object.  The bind call might:</p>
+<ul>
+<li> pass the address of a global function (BindStatic)</li>
+<li> pass a raw c++ pointer to the specific object (BindRaw)</li>
+<li> pass a lambda (BindLambda)</li>
+<li> create a weak reference to the specific object (BindSP, BindUObject)</li>
+</ul>
+<p>Typically a delegate is created, then bound, and then invoked at a later time, by calling
+<code>Execute()</code> or <code>ExecuteIfBound()</code>:</p>
+<ul>
+<li> invoking a delegate which references a static function will always work</li>
+<li> invoking a delegate which references a raw c++ pointer can crash the program if the object 
+that the delegate references has been deleted between the time the delegate was bound and when
+it was invoked</li>
+<li> invoking a delegate which uses a weak pointer will not crash if referenced object
+has been deleted, it just won't do anything</li>
+</ul>
+<h3 id="type-conversion">Type conversion</h3>
+<p>The parameters passed to the bind functions must match the types 
+use by the bound method exactly.  For example this code will fail
+to compile:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">struct</span> FExample
+{
+	<span class="keyword">void</span> Method( <span class="keyword">float</span> F1, <span class="keyword">float</span> F2 )
+	{
+	}
+};
+
+DECLARE_DELEGATE_OneParam( DelegateType, <span class="keyword">float</span> );
+DelegateType TheDelegate;
+TSharedRef Example = MakeShared&lt;FExample&gt;();
+TheDelegate.BindSP( Example, &amp;FExample::Method, 2.0 );
+</pre></div>
+<p>and results in some hard to decipher error messages:</p>
+<div class="cplusplus"><pre>
+error C2665: &#39;TDelegate&lt;<span class="keyword">void</span> (<span class="keyword">float</span>),FDefaultDelegateUserPolicy&gt;::BindSP&#39;: none of the 2 overloads could convert all the argument types
+note: could be &#39;<span class="keyword">void</span> TDelegate&lt;<span class="keyword">void</span> (<span class="keyword">float</span>),FDefaultDelegateUserPolicy&gt;::BindSP&lt;FExample,ESPMode::ThreadSafe,<span class="keyword">double</span>&gt;(<span class="keyword">const</span> TSharedRef&lt;FExample,ESPMode::ThreadSafe&gt; &amp;,<span class="keyword">void</span> (__cdecl FExample::* )(<span class="keyword">float</span>,<span class="keyword">double</span>) <span class="keyword">const</span>,<span class="keyword">double</span>)&#39;
+note: or       &#39;<span class="keyword">void</span> TDelegate&lt;<span class="keyword">void</span> (<span class="keyword">float</span>),FDefaultDelegateUserPolicy&gt;::BindSP&lt;FExample,ESPMode::ThreadSafe,<span class="keyword">double</span>&gt;(<span class="keyword">const</span> TSharedRef&lt;FExample,ESPMode::ThreadSafe&gt; &amp;,<span class="keyword">void</span> (__cdecl FExample::* )(<span class="keyword">float</span>,<span class="keyword">double</span>),<span class="keyword">double</span>)&#39;
+note: &#39;<span class="keyword">void</span> TDelegate&lt;<span class="keyword">void</span> (<span class="keyword">float</span>),FDefaultDelegateUserPolicy&gt;::BindSP&lt;FExample,ESPMode::ThreadSafe,<span class="keyword">double</span>&gt;(<span class="keyword">const</span> TSharedRef&lt;FExample,ESPMode::ThreadSafe&gt; &amp;,<span class="keyword">void</span> (__cdecl FExample::* )(<span class="keyword">float</span>,<span class="keyword">double</span>),<span class="keyword">double</span>)&#39;: cannot convert argument 2 from &#39;<span class="keyword">void</span> (__cdecl FExample::* )(<span class="keyword">float</span>,<span class="keyword">float</span>)&#39; to &#39;<span class="keyword">void</span> (__cdecl FExample::* )(<span class="keyword">float</span>,<span class="keyword">double</span>)&#39;
+note: Types pointed to are unrelated; conversion requires <span class="keyword">reinterpret_cast</span>, C-style cast or parenthesized function-style cast
+note: see declaration of &#39;TDelegate&lt;<span class="keyword">void</span> (<span class="keyword">float</span>),FDefaultDelegateUserPolicy&gt;::BindSP&#39;
+note: <span class="keyword">while</span> trying to match the argument list &#39;(TSharedRef&lt;FExample,ESPMode::ThreadSafe&gt;, <span class="keyword">void</span> (__cdecl FExample::* )(<span class="keyword">float</span>,<span class="keyword">float</span>), <span class="keyword">double</span>)&#39;
+</pre></div>
+<p>all because the value 2.0 passed to the <code>BindSP()</code> method is a double whereas the bound method takes a float. The 
+usual implicit type conversion which allows a C++ function which takes a double to be called with a float does not
+happen when calling a delegate.  Changing the double to a float (i.e 2.0 to 2.0f) will fix this.</p>
+<h3 id="dynamic-delegates">Dynamic Delegates</h3>
+<p>Dynamic delegates bind to a specific object by its address but bind the method to be 
+called by the name of that method instead of the address.  These are not used
+ much in Lyra but are used in the engine to bind
+ inputs, for example to bind a particular keystroke to a
+ named method on the input component like so:</p>
+<div class="cplusplus"><pre>
+FInputAxisKeyBinding AB( Binding.AxisKey );
+AB.bConsumeInput = Binding.bConsumeInput;
+AB.bExecuteWhenPaused = Binding.bExecuteWhenPaused;
+AB.AxisDelegate.BindDelegate(ObjectToBindTo, Binding.FunctionNameToBind);
+</pre></div>
+<p>Dynamic delegates are slower than normal delegates because when the delegate is invoked it must interact
+with the reflection system to find the method by its name. They are also serializable so when they
+are used in a blueprint they get save with that blueprint.</p>
+<h3 id="multi-cast-delegates">Multi-cast delegates</h3>
+<p>A normal delegate can have only one function bound to it at a time.  A multi-cast delegate can have more than one function bound to it,
+so when the delegate is invoked all the functions bound to it are called, one after the other.</p>
+<p>The delegate type is declared using some variation of <code>DECLARE_MULTICAST_DELEGATE</code>.</p>
+<p>Individual functions are bound one at a time 
+using methods which start with &quot;Add&quot;, like this:</p>
+<div class="cplusplus"><pre>
+DECLARE_MULTICAST_DELEGATE_TwoParams(FCommonSession_FindSessionsFinished, <span class="keyword">bool</span> bSucceeded, <span class="keyword">const</span> FText&amp; ErrorMessage);
+FCommonSession_FindSessionsFinished OnSearchFinished;
+QuickPlayRequest-&gt;OnSearchFinished.AddUObject(<span class="keyword">this</span>, &amp;UCommonSessionSubsystem::HandleQuickPlaySearchFinished, 
+    JoiningOrHostingPlayerPtr, HostRequestPtr);
+OnSearchFinished.Broadcast(bSucceeded, ErrorMessage);
+</pre></div>
+<p>Similarly to binding a normal delegate, there exist variations to bind 
+different type of functions:</p>
+<ul>
+<li> <code>AddSP()</code> binds member function and retains a weak pointer to the containing object</li>
+<li> <code>AddThreadSafeSP()</code> binds member function and retains a weak pointer to the containing object</li>
+<li> <code>AddUObject()</code> binds a member function and retains a raw pointer to the containing object</li>
+</ul>
+<p>Instead of calling <code>Delegate.ExecuteIfBound()</code> you call <code>Delegate.Broadcast()</code> to 
+invoke all the functions bound to the delegate.  The bound functions
+are called in the reverse order in which they were added.</p>
+<h3 id="delegates-and-blueprints">Delegates and Blueprints</h3>
+<p>Given a delegate type declared like this:</p>
+<div class="cplusplus"><pre>
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FDelegateType, <span class="keyword">float</span>, <span class="keyword">value</span> );
+</pre></div>
+<p>in a class header file we can declare a variable of that type and make it accessible from blueprints like so:</p>
+<div class="cplusplus"><pre>
+UPROPERTY(BlueprintAssignable, Category=<span class="string">&quot;Example Delegates&quot;</span>)
+FDelegateType OnSomethingInterestingHappening;
+</pre></div>
+<p>Note that the declaration is somewhat different to other definitons:</p>
+<ul>
+<li> it must be a dynamic multicast delegate</li>
+<li> the variable names must be listed in the delegate not just the types; in the above C++ code
+the delegate parameter is called &quot;value&quot; and is of type float.</li>
+<li> the name of the delegate type must start with 'F'</li>
+</ul>
+<p>If we add these lines to LyraCharacter.h</p>
+<div class="cplusplus"><pre>
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FDelegateType, <span class="keyword">float</span>, <span class="keyword">value</span> );
+UPROPERTY(BlueprintAssignable, Category=<span class="string">&quot;Example Delegates&quot;</span>)
+FDelegateType OnSomethingInterestingHappening;
+</pre></div>
+<p>then we can edit the blueprint /Game/Characters/Character_Default, click on the &quot;Character_Default&quot; top level component
+and see the new delegate in the list of possible events:</p>
+<p><img src="/images/lyra_03_001.png" alt="" /></p>
+<p>We can click the '+' button to have Unreal add an event node to the event graph, including the float parameter called &quot;value&quot;:</p>
+<p><img src="/images/lyra_03_003.png" alt="" /></p>
+<h3 id="binding-delegates-in-constructors">Binding Delegates in Constructors</h3>
+<p>Don't do this.  If you bind delegates in the constructor they become part of the class default
+object and, at least historically, have cause problems when interacting with blueprints.  Bind them in 
+<code>BeginPlay()</code> instead.</p>
+<h4 id="reference">Reference</h4>
+<p><a href="https://docs.unrealengine.com/5.0/en-US/delegates-and-lamba-functions-in-unreal-engine/">Epic Delegates</a></p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

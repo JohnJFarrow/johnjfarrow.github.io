@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Experiments With Chaos Physics - Using C++ | unrealcode.net</title>
+<meta name="description" content="Experiments With Chaos Physics - Using C++">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Experiments With Chaos Physics - Using C++
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#trebuchet-c++-class">
+Trebuchet C++ Class
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#atrebuchet-header-file">
+ATrebuchet Header File
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#atrebuchet-cpp-file">
+ATrebuchet CPP File
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#static-mesh-loading">
+Static Mesh Loading
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#properties-and-defaults-">
+Properties and Defaults 
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#cable-release-code">
+Cable Release Code
+</a>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Experiments With Chaos Physics - Using C++</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The page <a href="../PhysicsBlueprint.html">PhysicsUsingBlueprints</a> describes the creation of a simple
+physics example implementing a trebuchet using blueprints.</p>
+<p>This page describes implementing the same thing using c++.</p>
+<h2 id="trebuchet-c-class">Trebuchet C++ Class</h2>
+<p>Create the class using the <code>Tools | New C++ Class</code> menu option. Derive the class from the Actor
+base class and call it &quot;Trebuchet&quot;.  The editor will automatically prefix the 
+class name with &quot;A&quot; so the actual c++ class name will be &quot;ATrebuchet&quot;.</p>
+<p>Note that this will work even if the project was created as a blueprint project - 
+adding a c++ class will convert the project to a c++ project.</p>
+<h3 id="atrebuchet-header-file">ATrebuchet Header File</h3>
+<p>This header file looks like this:</p>
+<div class="cplusplus"><pre>
+#pragma once
+
+#include <span class="string">&quot;CoreMinimal.h&quot;</span>
+#include <span class="string">&quot;GameFramework/Actor.h&quot;</span>
+#include <span class="string">&quot;Trebuchet.generated.h&quot;</span>
+
+<span class="keyword">class</span> USphereComponent;
+<span class="keyword">class</span> UPhysicsConstraintComponent;
+
+UCLASS()
+<span class="keyword">class</span> PHYSICS_003_API ATrebuchet : <span class="keyword">public</span> AActor
+{
+	GENERATED_BODY()
+	
+<span class="keyword">public</span>:	
+	<span class="comment">// Sets default values for this actor&#39;s properties</span>
+	ATrebuchet();
+
+<span class="keyword">protected</span>:
+	<span class="comment">// Called when the game starts or when spawned</span>
+	<span class="keyword">virtual</span> <span class="keyword">void</span> BeginPlay() override;
+
+<span class="keyword">public</span>:	
+	<span class="comment">// Called every frame</span>
+	<span class="keyword">virtual</span> <span class="keyword">void</span> Tick(<span class="keyword">float</span> DeltaTime) override;
+
+<span class="keyword">public</span>:
+	UPROPERTY(VisibleAnywhere) UStaticMeshComponent* Arm;
+	UPROPERTY(VisibleAnywhere) UStaticMeshComponent* Base;
+	UPROPERTY(VisibleAnywhere) UStaticMeshComponent* Ramp;
+	UPROPERTY(VisibleAnywhere) UStaticMeshComponent* Weight;
+	UPROPERTY(VisibleAnywhere) USphereComponent* Ball;
+	UPROPERTY(VisibleAnywhere) UPhysicsConstraintComponent* ArmBaseConstraint;
+	UPROPERTY(VisibleAnywhere) UPhysicsConstraintComponent* ArmWeightConstraint;
+	UPROPERTY(VisibleAnywhere) UPhysicsConstraintComponent* CableConstraint;
+
+<span class="keyword">private</span>:
+	<span class="keyword">bool</span> bConstraintBroken = <span class="keyword">false</span>;
+};
+</pre></div>
+<p>In addition to the generated code we have added:</p>
+<ul>
+<li> forward declarations for USphereComponent and UPhysicsConstraintComponent classes</li>
+<li> member variables to hold the static mesh components which form the body of the trebuchet</li>
+<li> member variables for the physics constraints</li>
+<li> a member variable to track whether the cable constraint has been broken when the projectile is fired</li>
+</ul>
+<h3 id="atrebuchet-cpp-file">ATrebuchet CPP File</h3>
+<p>The constructor for the ATrebuchet class is shown here:</p>
+<div class="cplusplus"><pre>
+ATrebuchet::ATrebuchet()
+{
+  PrimaryActorTick.bCanEverTick = <span class="keyword">true</span>;
+
+  <span class="keyword">static</span> ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; 
+      ArmMeshAsset(TEXT(<span class="string">&quot;StaticMesh&#39;/Game/Meshes/SM_Arm.SM_Arm&#39;&quot;</span>));
+  <span class="keyword">static</span> ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; 
+      BaseMeshAsset(TEXT(<span class="string">&quot;StaticMesh&#39;/Game/Meshes/SM_Base.SM_Base&#39;&quot;</span>));
+  <span class="keyword">static</span> ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; 
+      RampMeshAsset(TEXT(<span class="string">&quot;StaticMesh&#39;/Game/Meshes/SM_Ramp.SM_Ramp&#39;&quot;</span>));
+  <span class="keyword">static</span> ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; 
+      WeightMeshAsset(TEXT(<span class="string">&quot;StaticMesh&#39;/Game/Meshes/SM_Weight.SM_Weight&#39;&quot;</span>));
+
+  Base = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(<span class="string">&quot;Base&quot;</span>));
+  Base-&gt;SetStaticMesh(BaseMeshAsset.Object);
+  Base-&gt;SetMobility(EComponentMobility::Static);
+  Base-&gt;SetCollisionProfileName(TEXT(<span class="string">&quot;BlockAll&quot;</span>));
+  RootComponent = Base;
+
+  Ramp = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(<span class="string">&quot;Ramp&quot;</span>));
+  Ramp-&gt;SetStaticMesh(RampMeshAsset.Object);
+  Ramp-&gt;SetMobility(EComponentMobility::Static);
+  Ramp-&gt;SetCollisionProfileName(TEXT(<span class="string">&quot;BlockAll&quot;</span>));
+  Ramp-&gt;SetRelativeLocation(FVector( 0.0, 410.0, 40.0 ));
+  Ramp-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform );
+
+  Arm = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(<span class="string">&quot;Arm&quot;</span>));
+  Arm-&gt;SetStaticMesh(ArmMeshAsset.Object);
+  Arm-&gt;SetMobility(EComponentMobility::Movable);
+  Arm-&gt;SetRelativeLocation(FVector( 20.000000,  57.132445,  694.646682));
+  Arm-&gt;SetRelativeRotation(FRotator(0.000000, 0.000000, 40.000000));
+  Arm-&gt;SetMassOverrideInKg(NAME_None, 505);
+  Arm-&gt;SetSimulatePhysics(<span class="keyword">true</span>);
+  Arm-&gt;SetEnableGravity(<span class="keyword">true</span>);
+  Arm-&gt;SetCollisionProfileName(TEXT(<span class="string">&quot;PhysicsActor&quot;</span>));
+  Arm-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
+
+  Weight = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(<span class="string">&quot;Weight&quot;</span>));
+  Weight-&gt;SetStaticMesh(WeightMeshAsset.Object);
+  Weight-&gt;SetMobility(EComponentMobility::Movable);
+  Weight-&gt;SetRelativeLocation(FVector( 10.000000, -165.000000, 640.000000));
+  Weight-&gt;SetSimulatePhysics(<span class="keyword">true</span>);
+  Weight-&gt;SetMassOverrideInKg(NAME_None,4506);
+  Weight-&gt;SetEnableGravity(<span class="keyword">true</span>);
+  Weight-&gt;SetCollisionProfileName(TEXT(<span class="string">&quot;PhysicsActor&quot;</span>));
+  Weight-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
+
+  Ball = CreateDefaultSubobject&lt;USphereComponent&gt;(TEXT(<span class="string">&quot;Ball&quot;</span>));
+  Ball-&gt;SetMobility(EComponentMobility::Movable);
+  Ball-&gt;SetRelativeLocation(FVector(0.000000, 190.000000, 140.000000));
+  Ball-&gt;SetSimulatePhysics(<span class="keyword">true</span>);
+  Ball-&gt;SetMassOverrideInKg(NAME_None,15);
+  Ball-&gt;SetEnableGravity(<span class="keyword">true</span>);
+  Ball-&gt;SetCollisionProfileName(TEXT(<span class="string">&quot;PhysicsActor&quot;</span>));
+  Ball-&gt;SetHiddenInGame(<span class="keyword">false</span>);
+  Ball-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
+
+  ArmBaseConstraint = CreateDefaultSubobject&lt; UPhysicsConstraintComponent &gt;(TEXT(<span class="string">&quot;ArmBaseConstraint&quot;</span>));
+  ArmBaseConstraint-&gt;SetRelativeLocation(FVector(10.000000, 0.000000, 740.000000));
+  ArmBaseConstraint-&gt;SetConstrainedComponents( Base, TEXT(<span class="string">&quot;&quot;</span>), Arm, TEXT(<span class="string">&quot;&quot;</span>) );
+  ArmBaseConstraint-&gt;SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmBaseConstraint-&gt;SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmBaseConstraint-&gt;SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmBaseConstraint-&gt;SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0 );
+  ArmBaseConstraint-&gt;SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0 );
+  ArmBaseConstraint-&gt;SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free, 0);
+  ArmBaseConstraint-&gt;SetDisableCollision(<span class="keyword">true</span>);
+  ArmBaseConstraint-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
+
+  ArmWeightConstraint = CreateDefaultSubobject&lt; UPhysicsConstraintComponent &gt;(TEXT(<span class="string">&quot;ArmWeightConstraint&quot;</span>));;
+  ArmWeightConstraint-&gt;SetRelativeLocation(FVector( 15.000000, -168.000000, 883.000000));
+  ArmWeightConstraint-&gt;SetConstrainedComponents(Arm, TEXT(<span class="string">&quot;&quot;</span>), Weight, TEXT(<span class="string">&quot;&quot;</span>));
+  ArmWeightConstraint-&gt;SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmWeightConstraint-&gt;SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmWeightConstraint-&gt;SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmWeightConstraint-&gt;SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked,0);
+  ArmWeightConstraint-&gt;SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked,0);
+  ArmWeightConstraint-&gt;SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free,0);
+  ArmWeightConstraint-&gt;SetDisableCollision(<span class="keyword">true</span>);
+  ArmWeightConstraint-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
+
+  CableConstraint = CreateDefaultSubobject&lt; UPhysicsConstraintComponent &gt;(TEXT(<span class="string">&quot;CableConstraint&quot;</span>));;
+  CableConstraint-&gt;SetRelativeLocation(FVector( 14.000000, 634.000000, 210.000000));
+  CableConstraint-&gt;SetConstrainedComponents(Arm, TEXT(<span class="string">&quot;&quot;</span>), Ball, TEXT(<span class="string">&quot;&quot;</span>));
+  CableConstraint-&gt;SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  CableConstraint-&gt;SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  CableConstraint-&gt;SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  CableConstraint-&gt;SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Free,0);
+  CableConstraint-&gt;SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Free,0);
+  CableConstraint-&gt;SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free,0);
+  CableConstraint-&gt;SetDisableCollision(<span class="keyword">true</span>);
+  CableConstraint-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
+}
+</pre></div><h4 id="static-mesh-loading">Static Mesh Loading</h4>
+<p>For each static mesh we have an object to locate and load it:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">static</span> ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; 
+    ArmMeshAsset(TEXT(<span class="string">&quot;StaticMesh&#39;/Game/Meshes/SM_Arm.SM_Arm&#39;&quot;</span>));
+</pre></div>
+<p>This works for a simple example, in a larger project you would not do this because:</p>
+<ul>
+<li> it forces the mesh assets to be loaded even if they are not in use</li>
+<li> hard coding the asset path is brittle and hard to maintain</li>
+</ul>
+<p>For most of the static mesh components we set properties like this:</p>
+<div class="cplusplus"><pre>
+Weight = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(<span class="string">&quot;Weight&quot;</span>));
+Weight-&gt;SetStaticMesh(WeightMeshAsset.Object);
+Weight-&gt;SetMobility(EComponentMobility::Movable);
+Weight-&gt;SetRelativeLocation(FVector( 10.000000, -165.000000, 640.000000));
+Weight-&gt;SetSimulatePhysics(<span class="keyword">true</span>);
+Weight-&gt;SetMassOverrideInKg(NAME_None,4506);
+Weight-&gt;SetEnableGravity(<span class="keyword">true</span>);
+Weight-&gt;SetCollisionProfileName(TEXT(<span class="string">&quot;PhysicsActor&quot;</span>));
+Weight-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
+</pre></div>
+<p>The location and rotation values are simply copied from the blueprint project.  This is enough to
+show physics working from c++.</p>
+<h3 id="properties-and-defaults">Properties and Defaults </h3>
+<p>Note that more properties required setting from c++ than when using the editor.  When
+using the editor, changing the Mobility property to &quot;Movable&quot; also changes the 
+Collision Preset value to &quot;PhysicsActor&quot;.  In c++ we need to manually set both 
+properties like this:</p>
+<div class="cplusplus"><pre>
+Weight-&gt;SetMobility(EComponentMobility::Movable);
+Weight-&gt;SetCollisionProfileName(TEXT(<span class="string">&quot;PhysicsActor&quot;</span>));
+</pre></div>
+<p>Also note the defaults for components are different depending on how they are created. A USphere
+component has the Hidden In Game property set to false when created in the blueprint editor and
+true when created from c++, so we need to explcitly set it in c++:</p>
+<div class="cplusplus"><pre>
+Ball-&gt;SetHiddenInGame(<span class="keyword">false</span>);
+</pre></div><h3 id="cable-release-code">Cable Release Code</h3>
+<p>This image shows the blueprint which breaks the Physics Constraint once the projectile
+is travelling in the right direction and at an angle of &lt;= 45 degrees:</p>
+<ImageExpando :imagePath="$withBase('/images/chaos_029.png')" imageId="BP2"/>
+<p>This is converted into the c++ code shown here:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> ATrebuchet::Tick(<span class="keyword">float</span> DeltaTime)
+{
+  check(Ball);
+  check(CableConstraint);
+
+  Super::Tick(DeltaTime);
+
+  <span class="keyword">if</span> (!bConstraintBroken )
+  {
+    <span class="keyword">const</span> FVector Velocity = Ball-&gt;GetComponentVelocity();
+
+    <span class="comment">// assume we firing down X axis, </span>
+    <span class="keyword">if</span> (Velocity.X &gt; 0)
+    {
+      <span class="keyword">const</span> <span class="keyword">float</span> TrajectoryDegress = 
+         FMath::RadiansToDegrees( FMath::Atan(Velocity.Z / Velocity.X) );
+      <span class="keyword">if</span> (TrajectoryDegress &lt; 45)
+      {
+        CableConstraint-&gt;BreakConstraint();
+        bConstraintBroken = <span class="keyword">true</span>;
+      }
+    }
+  }
+}
+</pre></div>
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

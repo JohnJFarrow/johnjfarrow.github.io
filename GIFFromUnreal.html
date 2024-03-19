@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Using Sequencer to make GIF Files from Unreal Engine | unrealcode.net</title>
+<meta name="description" content="Using Sequencer to make GIF Files from Unreal Engine">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Using Sequencer to make GIF Files from Unreal Engine
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#tools">
+Tools
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#recording-from-unreal-engine-">
+Recording from Unreal Engine 
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#adding-a-master-sequence">
+Adding a Master Sequence
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#aiming-the-camera">
+Aiming the Camera
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#setting-the-gif-duration">
+Setting the GIF Duration
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#rendering-to-png-files">
+Rendering to PNG files
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#creating-the-gif-using-ffmpeg">
+Creating the GIF using ffmpeg
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#references">
+References
+</a>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Using Sequencer to make GIF Files from Unreal Engine</h1>
+<h2 id="introduction">Introduction</h2>
+<p>This describes one approach to making GIF files from Unreal Engine.  This approach
+is used to make the GIF files on this site.  </p>
+<h3 id="tools">Tools</h3>
+<p>This approach uses Sequencer and ffmpeg.  Both Sequencer and ffmpeg have many, many 
+functions and options, here we use the bare minimum required to create a GIF.</p>
+<p>ffmpeg can be downloaded from <a href="https://ffmpeg.org/download.html">https://ffmpeg.org/download.html</a></p>
+<h2 id="recording-from-unreal-engine">Recording from Unreal Engine </h2>
+<h3 id="adding-a-master-sequence">Adding a Master Sequence</h3>
+<p>We will be using a master sequence, which is an object which controls a collection of shots.  For the purposes of this exercise we will have only one shot.</p>
+<p>Assuming you are in the Unreal editor, click on the Cinematics button and select &quot;Add Master Sequence&quot;
+like this:</p>
+<p><img src="/images/gifs_001.png" alt="" /></p>
+<p>This dialog appears:</p>
+<p><img src="/images/gifs_002.png" alt="" /></p>
+<p>Change the Number of Shots to 1 and click the &quot;Create Master Sequence&quot; button.</p>
+<p>Adding the master sequence opens the Sequencer tab like so:</p>
+<p><img src="/images/gifs_003.png" alt="" /></p>
+<p>and adds a CineCameraActor object to the scene, visible in the Outliner window:</p>
+<p><img src="/images/gifs_004.png" alt="" /></p>
+<p>The lightning bolt next to the actor in the outliner window indicates the camera is spawnable and so only exists in the scene
+when sequencer is rendering.</p>
+<h3 id="aiming-the-camera">Aiming the Camera</h3>
+<p>One way of positioning the camera is to right click it in the outliner and select &quot;Pilot CineCameraActor&quot; and then change the view
+to point the camera at scene you want rendered in the GIF:</p>
+<p><img src="/images/gifs_005.png" alt="" /></p>
+<p>Once the camera is pointed where you want right click the camera again and select &quot;Stop Piloting CineCameraActor&quot;.</p>
+<h3 id="setting-the-gif-duration">Setting the GIF Duration</h3>
+<p>If it helps you can change the timeline from frame to seconds by clicking on the &quot;30 fps&quot; button:</p>
+<p><img src="/images/gifs_007.png" alt="" /></p>
+<p>We need to do two things to change the length of the shot</p>
+<p>(1) In the sequencer window click the red line and drag it to the left to shorten the length of the camera cut:</p>
+<p><img src="/images/gifs_006.png" alt="" /></p>
+<p>(2) Click the SequenceMaster button shown here:</p>
+<p><img src="/images/gifs_008.png" alt="" /></p>
+<p>and drag the rightmost red line to change the length of the shot:</p>
+<p><img src="/images/gifs_009.png" alt="" /></p>
+<h3 id="rendering-to-png-files">Rendering to PNG files</h3>
+<p>We want to render each frame to a separate PNG file which will serve as the input to ffmpeg.</p>
+<p>Click the render button shown here:</p>
+<p><img src="/images/gifs_010.png" alt="" /></p>
+<p>Change the render settings to the ones shown here:</p>
+<p><img src="/images/gifs_011.png" alt="" /></p>
+<p>Particularly we changed these values from their defaults:</p>
+<ul>
+<li> Image Output Format to Image Sequence</li>
+<li> Resolution to 1280 x 720</li>
+<li> Filename Format to _, changing the default &quot;.&quot; to &quot;_&quot;</li>
+<li> Overwrite Existing (In Advanced) to checked, otherwise each time you capture frames the file names will change</li>
+<li> Delay Before Warm Up to 1.0s, otherwise the first frame can be blurred</li>
+</ul>
+<p>Press the Capture Movie button.  Once capture is complete a notification popup appears and you can press &quot;Open Capture Folder&quot;
+to open the directory where the PNG files were generated.</p>
+<h3 id="creating-the-gif-using-ffmpeg">Creating the GIF using ffmpeg</h3>
+<p>Assuming you have ffmpeg installed and on the path, there are two commands to run to create a GIF from
+the set of image files created by Unreal.</p>
+<p>The example Unreal level used here was called &quot;MainMap&quot; - this provides the basis for the file names
+created by the Capture Movie process - you will need to substitute your own map name in these commands.</p>
+<p>These steps are:</p>
+<ul>
+<li> open a command window</li>
+<li> change to the directory containing the image files</li>
+<li> run this command to create a palette from the colours used in the first PNG file.  
+<pre><code>  ffmpeg -i MainMap_0001.png -vf palettegen palette.png -y
+</code></pre>
+</li>
+<li> run this command to create the GIF file
+<pre><code>  ffmpeg -framerate 24 -i Mainmap_%4d.png -i palette.png -y -filter_complex &quot;paletteuse[v];[v]scale=720:-1&quot; output.gif 
+</code></pre>
+</li>
+</ul>
+<p>The scale value changes the quality of the GIF, higher values mean better quality but a larger GIF file.  The framerate
+specified should match the framerate used in the Render Movie Settings dialog.  The GIF below was recorded at 24fps and
+created by ffmpeg at 12fps so it appears to be in slow motion.</p>
+<p>For example with &quot;scale=720&quot; the GIF below is 18.1 Mb:</p>
+<p><img src="/images/gifs_025.gif" alt="" /></p>
+<p>Whereas with &quot;scale=360&quot; it is only GIF below was reduced to 4.5 Mb:</p>
+<p><img src="/images/gifs_024.gif" alt="" /></p>
+<p>If you place these commands into a .bat file, you will need to change the &quot;%&quot; character to &quot;%%&quot; like so:</p>
+<pre><code>  ffmpeg -framerate 24 -i Mainmap_%4d.png -i palette.png -y -filter_complex &quot;paletteuse[v];[v]scale=720:-1&quot; output.gif 
+</code></pre>
+<p>becomes</p>
+<pre><code>  ffmpeg -framerate 24 -i Mainmap_%%4d.png -i palette.png -y -filter_complex &quot;paletteuse[v];[v]scale=720:-1&quot; output.gif 
+</code></pre>
+<h3 id="references">References</h3>
+<p><a href="https://www.youtube.com/watch?v=5jHhIah8H7U">Sequencer Tutorial https://www.youtube.com/watch?v=5jHhIah8H7U</a></p>
+<p><a href="https://forums.unrealengine.com/t/using-the-sequencer-bad-first-frame-every-camera-change/447602/2">Sequencer Bad First Frame https://forums.unrealengine.com</a></p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Experiments With Chaos Physics - Using Blueprints | unrealcode.net</title>
+<meta name="description" content="Experiments With Chaos Physics - Using Blueprints">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Experiments With Chaos Physics - Using Blueprints
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#blender-model">
+Blender Model
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#exporting-at-the-origin-">
+Exporting at the Origin 
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#using-chaos-physics">
+Using Chaos Physics
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#things-fly-apart">
+Things fly apart
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#preventing-collisions-using-constraints">
+Preventing Collisions using Constraints
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#preventing-collisions-using-channels">
+Preventing Collisions using Channels
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#constraining-the-arm">
+Constraining the Arm
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#adding-the-counterweight">
+Adding the Counterweight
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#preventing-collisions-using-collision-meshes">
+Preventing Collisions using Collision Meshes
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#adding-the-ramp">
+Adding the Ramp
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#adding-the-projectile">
+Adding the Projectile
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#releasing-the-projectile">
+Releasing the Projectile
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#references">
+References
+</a>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Experiments With Chaos Physics - Using Blueprints</h1>
+<h2 id="introduction">Introduction</h2>
+<p>This describes some initial steps in using chaos physics in Unreal Engine 5.0.2. </p>
+<p>The image 
+below shows a working recreation of a medieval trebuchet built at <a href="https://en.wikipedia.org/wiki/Warwick_Castle">Warwick Castle</a>
+in England.</p>
+<p><img src="/images/chaos_001.jpg" alt="" /></p>
+<p>Image is from <a href="https://www.youtube.com/channel/UC89LF5ncbTZi9MukrMSN8eQ">https://www.youtube.com/channel/UC89LF5ncbTZi9MukrMSN8eQ</a> (c) Copyright the author.</p>
+<p>This article describes the steps I took to create a working trebuchet model in Unreal Engine.</p>
+<h2 id="blender-model">Blender Model</h2>
+<p>The image below show an unshaded blender model of the trebuchet.</p>
+<p><img src="/images/chaos_002.png" alt="" /></p>
+<p>This model is constructed of these parts:</p>
+<ol>
+<li> the base</li>
+<li> the arm</li>
+<li> the counterweight</li>
+<li> the ramp</li>
+</ol>
+<p>Each of these was exported from Blender in FBX format using these options </p>
+<img class="center" src="/images/chaos_003.png"/>
+<h3 id="exporting-at-the-origin">Exporting at the Origin </h3>
+<p>Before exporting it, each component was moved to the origin in Blender.  This makes it easier to
+work with the meshes once they are imported into Unreal. It makes the local coordinate 
+system meaningful.</p>
+<p>Taking the arm component as an example, 
+if it is centered on the world origin in Blender and then exported, in Unreal it looks
+like this:</p>
+<p><img src="/images/chaos_004.png" alt="" /></p>
+<p>If it is not centered on the world origin in Blender, in Unreal it looks
+like this:</p>
+<p><img src="/images/chaos_005.png" alt="" /></p>
+<p>The difference in the position of the arm's origin effects how it easy it is to manipulate
+once the FBX file has been imported as a mesh and referenced by a Static Mesh component in blueprint.  As this image shows, when the 
+arm is positioned at the world origin in Blender, the
+Unreal transform gizmo (using world coordinates) is centered on the arm origin:</p>
+<p><img src="/images/chaos_006.png" alt="" /></p>
+<p>and when using local coordinates the Unreal transform gizmo is centered on the arm origin
+and aligned parallel with the arm to make it easy to position and rotate the arm.</p>
+<p><img src="/images/chaos_008.png" alt="" /></p>
+<p>If the arm is not centered on the world origin in Blender before it is exported, this is what
+it looks like in Unreal:</p>
+<p><img src="/images/chaos_007.png" alt="" /></p>
+<p>The Unreal transform gizmo is not positioned on the arm, making it harder to position, and
+the local and world coordinate systems are the same, making it difficult to rotate without
+ manually changing the pivot point.</p>
+<h2 id="using-chaos-physics">Using Chaos Physics</h2>
+<p>To get to the position where we can start adding Physics Constraints, perform these steps to import the FBX files exported from Blender and create a blueprint trebuchet object:</p>
+<ul>
+<li> launch Unreal Editor </li>
+<li> create a new project with the Games, Blank, Blueprint options</li>
+<li> make new folders under the &quot;Content&quot; folder called &quot;Blueprints&quot; and &quot;Meshes&quot;</li>
+<li> open the Meshes folder and drop in <a href="https://github.com/JohnJFarrow/public/blob/85b1e346a91328e5c8432ed0fe2684051b4b788a/Arm.fbx">Arm.fbx</a>, <a href="https://github.com/JohnJFarrow/public/blob/85b1e346a91328e5c8432ed0fe2684051b4b788a/Weight.fbx">Weight.fbx</a>, <a href="https://github.com/JohnJFarrow/public/blob/85b1e346a91328e5c8432ed0fe2684051b4b788a/Ramp.fbx">Ramp.fbx</a>
+and <a href="https://github.com/JohnJFarrow/public/blob/85b1e346a91328e5c8432ed0fe2684051b4b788a/Base.fbx">Base.fbx</a></li>
+<li> rename these meshes SM_Arm, SM_Weight, SM_Ramp, and SM_Base respectively</li>
+<li> in the Blueprints directory create a new blueprint derived from the Actor parent class.  Rename this BP_Trebuchet</li>
+<li> open  BP_Trebuchet in the blueprint editor</li>
+<li> add a Static Mesh component
+<ul>
+<li> rename this &quot;Base&quot;</li>
+<li> set its static mesh property to &quot;SM_Base&quot;</li>
+<li> set its mobility property to &quot;Static&quot;; this will change Collision Presets to BlockAll</li>
+</ul>
+</li>
+<li> drag the Base component and drop it on the &quot;DefaultSceneRoot&quot; to make it the root component</li>
+<li> add another Static Mesh component
+<ul>
+<li> rename this &quot;Arm&quot;</li>
+<li> set its static mesh property to &quot;SM_Arm&quot;</li>
+<li> set Simulate Physics to checked, this will change Collision Presets to PhysicsActor</li>
+<li> set its mass to 505 kg which is calculated from its volume and the density of ash </li>
+<li> set Enable Gravity to checked</li>
+<li> position the arm to intersect the base axle like so:</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/chaos_009.png" alt="" /></p>
+<h4 id="things-fly-apart">Things fly apart</h4>
+<p>If you press the Simulate button now you will see something like this:</p>
+<img class="center" src="/images/chaos_010.gif"/>
+<p>What's happening here is that the base and the arm are colliding; in their start positions they are occupying the same
+space where the arm intersects the base axle.  The chaos physics solver tries to push them apart violently.</p>
+<p>This can be prevented by adding a Physics Constraint component to BP_Trebuchet.</p>
+<h3 id="preventing-collisions-using-constraints">Preventing Collisions using Constraints</h3>
+<p>A Physics Constraint can apply linear and angular forces
+to objects, and constrain the interactions between objects.   It can also disable collisions between
+objects, which is what we want to do, so we:</p>
+<ul>
+<li> add a Physics Constraint component</li>
+<li> rename it &quot;ArmBaseStopCollision&quot;</li>
+<li> set Component Name 1 to &quot;Base&quot;</li>
+<li> set Component Name 2 to &quot;Arm&quot;</li>
+<li> under &quot;Constraint Behaviour&quot; set Disable Collision to checked</li>
+<li> set all the linear and angular limits to Free so this constraint does not affect the motion of the arm, like this:</li>
+</ul>
+<img class="center" src="/images/chaos_012.png"/>
+<p>Now if you press the Simulate button now you will see something like this:</p>
+<img class="center" src="/images/chaos_011.gif"/>
+<p>This is what we expect, the arm falls because gravity acts on it, and we have disabled collision with the base so the
+arm falls right through the base.  (If you are using Unreal 5.0.2 you might need to close the blueprint editor window and reopen it to reset the simulation)</p>
+<h3 id="preventing-collisions-using-channels">Preventing Collisions using Channels</h3>
+<p>Another way of preventing the arm and the base from colliding is to use
+a custom Object Channel. We can create a custom Object Channel which represents a type of object. We assign 
+this type to the base
+component, and then configure the arm component not to collide with objects of this type.</p>
+<p>From the menu choose <code>Edit | Project Settings...</code> and 
+on the left hand side choose Collision, you will see this screen:</p>
+<p><img src="/images/chaos_031.png" alt="" /></p>
+<p>Click the &quot;New Object Channel&quot; button to create a new channel.  On the screen above
+you can see we have already added a custom channel cells &quot;CustomBaseChannel&quot;</p>
+<p>Edit the BP_Trebuchet blueprint and select the Base StaticMesh component.</p>
+<p>Set the collision properties like this:</p>
+<p><img src="/images/chaos_032.png" alt="" /></p>
+<p>This tells Unreal that when resolving collisions the base should be considered to 
+be of type &quot;CustomBaseChannel&quot;.</p>
+<p>Next select the Arm component and configure the collision properties like this:</p>
+<p><img src="/images/chaos_033.png" alt="" /></p>
+<p>This tells Unreal that when the arm collides with something of the &quot;CustomBaseChannel&quot;
+type, to ignore that collision.</p>
+<h3 id="constraining-the-arm">Constraining the Arm</h3>
+<p>We want the arm to pivot around the axle.  If we change all the Linear Limits to Locked, and
+change Swing 1 Motion and Swing 2 Motion to locked, leaving Twist Motion as Free, the only
+way the arm can move is to pivot is around the X axis.</p>
+<p><img src="/images/chaos_013.png" alt="" /></p>
+<p>Looking at the tooltip for Twist Limit it sort of explains what Twist Motion does: &quot;Symmetric angle of roll along the X-axis&quot;. This
+tells us the Twist Motion properties control the twist around <strong>the X-axis of the constraint, not the X-Axis of the 
+constrained components</strong>.  You can see this by changing the yaw angle (rotation around the local X-axis) of the constraint - at 45 degrees
+the arm just tips over slightly, at 90 degrees nothing happens at all.</p>
+<p>Looking at the image below, we can see the constraint X-axis (the red one) is pointing parallel to the axle 
+which is what we want.</p>
+<p><img src="/images/chaos_014.png" alt="" /></p>
+<p>If we press the Simulate button from this position the arm pivots around the position of the constraint like so:</p>
+<p><img src="/images/chaos_014.gif" alt="" /></p>
+<p>If we position the constraint where the axle is like this:</p>
+<p><img src="/images/chaos_015.png" alt="" /></p>
+<p>Then we get the arm swinging in the way we want:</p>
+<p><img src="/images/chaos_016.gif" alt="" /></p>
+<h3 id="adding-the-counterweight">Adding the Counterweight</h3>
+<p>Add another Static Mesh component:</p>
+<ul>
+<li> rename this &quot;Weight&quot;</li>
+<li> set its static mesh property to &quot;SM_Weight&quot;</li>
+<li> set Simulate Physics to checked, this will change Collision Presets to PhysicsActor</li>
+<li> set its mass to 4506 kg which is calculated from its volume and the density of stone</li>
+<li> set Enable Gravity to checked</li>
+<li> position the weight to intersect the arm like so:</li>
+</ul>
+<p><img src="/images/chaos_017.png" alt="" /></p>
+<p>Add a Physics Constraint component to link the weight to the arm:</p>
+<ul>
+<li> rename it &quot;ArmWeightConstraint&quot;</li>
+<li> set Component Name 1 to &quot;Arm&quot;</li>
+<li> set Component Name 2 to &quot;Weight&quot;</li>
+<li> under &quot;Constraint Behaviour&quot; set Disable Collision to checked</li>
+<li> move the constraint to where the weight is attached to the arm</li>
+</ul>
+<p>Add another Physics Constraint just to stop the weight colliding with the base:</p>
+<ul>
+<li> rename it &quot;BaseWeightConstraint&quot;</li>
+<li> set Component Name 1 to &quot;Base&quot;</li>
+<li> set Component Name 2 to &quot;Weight&quot;</li>
+<li> under &quot;Constraint Behaviour&quot; set Disable Collision to checked</li>
+<li> set all the limits to Free so it does nothing but disable the collision:</li>
+</ul>
+<p><img src="/images/chaos_012.png" alt="" /></p>
+<h3 id="preventing-collisions-using-collision-meshes">Preventing Collisions using Collision Meshes</h3>
+<p>Even though we can see that the base and the weight do not collide the BaseWeightConstraint constraint
+is necessary because the base is using a simple collision volume.  Open the SM_Base mesh
+and click Show | Simple Collision, this shows that the base is using a collision volume which 
+includes the area where the weight swings:</p>
+<p><img src="/images/chaos_019.png" alt="" /></p>
+<p>An alternative to adding the BaseWeightConstraint constraint is to use the complex collision
+volume for the base.  Click Show | Complex Collision to show the more complex and better
+fitting collision volume:</p>
+<p><img src="/images/chaos_020.png" alt="" /></p>
+<p>We can use this by changing the Collision Complexity property of the SM_Mesh to &quot;Use Complex Collision as Simple&quot;
+which will make Unreal use the complex collision volume in all cases. </p>
+<p>Now when simulating the weight should pull the arm down like so:</p>
+<p><img src="/images/chaos_018.gif" alt="" /></p>
+<h3 id="adding-the-ramp">Adding the Ramp</h3>
+<p>The ramp is a separate mesh which the projectile slides along when it is launched.  It is added
+by:</p>
+<ul>
+<li> adding a new Static Mesh to BP_Trebuchet component</li>
+<li> rename this &quot;Ramp&quot;</li>
+<li> set its static mesh property to &quot;SM_Ramp&quot;</li>
+<li> set its mobility property to &quot;Static&quot;; this will change Collision Presets to BlockAll</li>
+<li> position it like this:</li>
+</ul>
+<p><img src="/images/chaos_021.png" alt="" /></p>
+<h3 id="adding-the-projectile">Adding the Projectile</h3>
+<p>The projectile is Sphere component.  In theory it could be a separate actor because there can be many
+projectiles, and when they are thrown the move far away from the trebuchet, but for the purposes of learning chaos physics a component will suffice.</p>
+<p>Add the projectile by:</p>
+<ul>
+<li> adding a new Sphere component to BP_Trebuchet component</li>
+<li> rename this &quot;Ball&quot;</li>
+<li> set Simulate Physics to checked, this will change Collision Presets to PhysicsActor</li>
+<li> set its mass to 15 kg </li>
+<li> set Enable Gravity to checked</li>
+<li> position it on the ramp like this:</li>
+</ul>
+<p><img src="/images/chaos_022.png" alt="" /></p>
+<p>When the real trebuchet fires the arm is positioned close to the ground as shown in the 
+top picture, so rotate the arm to a similar position like this:</p>
+<p><img src="/images/chaos_023.png" alt="" /></p>
+<p>We will use a Physics Constraint to represent the connection between the arm and the ball:</p>
+<ul>
+<li> add a Physics Constraint component</li>
+<li> rename it &quot;CableConstraint&quot;</li>
+<li> set Component Name 1 to &quot;Arm&quot;</li>
+<li> set Component Name 2 to &quot;Ball&quot;</li>
+<li> under &quot;Constraint Behaviour&quot; set Disable Collision to checked</li>
+<li> set all the linear limits to Locked and all the angular limits to Free</li>
+<li> position the constraint at the end of the arm like this:</li>
+</ul>
+<p><img src="/images/chaos_024.png" alt="" /></p>
+<p>Now pressing Play in the editor should result in this motion:</p>
+<p><img src="/images/chaos_025.gif" alt="" /></p>
+<h3 id="releasing-the-projectile">Releasing the Projectile</h3>
+<p>The ball swings in the manner we want, but it remains connected to the arm.  We need to find a way to break
+the constraint connecting the ball to the arm.  There are several ways to do this, we could for example:</p>
+<ul>
+<li> break the constraint when the ball enters a certain area</li>
+<li> break the constraint when the ball is travelling at a certain angle</li>
+<li> break the constraint when the ball is travelling at a certain velocity</li>
+</ul>
+<p>We can visualize the velocity using a blueprint like this:</p>
+<ImageExpando :imagePath="$withBase('/images/chaos_026.png')" imageId="BP1"/>
+<p>Assuming the trebuchet is aligned to fire down the X-axis, when the velocity in the X direction is greater than zero this blueprint will:</p>
+<ul>
+<li> draw a vector representing the velocity of the ball, so a longer line represents a greater velocity</li>
+<li> print the angle of the velocity at the end of each vector</li>
+</ul>
+<p>The output looks like this:</p>
+<p><img src="/images/chaos_027.gif" alt="" /></p>
+<p>This is the last frame:</p>
+<p><img src="/images/chaos_028.png" alt="" /></p>
+<p>If we arbitrarily decide to fire when the angle is about 45 degrees, we can calculate the angle of the projectile from the velocity, and break the constraint between the arm and the ball as soon as the angle is &lt;= 45 degrees.</p>
+<p>We update the blueprint by adding a variable to track if the constraint has been broken, 
+and break the constraint the first time the angle is &lt;= 45 degrees:</p>
+<ImageExpando :imagePath="$withBase('/images/chaos_029.png')" imageId="BP2"/>
+<p>And we get this result:</p>
+<p><img src="/images/chaos_030.gif" alt="" /></p>
+<h3 id="references">References</h3>
+<p><a href="https://docs.unrealengine.com/5.0/en-US/add-a-custom-object-type-to-your-project-in-unreal-engine/">Custom Channels - https://docs.unrealengine.com</a></p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

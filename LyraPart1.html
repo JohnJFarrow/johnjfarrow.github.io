@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Looking into Lyra - Experiences | unrealcode.net</title>
+<meta name="description" content="Looking into Lyra - Experiences">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Looking into Lyra - Experiences
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#experiences-">
+Experiences 
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#data-classes">
+Data Classes
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#experience-blueprints">
+Experience Blueprints
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#default-map">
+Default Map
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#async-loading">
+Async Loading
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#discovery-">
+Discovery 
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#starting-an-experience">
+Starting an Experience
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#summary-">
+Summary 
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#references">
+References
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Looking into Lyra - Experiences</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The aim of this is to examine the source code from the Lyra example provided by Epic Games
+and to try and identify and document practices and approaches for using c++.</p>
+<h2 id="experiences">Experiences </h2>
+<p>&quot;Experience&quot; is the term Lyra uses for game modes such as first person, top down etc.</p>
+<h3 id="data-classes">Data Classes</h3>
+<p>An experience is represented in code by two distinct classes:</p>
+<ul>
+<li> <code>ULyraExperienceDefinition</code> which holds data properties and references to objects such as the Lyra pawn, actions and action sets</li>
+<li> <code>ULyraUserFacingExperienceDefinition</code> which is a lighter weight object which holds
+the IDs (of type <code>FPrimaryAssetId</code>) of maps and experiences together with references to UI widgets.  </li>
+</ul>
+<p>Because the <code>ULyraUserFacingExperienceDefinition</code> holds IDs and not references it can be loaded 
+without loading the experience to which it refers and so without loading other
+assets used by that experience.  This means (a) it is quick to create the opening experience selection UI
+and (b) it avoids loading experiences and their assets when those assets may not be required.</p>
+<h3 id="experience-blueprints">Experience Blueprints</h3>
+<p>Experience blueprints such as B_LyraDefaultExperience extend the c++ class <code>ULyraExperienceDefinition</code>. </p>
+<p>The B_LyraDefaultExperience blueprint is data only:</p>
+<p><img src="/images/lyra_003.png" alt="" /></p>
+<p>It holds:</p>
+<ul>
+<li> the pawn class for that experience: <code>TSubclassOf&lt;APawn&gt;</code></li>
+<li> default camera mode used by player controlled pawns: <code>TSubclassOf&lt;ULyraCameraMode&gt;</code></li>
+<li> input configuration used by player controlled pawns to create input mappings and bind input actions: <code>ULyraInputConfig* InputConfig</code></li>
+<li> &quot;action sets&quot; which are (from the c++ comments) &quot;ability sets to grant to this pawn's ability system&quot;: <code>TArray&lt;ULyraAbilitySet*&gt;</code>.  A <code>ULyraAbilitySet</code> is a non-mutable data asset used to grant gameplay abilities and gameplay effects</li>
+<li> the mapping of ability tags to use for actions taking by this pawn: <code>ULyraAbilityTagRelationshipMapping* TagRelationshipMapping</code>, i.e. a mapping of how ability tags block or cancel other abilities</li>
+</ul>
+<p>To get an idea what is actually stored in an experience object, we can look at it in the
+debugger.  This shows the actions:</p>
+<p><img src="/images/lyra_010.png" alt="" /></p>
+<p>And this shows the action sets:</p>
+<p><img src="/images/lyra_011.png" alt="" /></p>
+<h3 id="default-map">Default Map</h3>
+<p>When starting with the default map (/Game/System/DefaultEditorMap/L_DefaultEditorOverview),
+the level contains a blueprint (/Game/System/DefaultEditorMap/B_ExperienceList3D)
+which creates the display of possible experiences, so the user is presented with UI for choosing which experience they want:</p>
+<p><img src="/images/lyra_004.png" alt="" /></p>
+<p>The list created by B_ExperienceList3D is a list of <code>ULyraUserFacingExperienceDefinition</code>.  B_ExperienceList3D uses this blueprint: </p>
+<p><img src="/images/lyra_006.png" alt="" /></p>
+<p>It includes:</p>
+<ul>
+<li> a Get Primary Asset Id List node to get the list of Primary Asset Ids which are of type LyraUserFacingExperienceDefinition </li>
+<li> an Async Load Primary Asset List node to load array of LyraUserFacingExperienceDefinition objects</li>
+</ul>
+<p>Using <code>Tools | Search</code> and searching for &quot;LyraUserFacingExperienceDefinition&quot; shows all the data assets of 
+the experience type:</p>
+<p><img src="/images/lyra_005.png" alt="" /></p>
+<p>These are the source of the list of data asset ids returned from the Get Primary Asset Id List node.</p>
+<h3 id="async-loading">Async Loading</h3>
+<p>The full blueprint which executes when the B_ExperienceList3D object gets the BeginPlay event is shown here:</p>
+<p><img src="/images/lyra_008.png" alt="" /></p>
+<p>The vertical green line shows where the Async Load Primary Asset List is.  Everything to the left side of this line
+happens when the BeginPlay event is triggered, everything on the right side of the line happens asynchronously.  Nothing is waiting on the right side nodes because all they do is populate some UI elements.</p>
+<h3 id="discovery">Discovery </h3>
+<p>If configured to do so, Unreal will discover any objects of type &quot;LyraUserFacingExperienceDefinition&quot; which are added
+to the project.  This is done using the <code>Edit | Project Settings...</code> menu option and selecting <code>Asset Manager</code>
+on the left hand side.  The screenshot below shows how the project is configured:</p>
+<p><img src="/images/lyra_007.png" alt="" /></p>
+<h3 id="starting-an-experience">Starting an Experience</h3>
+<p>In Lyra experiences equate to game modes such as the main menu, the core shooter mode, the top down arena mode etc.</p>
+<p>Lyra has a <code>ULyraExperienceManagerComponent</code> component which manages the 
+launching of experiences with methods such as <code>StartExperienceLoad()</code> and <code>OnExperienceFullLoadCompleted()</code></p>
+<p><img src="/images/lyra_009.png" alt="" /></p>
+<p>When an experience is selected from the opening level <code>LyraExperienceManagerComponent::StartExperienceLoad()</code>
+is called.  This method:</p>
+<ul>
+<li> gets the primary asset id of any <code>ULyraExperienceActionSets</code> associated with the experience</li>
+<li> identified any asset bundles to load, such as &quot;Client&quot;, &quot;Server&quot; or &quot;Equipped&quot;</li>
+<li> creates a delegate to call <code>OnExperienceLoadComplete()</code> once the async asset loading
+has completed</li>
+</ul>
+<p>Then it starts the async loading of identified assets with these lines:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">const</span> TSharedPtr&lt;FStreamableHandle&gt; BundleLoadHandle = 
+      AssetManager.ChangeBundleStateForPrimaryAssets( BundleAssetList.Array(), 
+                                                      BundlesToLoad, {}, <span class="keyword">false</span>, 
+                                                      FStreamableDelegate(), 
+                                                      FStreamableManager::AsyncLoadHighPriority);
+
+<span class="keyword">const</span> TSharedPtr&lt;FStreamableHandle&gt; RawLoadHandle = 
+      AssetManager.LoadAssetList( RawAssetList.Array(), 
+                                  FStreamableDelegate(), 
+                                  FStreamableManager::AsyncLoadHighPriority, 
+                                  TEXT(<span class="string">&quot;StartExperienceLoad()&quot;</span>));
+</pre></div>
+<p>Once the load is completed <code>OnExperienceLoadComplete()</code> is called. This:</p>
+<ul>
+<li> identifies game features which have been loaded in plugins by calling <code>CollectGameFeaturePluginURLs()</code></li>
+<li> loads and actives those plugins by calling <code>LoadAndActivateGameFeaturePlugin()</code></li>
+</ul>
+<p>The <code>UGameFeaturesSubsystem</code> subsystem object is used:</p>
+<ul>
+<li> resolve plugin names such as &quot;ShooterCore&quot; to plugin files such as &quot;../Plugins/GameFeatures/ShooterCore/ShooterCore.uplugin&quot;</li>
+<li> load files using a call to <code>LoadAndActivateGameFeaturePlugin()</code></li>
+</ul>
+<h2 id="summary">Summary </h2>
+<p>So what about this approach is beneficial and could be reused on other projects?</p>
+<ul>
+<li> the data assets are split.  An experience object (a <code>LyraExperienceDefinition</code>) is represented in the UI by a corresponding
+<code>LyraUserFacingExperienceDefinition</code> object. The <code>LyraUserFacingExperienceDefinition</code> object 
+holds only a reference to a picture of the map (in a texture), so
+presenting the map on the level select screen does not mean loading the actual map
+and all the assets it contains</li>
+<li> the data assets hold IDs for the related map and the experience, not 
+references, so the data assets can be loaded without loading the maps</li>
+<li> the data assets such as maps and objects using in an experience are stored by in the <code>LyraExperienceDefinition</code>
+and automatically discovered by the engine.  This facilitates adding a new game mode without
+changing any of the Lyra code</li>
+</ul>
+<h2 id="references">References</h2>
+<p><a href="https://docs.unrealengine.com/5.0/en-US/asset-management-in-unreal-engine/">Epic: Asset Management</a>   (<a href="https://docs.unrealengine.com">https://docs.unrealengine.com</a>)  <br />
+<a href="https://youtu.be/9MGHBU5eNu0?t=1235">Epic: Asset Loading Best Practices</a>  (<a href="https://youtu.be/">https://youtu.be/</a>)   <br />
+<a href="https://www.tomlooman.com/unreal-engine-asset-manager-async-loading/">Tom Looman: Async Asset Loading</a> (<a href="https://www.tomlooman.com">https://www.tomlooman.com</a>)  </p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

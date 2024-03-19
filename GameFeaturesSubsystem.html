@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Understanding the Game Features Subsystem | unrealcode.net</title>
+<meta name="description" content="Understanding the Game Features Subsystem">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Understanding the Game Features Subsystem
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#existing-plugins">
+Existing Plugins
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#steps">
+Steps
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#creating-the-project">
+Creating the Project
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#making-the-project-modular">
+Making the Project Modular
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#gamefeatures-plugin">
+GameFeatures Plugin
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#creating-the-gamefeatureactions-plugin">
+Creating the GameFeatureActions Plugin
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#creating-a-test-plugin">
+Creating a Test Plugin
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#testing">
+Testing
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#how-does-it-work?">
+How Does It Work?
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#reference">
+Reference
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Understanding the Game Features Subsystem</h1>
+<h2 id="introduction">Introduction</h2>
+<p>This is an attempt to understand the Unreal Game Features Subsystem.  The Game Features Subsystem is used
+in the Valley of the Ancient and Lyra examples, and in Fortnite, to distribute game assets and functions as plugins.</p>
+<p>Plugins can contained both code and assets. Once support for the Game Features Subsystem is in place a particular game mode or map (or anything really) can be developed and distributed as a 
+plugin and added to a game without modifying the base game.  This has a lot of benefits including flexibility in
+development and better management of which assets are in memory when.  The Lyra example uses this approach to
+deliver different game modes (such as deathmatch) as different plugins.</p>
+<p>The  Game Features Subsystem makes elements in the base game responsive to plugins being enabled and disabled.  For example
+when a plugin containing a specific game mode is activated the player character  gains
+access to new weapons and abilities, and when that plugin is deactivated they lose those abilities.</p>
+<p>The notes below describe:</p>
+<ul>
+<li> how to add the Game Features Subsystem to an existing project (the Stack-O-Bot example) and </li>
+<li> demonstrates its functionality by adding a plugin which can be dynamically enabled and disabled.</li>
+</ul>
+<h3 id="existing-plugins">Existing Plugins</h3>
+<p>Unreal Engine ships with plugins which support the Game Features Subsystem.  We will be using these and adding new functionality
+to the Stack-O-Bot project using code from the Valley of the Ancient and Lyra projects.</p>
+<p>The <strong>GameFeatures</strong> plugin contains:</p>
+<ul>
+<li> UGameFeatureAction base class
+<ul>
+<li> UGameFeatureAction_AddCheats class</li>
+<li> UGameFeatureAction_AddComponents class</li>
+<li> UGameFeatureAction_DataRegistry - Specifies a list of Data Registries to load and initialize with this feature </li>
+<li> UGameFeatureAction_DataRegistrySource - Specifies a list of source assets to add to Data Registries when this feature is activated</li>
+</ul>
+</li>
+<li> UGameFeaturesSubsystem class</li>
+<li> IGameFeatureStateChangeObserver interface</li>
+</ul>
+<p>The <strong>ModularGameplay</strong> plugin contains:</p>
+<ul>
+<li> UGameFrameworkComponentManager - A manager to handle  dynamically adding components to actors, and removing components from
+ actors, as plugins are loaded and unloaded.</li>
+<li> UControllerComponent - an actor component used by the AController class which receives controller events such as  ReceivedPlayer, PlayerTick</li>
+<li> UGameStateComponent - an actor component used by the AGameStateBase class which receives GameState events such as HandleMatchHasStarted</li>
+</ul>
+<hr />
+<p id="top"/>
+<h3 id="steps">Steps</h3>
+<p>These are the steps used to add the Game Features Subsystem to the StackOBot project (or any other project) and to demonstrate
+an working plugin.</p>
+<ol>
+<li> <a href="#internal_create_project">Creating the Project</a></li>
+<li> <a href="#internal_modular">Making the Project Modular</a></li>
+<li> <a href="#internal_plugin">Creating the GameFeatureActions Plugin</a></li>
+<li> <a href="#internal_create_test">Creating a Test Content</a></li>
+<li> <a href="#internal_test">Testing</a></li>
+<li> <a href="#internal_workings">How Does It Work?</a></li>
+</ol>
+<hr />
+<p id="internal_create_project"/>
+<h2 id="creating-the-project">Creating the Project</h2>
+<p>Download the Stack-O-Bot example project using the Epic Game Launcher.  Once it is downloaded it will
+appear in the Library|Vault section of the Epic Game Launcher like this:</p>
+<p><img src="/images/mod_01_001.png" alt="" /></p>
+<p>Create a new Stack-O-Bot project by clicking &quot;Create Project&quot;, name the project &quot;StackOBot&quot;.  Once
+the Epic Game Launcher has finished creating the project exit the launcher.</p>
+<p>We will be using Unreal Engine 5.1 Preview version, so in Windows Explorer find the location of the project you just created
+and right-click the StackOBot.uproject file and chose &quot;Switch Unreal Engine version&quot; and change the version to 5.1.  This process
+is shown here:</p>
+<p><img src="/images/mod_01_003.png" alt="" /></p>
+<p><img src="/images/mod_01_002.png" alt="" /></p>
+<p>Open the project in Unreal by double-clicking the StackOBot.uproject file.</p>
+<p>Depending on which Unreal versions you used, if might see a message like this:</p>
+<p><img src="/images/mod_01_006.png" alt="" /></p>
+<p>If so, update the setting as instructed by the message.</p>
+<p><a href="#top">back to top</a></p>
+<hr />
+<p id="internal_modular"/>
+<h2 id="making-the-project-modular">Making the Project Modular</h2>
+<p>Both the Valley of the Ancient and the Lyra project add classes to make the project behave in a modular way, so plugins can be created which contain content 
+such as Gameplay Abilities and Input Mapping Contexts.  These plugins can be activated to, for example, grant the player abilities which are defined in the plugin, and later deactivated to withdraw those abilities when the plugin is unloaded.</p>
+<p>The Valley of the Ancient and the Lyra project classes (<code>AModularPlayerController</code>, <code>AModularCharacter</code> etc.) used to do this are 
+contained in their own plugin called ModularGameplayActors.  These classes interact with the <code>UGameFrameworkComponentManager</code> allowing them to 
+add and remove components from derived classes in response to plugins being enabled or disabled.</p>
+<h3 id="gamefeatures-plugin">GameFeatures Plugin</h3>
+<p>The Game Features plugin which ships with Unreal Engine has the classes shown on the bottom rows of the diagram below:</p>
+<p><img src="/images/GameFeatureActionsEngine.png" alt="" /></p>
+<p>These classes all extend <code>UGameFeatureAction</code> to create actions which can be performed when 
+a plugin is enabled, for example UGameFeatureAction_AddComponents adds new components to specified classes.</p>
+<p>When the Game Features plugin is enabled and you create a new plugin and add a new actions, the list of  actions
+you can choose from comes from the classes derived from <code>UGameFeatureAction</code>, as shown here:</p>
+<p><img src="/images/mod_01_004.png" alt="" /></p>
+<p>In the next section we will create a new plugin which adds more actions to the list.</p>
+<p><a href="#top">back to top</a></p>
+<hr />
+<p id="internal_plugin"/>
+<h2 id="creating-the-gamefeatureactions-plugin">Creating the GameFeatureActions Plugin</h2>
+<p>I have created a git repository for the GameFeatureActions plugin which
+contains mostly files from the Valley of the Ancient project.  These
+files, with minor modifications, are also used in the Lyra project.  The repository contains:</p>
+<ul>
+<li> classes for actions which can be done from a plugin, such as
+adding an Input Mapping Context, and</li>
+<li> classes to derive from, such as AModularCharacter, which 
+work with the Game Features Subsystem when adding new components to derived classes. </li>
+</ul>
+<p>I have put them in a git repository purely to make them easier to access for this learning exercise. They remain (c) Epic Games.</p>
+<p>This plugin contains more classes which extend <code>UGameFeatureAction</code>:</p>
+<p><img src="/images/GameFeatureActions.png" alt="" /></p>
+<p>When the GameFeatureActions plugin is enabled you can see from the below image that it adds 
+more actions to the dropdown list of action types:</p>
+<p><img src="/images/mod_01_005.png" alt="" /></p>
+<p>The process of creating the GameFeatureActions plugin is:</p>
+<ul>
+<li> open the StackOBot project in the Unreal Editor</li>
+<li> enable these plugins (if they are not enabled then the new GameFeatureActions plugin will not compile):
+<ul>
+<li> &quot;Game Features&quot; </li>
+<li> &quot;Gameplay Abilities&quot;</li>
+<li> &quot;Modular Gameplay&quot;</li>
+</ul>
+</li>
+<li> add a C++ class which we will later delete, this is just to convert it from a blueprint project to a C++ project (use Tools -&gt; New C++ Class, 
+derived from None, any name will do)</li>
+<li> exit the Unreal editor</li>
+<li> to clone the git repository which contains the files for the GameFeatureActions plugin either:	(1) if the StackOBot game is not contained in a git repository, then just clone the GameFeatureActions repository into the Plugins directory like this:
+<pre><code>	cd StackOBot\Plugins
+  git clone git@github.com:JohnJFarrow/GameFeatureActions.git
+</code></pre>
+	(2) if the StackOBot game is contained in a git repository, then add the GameFeatureActions repository as a submodule like this:
+<pre><code>	cd StackOBot\Plugins
+	git submodule add git@github.com:JohnJFarrow/GameFeatureActions.git 
+</code></pre>
+</li>
+<li> in Windows Explorer right-click the StackOBot.uproject and Generate Visual Studio project files</li>
+<li> open the project in Visual Studio (by double-clicking the .sln file)</li>
+</ul>
+<p><a href="#top">back to top</a></p>
+<hr />
+<p id="internal_create_test"/>
+<h2 id="creating-a-test-plugin">Creating a Test Plugin</h2>
+<p>Here we create a new plugin which contains:</p>
+<ol>
+<li> an Input Mapping Context which connects a keyboard input to an Input Action which already exists in the base StackOBot game</li>
+<li> a data asset containing an action which activates the new Input Mapping Context while the plugin is active.</li>
+</ol>
+<p>If it is not already, open the StackOBot game in the Visual Studio and build and run it.</p>
+<p>Create a new plugin by using Edit -&gt; Plugins, click the +Add button near the top left corner, select &quot;Game Feature (Content Only)&quot;
+as the type of plugin, and name it &quot;Test&quot;, as shown here:</p>
+<p><img src="/images/mod_01_007.png" alt="" /></p>
+<p><em>Do not change the path of the plugin, it needs to be in a directory under &quot;Plugins\GameFeatures&quot;</em></p>
+<p>Press the &quot;Create Plugin&quot; button to create the plugin.</p>
+<p>The plugin editor window should appear like this:</p>
+<p><img src="/images/mod_01_008.png" alt="" /></p>
+<p><em>Press the save button now.  With the 5.1 Preview build it is easy to close the editor without saving this asset</em></p>
+<p>Without closing the Test data asset window, go back to the content browser and locate the new plugin, it should look something like this:</p>
+<p><img src="/images/mod_01_009.png" alt="" /></p>
+<p>Right click in the content area and select Input -&gt; Input Mapping Context to create a new Input Mapping Context
+<em>in the plugin</em>, name it &quot;IMC_Test&quot;.  The content browser should now look like this:</p>
+<p><img src="/images/mod_01_010.png" alt="" /></p>
+<p>Edit IMC_Test and add an input mapping so the IA_Jump action is performed when then user presses the &quot;U&quot; key.  It should look
+like this:</p>
+<p><img src="/images/mod_01_011.png" alt="" /></p>
+<p>Save and close the input mapping.</p>
+<p>Go back to the Test data asset window and </p>
+<ol>
+<li> add an action which will activate the IMC_Test Input Mapping Context when the plugin 
+is activated</li>
+<li>  change the Current State property to &quot;Loaded&quot;</li>
+</ol>
+<p>It should now look like this:</p>
+<p><img src="/images/mod_01_012.png" alt="" /></p>
+<p>Save the Test data asset.</p>
+<p><a href="#top">back to top</a></p>
+<hr />
+<p id="internal_test"/>
+<h2 id="testing">Testing</h2>
+<p>To test if this works drag the Test data asset window to the right of the main editor window like this:</p>
+<p><img src="/images/mod_01_013.png" alt="" /></p>
+<p>You then be able to press Play in the editor and move the robot around.  The spacebar will
+make the robot jump but the &quot;U&quot; key will not.</p>
+<p>Alt-Tab to the Test data asset window and change the &quot;Current State&quot; property
+from whatever it is to &quot;Active&quot;.  This will load the plugin and activate the IMC_Test Input Mapping Context.</p>
+<p>Alt-Tab back to the editor window, the robot should now jump when you press the &quot;U&quot; key.</p>
+<p>This shows that the plugin has loaded and the &quot;Add Input Mapping&quot; action has been executed to activate the IMC_Test Input Mapping Context.</p>
+<p>Similarly if you change the &quot;Current State&quot; property from &quot;Active&quot; back to &quot;Loaded&quot; the &quot;U&quot; key will no longer make the robot jump.</p>
+<p><a href="#top">back to top</a></p>
+<p id="internal_workings"/>
+<h2 id="how-does-it-work">How Does It Work?</h2>
+<p>Broadly speaking this is what happens when processing an action to add an Input Mapping Context from a plugin:</p>
+<ul>
+<li> <code>UGameFeaturePluginStateMachine::UpdateStateMachine()</code> is called by the engine when any plugin is changed to enabled</li>
+</ul>
+<ol>
+<li> <code>UGameFeaturePluginStateMachine::UpdateStateMachine()</code> calls <code>UGameFeaturesSubsystem::OnGameFeatureActivating()</code></li>
+<li> <code>UGameFeaturesSubsystem::OnGameFeatureActivating</code> calls <code>UGameFeatureAction_AddInputContextMapping::OnGameFeatureActivating()</code></li>
+</ol>
+<p>The UGameFeaturesSubsystem in the engine knows about our UGameFeatureAction_AddInputContextMapping because it 
+maintains a list of plugins:</p>
+<div class="cplusplus"><pre>
+TMap&lt;FGameFeaturePluginIdentifier, TObjectPtr&lt;UGameFeaturePluginStateMachine&gt;&gt; GameFeaturePluginStateMachines;
+</pre></div>
+<p>from which it can retrieve the actions:</p>
+<div class="cplusplus"><pre>
+UGameFeaturePluginStateMachine* UGameFeaturesSubsystem::FindOrCreateGameFeaturePluginStateMachine(<span class="keyword">const</span> FString&amp; PluginURL)
+{
+	<span class="keyword">if</span> (UGameFeaturePluginStateMachine* ExistingStateMachine = FindGameFeaturePluginStateMachine(PluginURL))
+	{
+		<span class="keyword">return</span> ExistingStateMachine;
+	}
+
+	UGameFeaturePluginStateMachine* NewStateMachine = NewObject&lt;UGameFeaturePluginStateMachine&gt;(<span class="keyword">this</span>);
+	GameFeaturePluginStateMachines.Add(PluginURL, NewStateMachine);
+	NewStateMachine-&gt;InitStateMachine(PluginURL);
+
+	<span class="keyword">return</span> NewStateMachine;
+}
+</pre></div>
+<ul>
+<li> <code>UGameFeatureAction_AddInputContextMapping::OnGameFeatureActivating()</code> calls it's base class to
+loop through all world contexts and call <code>AddToWorld()</code> on each of them:</li>
+</ul>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> UGameFeatureAction_WorldActionBase::OnGameFeatureActivating()
+{
+	GameInstanceStartHandle = FWorldDelegates::OnStartGameInstance.AddUObject(<span class="keyword">this</span>, 
+				&amp;UGameFeatureAction_WorldActionBase::HandleGameInstanceStart);
+
+	<span class="comment">// Add to any worlds with associated game instances that have already been initialized</span>
+	<span class="keyword">for</span> (<span class="keyword">const</span> FWorldContext&amp; WorldContext : GEngine-&gt;GetWorldContexts())
+	{
+		AddToWorld(WorldContext);
+	}
+}
+</pre></div>
+<ul>
+<li> <code>AddToWorld()</code> does this:</li>
+</ul>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> UGameFeatureAction_AddInputContextMapping::AddToWorld(<span class="keyword">const</span> FWorldContext&amp; WorldContext)
+{
+	UWorld* World = WorldContext.World();
+	UGameInstance* GameInstance = WorldContext.OwningGameInstance;
+
+	<span class="keyword">if</span> ((GameInstance != <span class="keyword">nullptr</span>) &amp;&amp; (World != <span class="keyword">nullptr</span>) &amp;&amp; World-&gt;IsGameWorld())
+	{
+		<span class="keyword">if</span> (UGameFrameworkComponentManager* ComponentMan = 
+		      UGameInstance::GetSubsystem&lt;UGameFrameworkComponentManager&gt;(GameInstance))
+		{
+			<span class="keyword">if</span> (!InputMapping.IsNull())
+			{
+				UGameFrameworkComponentManager::FExtensionHandlerDelegate AddAbilitiesDelegate = 
+					UGameFrameworkComponentManager::FExtensionHandlerDelegate::CreateUObject(
+						<span class="keyword">this</span>, &amp;UGameFeatureAction_AddInputContextMapping::HandleControllerExtension);
+
+				TSharedPtr&lt;FComponentRequestHandle&gt; ExtensionRequestHandle = 
+					ComponentMan-&gt;AddExtensionHandler(APlayerController::StaticClass(), AddAbilitiesDelegate);
+
+				ExtensionRequestHandles.Add(ExtensionRequestHandle);
+			}
+		}
+	}
+}
+</pre></div>
+<p>The key line is:</p>
+<div class="cplusplus"><pre>
+	TSharedPtr&lt;FComponentRequestHandle&gt; ExtensionRequestHandle = 
+		ComponentMan-&gt;AddExtensionHandler(APlayerController::StaticClass(), AddAbilitiesDelegate);
+</pre></div>
+<ul>
+<li> <code>AddExtensionHandler()</code> does this:</li>
+</ul>
+<div class="cplusplus"><pre>
+TSharedPtr&lt;FComponentRequestHandle&gt; UGameFrameworkComponentManager::AddExtensionHandler(
+			<span class="keyword">const</span> TSoftClassPtr&lt;AActor&gt;&amp; ReceiverClass, FExtensionHandlerDelegate ExtensionHandler)
+{
+	FComponentRequestReceiverClassPath ReceiverClassPath(ReceiverClass);
+	FExtensionHandlerEvent&amp; HandlerEvent = ReceiverClassToEventMap.FindOrAdd(ReceiverClassPath);
+
+	<span class="comment">// This is a fake multicast delegate using a map</span>
+	FDelegateHandle DelegateHandle(FDelegateHandle::EGenerateNewHandleType::GenerateNewHandle);
+	HandlerEvent.Add(DelegateHandle, ExtensionHandler);
+
+	<span class="keyword">if</span> (UClass* ReceiverClassPtr = ReceiverClass.Get())
+	{
+		UGameInstance* LocalGameInstance = GetGameInstance();
+		<span class="keyword">if</span> (ensure(LocalGameInstance))
+		{
+			UWorld* LocalWorld = LocalGameInstance-&gt;GetWorld();
+			<span class="keyword">if</span> (ensure(LocalWorld))
+			{
+				<span class="keyword">for</span> (TActorIterator&lt;AActor&gt; ActorIt(LocalWorld, ReceiverClassPtr); ActorIt; ++ActorIt)
+				{
+					<span class="keyword">if</span> (ActorIt-&gt;IsActorInitialized())
+					{
+						ExtensionHandler.Execute(*ActorIt, NAME_ExtensionAdded);
+					}
+				}
+			}
+		}
+	}
+
+	<span class="keyword">return</span> MakeShared&lt;FComponentRequestHandle&gt;(<span class="keyword">this</span>, ReceiverClass, DelegateHandle);
+}
+</pre></div>
+<p>The key line is:</p>
+<div class="cplusplus"><pre>
+TActorIterator&lt;AActor&gt; ActorIt(LocalWorld, ReceiverClassPtr); ActorIt; ++ActorIt)
+</pre></div>
+<p>which finds all the actors in the world of the required class.  In the case of adding an Input Mapping Context
+it finds all the actors of the <code>PlayerController</code> class and invokes the ExtensionHandler on each actor:</p>
+<div class="cplusplus"><pre>
+ExtensionHandler.Execute(*ActorIt, NAME_ExtensionAdded);
+</pre></div>
+<p>The invocation of the extension handler calls <code>UGameFeatureAction_AddInputContextMapping::HandleControllerExtension()</code>
+which calls <code>InputSystem-&gt;AddMappingContext()</code> to add the Input Mapping Context</p>
+<h2 id="reference">Reference</h2>
+<p><a href="https://docs.unrealengine.com/5.0/en-US/gameplay-tags-in-unreal-engine/">Epic Gameplay Tags</a>  <br />
+<a href="https://nerivec.github.io/old-ue4-wiki/pages/gameplayabilities-and-you.html">Old Wiki Article: Gameplay Abilities and You</a>  <br />
+<a href="https://forums.unrealengine.com/t/comprehensive-gameplayabilities-analysis-series/91086">Unreal Forums: Comprehensive Gameplay Abilities Analysis</a>  <br />
+<a href="https://forums.unrealengine.com/t/gameplay-abilities-and-weapon-firing/130633/12">Unreal Forums: Gameplay Abilities and Weapon Firing</a>  <br />
+<a href="https://github.com/tranek/GASDocumentation#concepts-at">Tranek GAS Documentation</a>  <br />
+<a href="https://forums.unrealengine.com/docs?topic=265041">Unreal Forums: A holistic look at replicated movement</a></p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Clang has better error messages | unrealcode.net</title>
+<meta name="description" content="Clang has better error messages">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Clang has better error messages
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Clang has better error messages</h1>
+<p>Comparing the error messages created by Clang and by MSVC.</p>
+<!-- more -->
+<p>Consider this code:</p>
+<div class="cplusplus"><pre>
+#include &lt;memory&gt;
+
+<span class="keyword">struct</span> SPDeleter
+{
+    <span class="keyword">void</span> <span class="keyword">operator</span>()(<span class="keyword">int</span>) <span class="keyword">const</span> {}
+};
+
+<span class="keyword">int</span> main()
+{
+    <span class="keyword">using</span> T = <span class="keyword">int</span>;
+    std::shared_ptr&lt;T&gt; X( <span class="keyword">new</span> T(), SPDeleter() );
+}
+</pre></div>
+<p>The problem here is that that <code>operator()()</code> on the <code>SPDeleter</code> should take an <code>int*</code> not just an <code>int</code>.</p>
+<p>MSVC gives this error message:</p>
+<pre><code>error C2661: 'std::shared_ptr&lt;T&gt;::shared_ptr': no overloaded function takes 2 arguments
+</code></pre>
+<p>which is misleading at best.  The constructor of <code>std::shared_ptr</code> does have functions which take two arguments.</p>
+<p>Compiling with clang gives a much better error message:</p>
+<pre><code>error: no matching constructor for initialization of 'std::shared_ptr&lt;T&gt;' (aka 'shared_ptr&lt;int&gt;')
+    std::shared_ptr&lt;T&gt; X( new T(), SPDeleter() );
+</code></pre>
+<p>plus clang lists all the possible matches and explains why they were not chosen:</p>
+<pre><code>C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1526:5: note:
+      candidate template ignored: requirement 'conjunction_v&lt;std::is_move_constructible&lt;SPDeleter&gt;,
+      std::_Can_call_function_object&lt;SPDeleter &amp;, int *&amp;, void&gt;, std::_SP_convertible&lt;int, int&gt;&gt;' was not satisfied
+      [with _Ux = int, _Dx = SPDeleter]
+    shared_ptr(_Ux* _Px, _Dx _Dt) { // construct with _Px, deleter
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1540:5: note:
+      candidate template ignored: requirement 'conjunction_v&lt;std::is_move_constructible&lt;SPDeleter&gt;,
+      std::_Can_call_function_object&lt;SPDeleter &amp;, nullptr_t &amp;, void&gt;&gt;' was not satisfied [with _Dx = SPDeleter]
+    shared_ptr(nullptr_t, _Dx _Dt) { // construct with nullptr, deleter
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1551:5: note:
+      candidate template ignored: could not match 'shared_ptr&lt;type-parameter-0-0&gt;' against 'int *'
+    shared_ptr(const shared_ptr&lt;_Ty2&gt;&amp; _Right, element_type* _Px) noexcept {
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1557:5: note:
+      candidate template ignored: could not match 'shared_ptr&lt;type-parameter-0-0&gt;' against 'int *'
+    shared_ptr(shared_ptr&lt;_Ty2&gt;&amp;&amp; _Right, element_type* _Px) noexcept {
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1506:15: note:
+      candidate constructor not viable: requires 1 argument, but 2 were provided
+    constexpr shared_ptr(nullptr_t) noexcept {} // construct empty shared_ptr
+              ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1512:14: note:
+      candidate constructor template not viable: requires single argument '_Px', but 2 arguments were provided
+    explicit shared_ptr(_Ux* _Px) { // construct shared_ptr object that owns _Px
+             ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1562:5: note:
+      candidate constructor not viable: requires single argument '_Other', but 2 arguments were provided
+    shared_ptr(const shared_ptr&amp; _Other) noexcept { // construct shared_ptr object that owns same resource as _Other
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1567:5: note:
+      candidate constructor template not viable: requires single argument '_Other', but 2 arguments were provided
+    shared_ptr(const shared_ptr&lt;_Ty2&gt;&amp; _Other) noexcept {
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1572:5: note:
+      candidate constructor not viable: requires single argument '_Right', but 2 arguments were provided
+    shared_ptr(shared_ptr&amp;&amp; _Right) noexcept { // construct shared_ptr object that takes resource from _Right
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1577:5: note:
+      candidate constructor template not viable: requires single argument '_Right', but 2 arguments were provided
+    shared_ptr(shared_ptr&lt;_Ty2&gt;&amp;&amp; _Right) noexcept { // construct shared_ptr object that takes resource from _Right
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1582:14: note:
+      candidate constructor template not viable: requires single argument '_Other', but 2 arguments were provided
+    explicit shared_ptr(const weak_ptr&lt;_Ty2&gt;&amp; _Other) { // construct shared_ptr object that owns resource *_Other
+             ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1590:5: note:
+      candidate constructor template not viable: requires single argument '_Other', but 2 arguments were provided
+    shared_ptr(auto_ptr&lt;_Ty2&gt;&amp;&amp; _Other) { // construct shared_ptr object that owns *_Other.get()
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1601:5: note:
+      candidate constructor template not viable: requires single argument '_Other', but 2 arguments were provided
+    shared_ptr(unique_ptr&lt;_Ux, _Dx&gt;&amp;&amp; _Other) {
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1534:5: note:
+      candidate constructor template not viable: requires 3 arguments, but 2 were provided
+    shared_ptr(_Ux* _Px, _Dx _Dt, _Alloc _Ax) { // construct with _Px, deleter, allocator
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1546:5: note:
+      candidate constructor template not viable: requires 3 arguments, but 2 were provided
+    shared_ptr(nullptr_t, _Dx _Dt, _Alloc _Ax) { // construct with nullptr, deleter, allocator
+    ^
+C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1504:15: note:
+      candidate constructor not viable: requires 0 arguments, but 2 were provided
+    constexpr shared_ptr() noexcept = default;
+</code></pre>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

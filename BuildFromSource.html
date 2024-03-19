@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Building Unreal Engine From Source with Visual Studio 2022 | unrealcode.net</title>
+<meta name="description" content="Building Unreal Engine From Source with Visual Studio 2022">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Building Unreal Engine From Source with Visual Studio 2022
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#github-account-">
+Github Account 
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#epic-games-account">
+Epic Games Account
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#connecting-the-epic-games-account-to-the-github-account">
+Connecting the Epic Games account to the Github account
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#installing-git-">
+Installing git 
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#installing-visual-studio-2022">
+Installing Visual Studio 2022
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#downloading-&-building">
+Downloading & Building
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#downloading-the-source">
+Downloading the source
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#installing-the-unrealvs-plugin-for-visual-studio">
+Installing the UnrealVS plugin for Visual Studio
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#choosing-a-branch">
+Choosing a branch
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#building">
+Building
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#opening-the-solution">
+Opening the Solution
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#running-unreal">
+Running Unreal
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#registering-the-build">
+Registering the Build
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#other-useful-addons">
+Other Useful Addons
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#earlier-versions">
+Earlier versions
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#references">
+References
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Building Unreal Engine From Source with Visual Studio 2022</h1>
+<p>Updated for Unreal Engine 5.1.1</p>
+<p>This is a brief guide to downloading and building UE5 using git command line tools
+and Visual Studio 2022.  Updated for Unreal Engine 5.1.1 and Visual Studio 2022 17.4.4</p>
+<h2 id="github-account">Github Account </h2>
+<p>If you don't have a github account, go to <a href="https://github.com/">github.com</a> and create one.</p>
+<h2 id="epic-games-account">Epic Games Account</h2>
+<p>If you don't have an Epic Games account, go to <a href="https://www.epicgames.com/id/register">epicgames.com/register</a> and create one.</p>
+<h2 id="connecting-the-epic-games-account-to-the-github-account">Connecting the Epic Games account to the Github account</h2>
+<p>You need to connect your Epic Games account to your github account so you can get access to Epic's
+github repositories.</p>
+<p>To do this:</p>
+<ul>
+<li> sign into your Epic Games account at <a href="https://epicgames.com">epicgames.com</a></li>
+<li> click on your username near the top right corner of the page and select &quot;Account&quot; from the dropdown menu</li>
+<li> click on &quot;Connections&quot; in the list of options on the left side of the page</li>
+<li> select &quot;Accounts&quot; from the tab bar with the &quot;Apps&quot; and &quot;Accounts&quot; options</li>
+<li> under the github icon click the &quot;Connect&quot; button.  This will guide you through a series of steps to connect
+your Epic Games and github accounts</li>
+</ul>
+<h2 id="installing-git">Installing git </h2>
+<p>If you do not already have the git commandline tools installed, install them from <a href="https://git-scm.com/downloads">git-scm.com/downloads</a>.</p>
+<h2 id="installing-visual-studio-2022">Installing Visual Studio 2022</h2>
+<p>See <a href="VisualStudio2022.html">Configuring Visual Studio 2022</a> 
+for instructions on how to install and configure Visual Studio.</p>
+<h2 id="downloading-building">Downloading &amp; Building</h2>
+<h3 id="downloading-the-source">Downloading the source</h3>
+<p>Make a new directory such as c:\work, and change into it.</p>
+<p>Clone the Unreal Engine source repository:</p>
+<pre><code>git clone https://github.com/EpicGames/UnrealEngine.git UnrealSource
+</code></pre>
+<p>where <code>UnrealSource</code> is the name of a new directory to which the source will be downloaded.</p>
+<p>This takes a while, and uses 25 GB of space</p>
+<h3 id="installing-the-unrealvs-plugin-for-visual-studio">Installing the UnrealVS plugin for Visual Studio</h3>
+<p>UnrealVS is a Visual Studio plugin from Epic.  It is included in the UE source code.
+Exit Visual Studio if needed and install the file
+[UnrealEngineSource]\Engine\Extras\UnrealVS\VS2022\UnrealVS.vsix by double clicking it.</p>
+<h3 id="choosing-a-branch">Choosing a branch</h3>
+<p>This page <a href="https://github.com/EpicGames/UnrealEngine/branches">github.com/EpicGames/UnrealEngine/branches</a> lists significant branches including:</p>
+<ul>
+<li> release - the latest released version of UE</li>
+<li> ue5-main - most up to date - this is being continuously updated and won't necessarily build or run on any given day.</li>
+</ul>
+<p>Decide on a branch and change into the new source directory created by the git clone command.</p>
+<p>Run <code>git checkout [branch-name]</code> for whichever branch you chose to build.</p>
+<h3 id="building">Building</h3>
+<p>This is a summary of information from [https://github.com/EpicGames/UnrealEngine/tree/master].</p>
+<p>Change to the directory in which you downloaded the UE source code and
+run this command to download and install prerequisites required to build UE - it might take a while:</p>
+<pre><code>Setup.bat
+</code></pre>
+<p>then run</p>
+<pre><code>GenerateProjectFiles.bat -2022
+</code></pre>
+<h3 id="opening-the-solution">Opening the Solution</h3>
+<p>The above commands will create the file UE5.sln in the current directory, open it
+in Visual Studio and:</p>
+<ul>
+<li> change the Solution Configuration dropdown to &quot;Development Editor&quot;</li>
+<li> change the Solution Platform to &quot;Win64&quot;</li>
+<li> right click the UE5 project in the solution explorer and choose &quot;Build&quot;.</li>
+</ul>
+<p><img src="/images/vsinstall_7.png" alt="" /></p>
+<p>This will take some time to complete.  On a Ryzen 5950x 16 core machine using 
+an M.2 SSD it took 37 minutes.</p>
+<h3 id="running-unreal">Running Unreal</h3>
+<p>In the solution explorer right-click &quot;UE5&quot; under the &quot;Engine&quot; entry at the top
+and select &quot;Set as Startup Project&quot;.</p>
+<p>Press F5 to run UE</p>
+<h3 id="registering-the-build">Registering the Build</h3>
+<p>You can register your source build so that it appears as an option when you
+right-click a .uproject file.  To do this use Explorer to locate and
+execute this file under your build directory:  </p>
+<blockquote>
+<p>.\Engine\Binaries\Win64\UnrealVersionSelector-Win64-Shipping.exe</p>
+</blockquote>
+<p>Once you have done this you can right-click on a .uproject file
+and see the source build as an option like this:</p>
+<p><img src="/images/vsinstall_017.png" alt="" /></p>
+<h2 id="other-useful-addons">Other Useful Addons</h2>
+<p>Microsoft has Unreal Engine extensions for Visual Studio which allows 
+ Visual Studio to display information about Blueprints assets in the C++ code.  Instructions
+ for installation can be found at <a href="https://github.com/microsoft/vc-ue-extensions#readme">https://github.com/microsoft/vc-ue-extensions#readme</a>.</p>
+<h3 id="earlier-versions">Earlier versions</h3>
+<p>These instructions will work for Unreal 4.27 and Visual Studio 2022.  Make sure you
+clone the git repository then checkout the 4.27 branch <em>before</em> you run
+Setup.bat or GenerateProjectFiles.bat.</p>
+<p>The solution file created will be called UE4.sln not UE5.sln.</p>
+<h2 id="references">References</h2>
+<p><a href="https://docs.unrealengine.com/5.3/en-US/using-an-installed-build-of-unreal-engine/#registeringaninstalledbuild">Using an Installed Build</a></p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

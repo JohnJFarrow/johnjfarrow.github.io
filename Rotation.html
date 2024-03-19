@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Creating a Blueprint Node in C++ | unrealcode.net</title>
+<meta name="description" content="Creating a Blueprint Node in C++">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Creating a Blueprint Node in C++
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#manual-rotation-">
+Manual Rotation 
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#blueprint-rotation">
+Blueprint Rotation
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#header-file">
+Header File
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#ufunction-declaration">
+UFUNCTION Declaration
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#implementation">
+Implementation
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#usage">
+Usage
+</a>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Creating a Blueprint Node in C++</h1>
+<h2 id="introduction">Introduction</h2>
+<p>This post is about creating a new Blueprint node in c++ to rotate an Actor object around
+a pivot point.</p>
+<p>The image below shows a mesh (called SM_Arm) that was imported into Unreal from
+a FBX file generated in Blender.</p>
+<p><img src="/images/rotn_001.png" alt="" /></p>
+<p>The gizmo on the left is at the position of a socket.  The red, green and blue lines near the middle
+indicate the origin of the mesh, which is where the origin was in the Blender model.</p>
+<p>We create a new blueprint actor, add a Static Mesh component, and
+set the mesh to SM_Arm.  If we place this actor in the world, 
+select it in the outliner, and press E to rotate it, the rotation gizmo (which
+indicates the pivot point around which it will rotate) is 
+positioned on the origin of the SM_Arm mesh:</p>
+<p><img src="/images/rotn_002.png" alt="" /></p>
+<h2 id="manual-rotation">Manual Rotation </h2>
+<p>If we want to manually rotate around the socket position, we can use ALT-middle-mouse-click
+to temporarily move the pivot point like so:</p>
+<p><img src="/images/rotn_003.png" alt="" /></p>
+<p>Once we have applied a rotation the pivot point will return to the original position.</p>
+<h2 id="blueprint-rotation">Blueprint Rotation</h2>
+<h3 id="header-file">Header File</h3>
+<p>No existing single blueprint node supports rotating an actor around a specified pivot point, so as an 
+exercise I decided to write one.  </p>
+<p>A blueprint node can be implemented as a static function on a c++ class which is derived from
+the UBlueprintFunctionLibrary class.  To create such a node use the <code>Tools | New C++ Class</code> menu option and create a class
+derived from UBlueprintFunctionLibrary.  In this example the new class is called &quot;UtilityFunctionLibrary&quot;.</p>
+<p>Unreal will create the header and implementation files.  The header looks like this:</p>
+<div class="cplusplus"><pre>
+#pragma once
+#include <span class="string">&quot;CoreMinimal.h&quot;</span>
+#include <span class="string">&quot;Kismet/BlueprintFunctionLibrary.h&quot;</span>
+#include <span class="string">&quot;UtilityFunctionLibrary.generated.h&quot;</span>
+
+UCLASS()
+<span class="keyword">class</span> MYPROJECT8_API UUtilityFunctionLibrary : <span class="keyword">public</span> UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+};
+</pre></div>
+<p>There are no methods on the new class.  We can add one like so:</p>
+<div class="cplusplus"><pre>
+#pragma once
+#include <span class="string">&quot;CoreMinimal.h&quot;</span>
+#include <span class="string">&quot;Kismet/BlueprintFunctionLibrary.h&quot;</span>
+#include <span class="string">&quot;UtilityFunctionLibrary.generated.h&quot;</span>
+
+UCLASS()
+<span class="keyword">class</span> MYPROJECT8_API UUtilityFunctionLibrary : <span class="keyword">public</span> UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+	UFUNCTION(BlueprintCallable, Category = <span class="string">&quot;Utility&quot;</span>)
+	<span class="keyword">static</span> <span class="keyword">void</span> RotateActorAroundPivot( 
+		AActor* Actor,
+		<span class="keyword">const</span> FVector&amp; PivotLocation,
+		<span class="keyword">const</span> FRotator&amp; DeltaRotation );	
+};
+</pre></div>
+<p>The new function RotateActorAroundPivot takes as parameters the actor object we want to rotate, the pivot point 
+we want to rotate it around, and the size of the rotation.</p>
+<h3 id="ufunction-declaration">UFUNCTION Declaration</h3>
+<p>There are a couple of improvements we can make to the declaration of the RotateActorAroundPivot function, which currently 
+looks like this:</p>
+<p><img src="/images/rotn_004.png" alt="" /></p>
+<ul>
+<li> we can make the Actor parameter default to &quot;self&quot;, which is the actor which this blueprint is a part of, by adding <code>meta = (DefaultToSelf = &quot;Actor&quot;)</code>
+to the UFUNCTION declaration</li>
+<li> we can make the node easier to use by making the parameters optional (so they will be replaced by default values), by making them values, not references.</li>
+</ul>
+<p>The updated declaration looks this this:</p>
+<div class="cplusplus"><pre>
+UFUNCTION(BlueprintCallable, Category = <span class="string">&quot;Utility&quot;</span>, meta = (DefaultToSelf = <span class="string">&quot;Actor&quot;</span>))
+<span class="keyword">static</span> <span class="keyword">void</span> RotateActorAroundPivot(
+	AActor* Actor,
+	<span class="keyword">const</span> FVector PivotLocation,
+	<span class="keyword">const</span> FRotator DeltaRotation);
+</pre></div>
+<p>and the node now looks like this:</p>
+<p><img src="/images/rotn_005.png" alt="" /></p>
+<h3 id="implementation">Implementation</h3>
+<p>The implementation of the node contains the maths operations needed to rotate the actor around the pivot point:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> UUtilityFunctionLibrary::RotateActorAroundPivot(
+	AActor* Actor,
+	<span class="keyword">const</span> FVector PivotLocation,
+	<span class="keyword">const</span> FRotator DeltaRotation)
+{
+	<span class="keyword">if</span> (!Actor) <span class="keyword">return</span>;
+	Actor-&gt;AddActorWorldRotation(DeltaRotation);
+	FVector NewActorLocation = Actor-&gt;GetActorLocation();
+	NewActorLocation -= PivotLocation;
+	NewActorLocation = 
+	   FRotationMatrix(DeltaRotation).TransformPosition(NewActorLocation);
+	NewActorLocation += PivotLocation;
+	NewActorLocation -= Actor-&gt;GetActorLocation();
+	Actor-&gt;AddActorWorldOffset(NewActorLocation);
+}
+</pre></div>
+<p>This code is very substantially based on the code the editor uses to implement manual rotation.</p>
+<h3 id="usage">Usage</h3>
+<p>This blueprint shows an example usage:</p>
+<ImageExpando :imagePath="$withBase('/images/rotn_006.png')" imageId="BP2"/>
+<p>Every tick it:</p>
+<ul>
+<li> multiplies the tick duration by a factor (the Rotation Step variable) to calculate a rotation amount</li>
+<li> finds the location of the named socket on the Static Mesh component of the actor</li>
+<li> and rotates the actor around the position of that socket.</li>
+</ul>
+<p>(This does not need sockets to work, the pivot location could come from anywhere.)</p>
+<p>If the socket name is left blank, so the socket location is (0,0,0), the mesh rotates around its origin like so:</p>
+<p><img src="/images/rotn_020.gif" alt="" /></p>
+<p>Whereas if a socket is chosen which is on the narrow end of the arm mesh, the rotation is like this:</p>
+<p><img src="/images/rotn_021.gif" alt="" /></p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

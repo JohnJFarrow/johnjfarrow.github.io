@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Looking into Lyra - GAS 1 Inputs and the Gameplay Ability System | unrealcode.net</title>
+<meta name="description" content="Looking into Lyra - GAS 1 Inputs and the Gameplay Ability System">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Looking into Lyra - GAS 1 Inputs and the Gameplay Ability System
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#about-gameplay-tags">
+About Gameplay Tags
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#stages-in-how-lyra-uses-the-gameplay-ability-system">
+Stages in how Lyra uses the Gameplay Ability System
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#step-1:-input-">
+Step 1: Input 
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#step-2:-from-input-to-input-action-using-input-mapping-context">
+Step 2: From Input to Input Action using Input Mapping Context
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#step-3:-from-input-action-to-gameplay-tag">
+Step 3: From Input Action to Gameplay Tag
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#step-4:-from-gameplay-tag-to-gameplay-ability">
+Step 4: From Gameplay Tag to Gameplay Ability
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#step-5:-queueing-a-gameplay-ability-for-activation">
+Step 5: Queueing a Gameplay Ability for Activation
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#input-step-4:-activating-a-queued-gameplay-ability">
+Input Step 4: Activating a Queued Gameplay Ability
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#reference">
+Reference
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#move">
+MOVE
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#using-gameplay-tags-as-an-interface">
+Using Gameplay Tags as an interface
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#"extension"">
+"Extension"
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#references">
+References
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Looking into Lyra - GAS 1 Inputs and the Gameplay Ability System</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The aim of this is to examine the source code from the Lyra example provided by Epic Games
+and to try and identify and document practices and approaches for using c++.</p>
+<p>Here we look at use of Gameplay Tags and the Gameplay Ability System (GAS), and
+try and trace the use of gameplay tags from pressing a button
+to getting a response in the UI and in gameplay.</p>
+<h2 id="about-gameplay-tags">About Gameplay Tags</h2>
+<p>A Gameplay Tag is a string-like object with a number of parts
+delimited by &quot;.&quot; characters, such as &quot;Event.Movement.Dash&quot;.  All of GAS
+depends on these tags. Gameplay tags can be created in different ways including
+using the Unreal Editor, loading from data tables, loading from .ini files, and using C++.</p>
+<p>For more information on how tags are 
+created see <a href="LyraGASGameplayTags.html">Gameplay Tags</a>.</p>
+<h2 id="stages-in-how-lyra-uses-the-gameplay-ability-system">Stages in how Lyra uses the Gameplay Ability System</h2>
+<p>These are the major steps which happen when Lyra receives input from the user
+to when the consequences of that input are displayed.</p>
+<h3 id="step-1-input">Step 1: Input </h3>
+<p>User enters input</p>
+<h3 id="step-2-from-input-to-input-action-using-input-mapping-context">Step 2: From Input to Input Action using Input Mapping Context</h3>
+<p>Input is matched to an Input Mapping Context.   An Input Mapping Context is 
+like a table matching hardware inputs to Input Action objects.  </p>
+<p>Input Mapping Contexts are used by Lyra to assign a set of actions (for example 
+matching a game mode such as deathmatch) or an individual action (matching an individual weapon)
+dynamically as game modes are selected and items are equipped and discarded.  </p>
+<p>In addition to matching an hardware input, an Input Mapping Context can modify input processing, for example by altering joystick sensitivity.</p>
+<p>For more information on how tags are 
+created and used see <a href="LyraGASInputMappingContexts.html">Input Mapping Contexts</a>.</p>
+<h3 id="step-3-from-input-action-to-gameplay-tag">Step 3: From Input Action to Gameplay Tag</h3>
+<p>The <code>ULyraPawnData</code> class is used to define a Lyra pawn.   The pawn contains mappings from an Input Action to either:</p>
+<ul>
+<li> a gameplay tag, which will lead us to a gameplay ability</li>
+<li> a native action, which is a function which is executed directly without using a gameplay ability.</li>
+</ul>
+<p>The pawn class has a reference to a <code>ULyraInputConfig</code> like so:</p>
+<p><img src="/images/lyra_02_009.png" alt="" /></p>
+<p>This is used to load configuration data which populates the pawns action mappings.</p>
+<p>For more information on how input actions are 
+mapped to native actions and gameplay abilities see <a href="LyraGASActionMappings.html">Pawn Action Mappings</a>.</p>
+<h3 id="step-4-from-gameplay-tag-to-gameplay-ability">Step 4: From Gameplay Tag to Gameplay Ability</h3>
+<p>Gameplay abilities are assigned to player character (an other pawns) when they become available due to the game mode, game phase, or equipped items. The gameplay abilities which are assigned
+to a character are referred to by Lyra as &quot;activatable&quot; abilities.</p>
+<p>The LyraAbilitySystemComponent, which is used as a component of both the part of the player character and the player state, maintains a list of activatable gameplay abilities.  Each gameplay ability in the list is associated with one gameplay tag.  This pairing of a gameplay ability and a gameplay tag is held in a FGameplayAbilitySpec structure.  </p>
+<p>The LyraAbilitySystemComponent has a list of these FGameplayAbilitySpec objects 
+(in the member <code>ActivatableAbilities</code>), and once a user action is translated to a gameplay tag, this list is searched for items which match that gameplay tag.</p>
+<p>Here is an example of  the asset which associates the GA_Hero_Jump ability with the InputTag.Jump gameplay tag:</p>
+<p><img src="/images/lyra_02_013.png" alt="" /></p>
+<p>For more information about <code>LyraAbilitySystemComponent</code> and <code>FGameplayAbilitySpec</code>
+see <a href="LyraGASActivatableAbilities.html">Activatable Abilities</a></p>
+<h3 id="step-5-queueing-a-gameplay-ability-for-activation">Step 5: Queueing a Gameplay Ability for Activation</h3>
+<p>When an action is initiated by the user and the <code>LyraHeroComponent::Input_AbilityInputTagPressed()</code> method is called, this forwards the call to the <code>ULyraAbilitySystemComponent</code>:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> ULyraHeroComponent::Input_AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	<span class="keyword">if</span> (<span class="keyword">const</span> APawn* Pawn = GetPawn&lt;APawn&gt;())
+	{
+		<span class="keyword">if</span> (<span class="keyword">const</span> ULyraPawnExtensionComponent* PawnExtComp = ULyraPawnExtensionComponent::FindPawnExtensionComponent(Pawn))
+		{
+			<span class="keyword">if</span> (ULyraAbilitySystemComponent* LyraASC = PawnExtComp-&gt;GetLyraAbilitySystemComponent())
+			{
+				LyraASC-&gt;AbilityInputTagPressed(InputTag);
+			}
+		}	
+	}
+}
+</pre></div>
+<p>The <code>LyraAbilitySystemComponent</code> component (which is part of the player class) holds a list of <code>FGameplayAbilitySpec</code> objects each of which holds (in addition to other things) a pointer to a <code>UGameplayAbility</code> object and a collection of one or more gameplay tags.  These are the available abilities configured when the pawn was created.  Each <code>FGameplayAbilitySpec</code> has a unique handle.</p>
+<p>The code in <code>ULyraAbilitySystemComponent::AbilityInputTagPressed()</code> scans that list 
+and if it finds a <code>FGameplayAbilitySpec</code> with a the required gameplay tag it adds the handle of the <code>FGameplayAbilitySpec</code> to two collections of handles called <code>InputPressedSpecHandles</code> and <code>InputHeldSpecHandles</code>.  It does not execute the ability, it just
+updates the list of handles of abilities which are currently executing.</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> ULyraAbilitySystemComponent::AbilityInputTagPressed(<span class="keyword">const</span> FGameplayTag&amp; InputTag)
+{
+	<span class="keyword">if</span> (InputTag.IsValid())
+	{
+		<span class="keyword">for</span> (<span class="keyword">const</span> FGameplayAbilitySpec&amp; AbilitySpec : ActivatableAbilities.Items)
+		{
+			<span class="keyword">if</span> (AbilitySpec.Ability &amp;&amp; (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag)))
+			{
+				InputPressedSpecHandles.AddUnique(AbilitySpec.Handle);
+				InputHeldSpecHandles.AddUnique(AbilitySpec.Handle);
+			}
+		}
+	}
+}
+</pre></div><h4 id="input-step-4-activating-a-queued-gameplay-ability">Input Step 4: Activating a Queued Gameplay Ability</h4>
+<p>What happens next is that the game executes the tick function for the player controller and
+these functions are called:</p>
+<ul>
+<li> <code>APlayerController::TickActor()</code> calls</li>
+<li> <code>ALyraPlayerController::PlayerTick()</code> eventually calls</li>
+<li> <code>ULyraAbilitySystemComponent::ProcessAbilityInput()</code></li>
+</ul>
+<p>This iterates through all the <code>FGameplayAbilitySpec</code> handles added since last tick (i.e. added in step 3 above) and collects them
+into the <code>AbilitiesToActivate</code> collection:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">for</span> (<span class="keyword">const</span> FGameplayAbilitySpecHandle&amp; SpecHandle : InputPressedSpecHandles)
+{
+	<span class="keyword">if</span> (FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(SpecHandle))
+	{
+		<span class="keyword">if</span> (AbilitySpec-&gt;Ability)
+		{
+			AbilitySpec-&gt;InputPressed = <span class="keyword">true</span>;
+
+			<span class="keyword">if</span> (AbilitySpec-&gt;IsActive())
+			{
+				<span class="comment">// Ability is active so pass along the input event.</span>
+				AbilitySpecInputPressed(*AbilitySpec);
+			}
+			<span class="keyword">else</span>
+			{
+				<span class="keyword">const</span> ULyraGameplayAbility* LyraAbilityCDO = CastChecked&lt;ULyraGameplayAbility&gt;(AbilitySpec-&gt;Ability);
+
+				<span class="keyword">if</span> (LyraAbilityCDO-&gt;GetActivationPolicy() == ELyraAbilityActivationPolicy::OnInputTriggered)
+				{
+					AbilitiesToActivate.AddUnique(AbilitySpec-&gt;Handle);
+				}
+			}
+		}
+	}
+}
+</pre></div>
+<p>Immediately after that the abilities are activated:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">for</span> (<span class="keyword">const</span> FGameplayAbilitySpecHandle&amp; AbilitySpecHandle : AbilitiesToActivate)
+{
+	TryActivateAbility(AbilitySpecHandle);
+}
+</pre></div><h3 id="reference">Reference</h3>
+<p><a href="https://docs.unrealengine.com/5.0/en-US/gameplay-tags-in-unreal-engine/">Epic: Gameplay Tags</a>  <br />
+<a href="https://docs.unrealengine.com/5.0/en-US/using-gameplay-abilities-in-unreal-engine/">Epic: Using Gas</a>  <br />
+<a href="https://docs.unrealengine.com/5.0/en-US/gameplay-attributes-and-gameplay-effects-for-the-gameplay-ability-system-in-unreal-engine/">Epic: GAS Attributes and Effects</a>  <br />
+<a href="https://docs.unrealengine.com/5.0/en-US/BlueprintAPI/Ability/Async/WaitGameplayEventtoActor/">Epic: GAS</a>  <br />
+<a href="https://dev.epicgames.com/community/learning/tutorials/aqrD/unreal-engine-enhanced-input-binding-with-gameplay-tags-c">Epic: Games Input</a>  </p>
+<h3 id="move">MOVE</h3>
+<p>Lyra's design supports multiple game
+modes (such as the Arena and ShooterGame) and different phases within each game mode (such as 
+warmup, play, post-game).  This adds some complexity to Lyra's use of the Gameplay Ability System.</p>
+<p>This intent here is that gameplay abilities, gameplay effects, and gameplay attributes are grouped into sets, and that these
+sets can be associated with different game modes, different phases of the game, and 
+different items of equipment.  A player might gain a specific ability (i.e. have a gameplay ability become
+available to his Actor object) by stepping into a room
+or picking up weapon, and lose that ability once he leaves the room or 
+puts down the weapon.</p>
+<h3 id="using-gameplay-tags-as-an-interface">Using Gameplay Tags as an interface</h3>
+<p>A gameplay tags is a string like &quot;Player.Weapon.Shotgun&quot;.  Lyra uses gameplay tags to separate parts of the game.  When the user does an input action such as pressing a key this executes a series of steps eventually producing a single gameplay tag which is used</p>
+<h3 id="extension">&quot;Extension&quot;</h3>
+<p>Lyra labels the concept of separating the player pawn object from the player state (which holds the
+available gameplay abilities) &quot;Extension&quot;.  The player pawn object is extended by the LyraPawnExtensionComponent
+component.  </p>
+<details closed>
+<summary>Show more details...</summary>
+An example of  this is forwarding a request for the ability system component from the Lyra character
+to its pawn extension component:
+<div class="cplusplus"><pre>
+UAbilitySystemComponent* ALyraCharacter::GetAbilitySystemComponent() <span class="keyword">const</span>
+{
+	<span class="keyword">return</span> PawnExtComponent-&gt;GetLyraAbilitySystemComponent();
+}
+</pre></div></details>
+<h2 id="references">References</h2>
+<p><a href="https://docs.unrealengine.com/5.0/en-US/asset-management-in-unreal-engine/">Epic: Asset Management</a>   (<a href="https://docs.unrealengine.com">https://docs.unrealengine.com</a>)  <br />
+<a href="https://youtu.be/9MGHBU5eNu0?t=1235">Epic: Asset Loading Best Practices</a>  (<a href="https://youtu.be/">https://youtu.be/</a>)   <br />
+<a href="https://www.tomlooman.com/unreal-engine-asset-manager-async-loading/">Tom Looman: Async Asset Loading</a> (<a href="https://www.tomlooman.com">https://www.tomlooman.com</a>)  <br />
+<a href="https://github.com/tranek/GASDocumentation">tranek/GASDocumentation</a>  </p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

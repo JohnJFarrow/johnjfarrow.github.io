@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Using Slate UI Classes from C++ | unrealcode.net</title>
+<meta name="description" content="Using Slate UI Classes from C++">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Using Slate UI Classes from C++
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#background">
+Background
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#overview-">
+Overview 
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#object-hierarchy">
+Object Hierarchy
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#the-construct-method">
+The Construct method
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#the-snew-macro">
+The SNew macro
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#the-sassignnew-macro">
+The SAssignNew macro
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#slots-">
+Slots 
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#styles">
+Styles
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#construction-approaches">
+Construction approaches
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#buttons">
+Buttons
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#buttons-are-containers">
+Buttons are Containers
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#button-styles">
+Button Styles
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#callbacks-and-events">
+Callbacks and Events
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#beware-of-logic-errors">
+Beware of Logic Errors
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#widget-reflector">
+Widget Reflector
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Using Slate UI Classes from C++</h1>
+<p>Updated for Unreal Engine 5.0</p>
+<h2 id="background">Background</h2>
+<p>The notes here were made in the course of 
+creating a plugin which checks a project configuration
+against a known-good collection of configuration settings, for 
+example to check that all the settings required for hardware 
+raytracing have their correct values, and have to options to display and change
+the current settings, as shown here:</p>
+<p><img src="/images/reflection_1.png" alt="" /></p>
+<h2 id="overview">Overview </h2>
+<p>Slate is a cross-platform user interface framework for creating tool and in-game UI.  <br />
+Slate is used by the default code generated when
+creating a new plugin.</p>
+<p>When creating a new plugin the generated code for the main window of the plugin looks like this:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">class</span> SPresetBrowser : <span class="keyword">public</span> SCompoundWidget
+{
+	SLATE_BEGIN_ARGS(SPresetBrowser)
+	{
+	}
+
+	SLATE_END_ARGS()
+
+	<span class="keyword">virtual</span> ~SPresetBrowser();
+
+	<span class="comment">/** Widget constructor */</span>
+	<span class="keyword">void</span> Construct(<span class="keyword">const</span> FArguments&amp; Args, <span class="keyword">const</span> TArray&lt; TSharedRef&lt;FPreset&gt; &gt;&amp; );
+};
+</pre></div>
+<p>This shows two key features of Slate:</p>
+<ol>
+<li> The use of the SLATE_BEGIN_ARGS/SLATE_END_ARGS macros to declare arguments</li>
+<li> The Construct() method which is where the actual UI objects are created.</li>
+</ol>
+<p>The code used in the examples below is based on the concept of a 'preset', which is a group
+of editor properties like the ones shown in the image above. Each property
+has fields which identify it such as the screen prompt in the project settings editor, and 
+the target value.</p>
+<h3 id="object-hierarchy">Object Hierarchy</h3>
+<p>The data objects for this plugin are listed in the table below.  The data objects form a 
+hierarchy, and so do the UI widgets representing each data object.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Data Object</th>
+<th style="text-align: left;">Details</th>
+<th style="text-align: left;">UI Widget</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">FPresetList</td>
+<td style="text-align: left;">Holds all of the data objects for the entire plugin</td>
+<td style="text-align: left;">SPresetBrowser</td>
+</tr>
+<tr>
+<td style="text-align: left;">FPreset</td>
+<td style="text-align: left;">Holds all of the data for one preset, including a list of properties and their desired values</td>
+<td style="text-align: left;">SPresetTile</td>
+</tr>
+<tr>
+<td style="text-align: left;">FPresetSetting</td>
+<td style="text-align: left;">Holds the data about one property such as name, type, desired value</td>
+<td style="text-align: left;">SPresetSettingTile</td>
+</tr>
+</tbody>
+</table>
+<p>The data objects have a hierarchy like this:</p>
+<ul>
+<li> FPresetList
+<ul>
+<li> FPreset
+<ul>
+<li> FPresetSetting</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>And the corresponding UI widgets have a hierarchy like this:</p>
+<ul>
+<li> SPresetBrowser
+<ul>
+<li> SPresetTile
+<ul>
+<li> SPresetSettingTile</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Each of the UI widgets is a subclass of <code>SCompoundWidget</code>, and each overrides the  Construct() method
+to create its child widgets.</p>
+<p>Each widget which has children has:</p>
+<ul>
+<li> a member which is a list of child data objects and </li>
+<li> a member of type SListView which displays whatever is in the list of child data objects.</li>
+</ul>
+<p>Specifically:</p>
+<ul>
+<li> the SPresetBrowser has a list of FPreset objects and an <code>SListView&lt;FPreset&gt;</code> member</li>
+<li> the SPresetTile has a list of FPresetSetting objects and an <code>SListView&lt;SPresetSettingTile&gt;</code> member</li>
+</ul>
+<h3 id="the-construct-method">The Construct method</h3>
+<p>The SPresetBrowser Construct method looks like this:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> SPresetBrowser::Construct(<span class="keyword">const</span> FArguments&amp; Args, 
+       <span class="keyword">const</span> TArray&lt; TSharedRef&lt;FPreset&gt; &gt;&amp; InPresets )
+{
+	TSharedRef&lt;SBorder&gt; MainContent = SNew(SBorder)
+		.BorderImage(FAppStyle::Get().GetBrush(<span class="string">&quot;Brushes.Panel&quot;</span>))
+		.Padding(0.f)
+		[
+			SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
+			.VAlign(VAlign_Top)
+			[
+				SAssignNew(PresetListWidget, SPresetTileList, SharedThis(<span class="keyword">this</span>))
+			]
+		];
+
+	ChildSlot
+	[
+		MainContent
+	];
+}
+</pre></div>
+<p>This shows the basic idea of constructing a UI declaratively using c++.</p>
+<h3 id="the-snew-macro">The SNew macro</h3>
+<p>This creates a widget, as in SNew(SVerticalBox) and makes it available for other calls such as VAlign() as shown above</p>
+<h3 id="the-sassignnew-macro">The SAssignNew macro</h3>
+<p>This creates a widget like SNew() does but also assigns it to a member shared pointer so it can be referenced later</p>
+<h3 id="slots">Slots </h3>
+<p>Many widgets have positions for child widgets.  The positions are called slots. Slots are created and
+accessed in different ways:</p>
+<ul>
+<li> Some widgets already have slots when the widget is constructed; like the SPresetBrowser itself which is created with a slot called ChildSlot which can be 
+accessed as shown above.  </li>
+<li> Widgets such as SHorizontalBox and SVerticalBox (as shown above) need to have each slot added using a call
+to +SHorizontalBox<span>Slot() or +SVerticalBox</span>Slot().</li>
+<li> some widgets have slots in specific places.  The SGridPanel uses +SGridPanel::Slot(ColNum, RowNum) to add a
+child widget in a specific place in the grid</li>
+</ul>
+<h3 id="styles">Styles</h3>
+<p>The call to BorderImage() above calls <code>FAppStyle::Get()</code> to access a style object.  Style objects contain brushes
+(a rectangular area of a specific color), images, border detail and more.  Style objects enable setting values such as 
+a font size or a widget color in one place (on the style) and reusing it in many places, ensuring a consistent look and feel
+to the application.  Making changes to the look of an application is easier because the styles are all in one place.</p>
+<h3 id="construction-approaches">Construction approaches</h3>
+<p>Widgets can be created and stored in variables, or created inline.  The two code samples below do the same thing, the first
+stores the SVerticalBox widget in a variable and then adds it to the child slot, the second creates it in the child
+slot directly:</p>
+<div class="cplusplus"><pre>
+TSharedRef&lt;SBorder&gt; Variable = SNew(SVerticalBox)
+	+ SVerticalBox::Slot()
+	.VAlign(VAlign_Top)
+	[
+		SAssignNew(PresetListWidget, SPresetTileList, SharedThis(<span class="keyword">this</span>))
+	]
+];
+
+ChildSlot
+[
+	Variable 
+];
+</pre></div><div class="cplusplus"><pre>
+ChildSlot
+[
+	SNew(SVerticalBox)
+		+ SVerticalBox::Slot()
+		.VAlign(VAlign_Top)
+		[
+			SAssignNew(PresetListWidget, SPresetTileList, SharedThis(<span class="keyword">this</span>))
+		]
+	];
+];
+</pre></div>
+<p>Some widgets automatically create child widgets.  The SListView widget is constructed like this:</p>
+<div class="cplusplus"><pre>
+PresetListViewWidget =
+	SNew(SListView&lt; TSharedRef&lt;FPreset&gt; &gt;)
+	.SelectionMode(ESelectionMode::Single)
+	.ListItemsSource(&amp;PresetListItems)
+	.OnGenerateRow(<span class="keyword">this</span>, &amp;SPresetTileList::PresetListView_OnGenerateRow)
+	.ListViewStyle(FAppStyle::Get(), <span class="string">&quot;SimpleListView&quot;</span>);
+</pre></div>
+<p>These lines:</p>
+<div class="cplusplus"><pre>
+.ListItemsSource(&amp;PresetListItems)
+.OnGenerateRow(<span class="keyword">this</span>, &amp;SPresetTileList::PresetListView_OnGenerateRow)
+</pre></div>
+<p>pass the SListView a list of FPreset objects, and tell it to call PresetListView_OnGenerateRow() once for every row.
+The PresetListView_OnGenerateRow() method creates and returns the widget(s) which represent one row:</p>
+<div class="cplusplus"><pre>
+TSharedRef&lt;ITableRow&gt; SPresetTileList::PresetListView_OnGenerateRow(
+	TSharedRef&lt;FPreset&gt; Item, 
+	<span class="keyword">const</span> TSharedRef&lt;STableViewBase&gt;&amp; OwnerTable)
+{
+	<span class="keyword">return</span>
+		SNew(STableRow&lt; TSharedRef&lt;FPreset&gt; &gt;, OwnerTable)
+		[
+			SNew(SPresetTile, SharedThis(<span class="keyword">this</span>), Item)
+		];
+}
+</pre></div><h2 id="buttons">Buttons</h2>
+<p>Buttons are implemented using the SButton class and styled using the SButtonStyle class.  This code
+shows creation of a button widget:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">const</span> FText ApplyButtonLabel = LOCTEXT(<span class="string">&quot;WindowWidgetText&quot;</span>, <span class="string">&quot;Apply&quot;</span>);
+
+SNew(SButton)
+.ButtonStyle( FEditorPresetsPluginStyle::Get(), <span class="string">&quot;PresetTile.ApplyButtonStyle&quot;</span> )
+.HAlign(HAlign_Center)
+.VAlign(VAlign_Center)
+.IsEnabled_Lambda([<span class="keyword">this</span>]() -&gt; <span class="keyword">bool</span>
+{
+	<span class="keyword">return</span> PresetSetting-&gt;EditorValueIsDifferent() || PresetSetting-&gt;bRevertable;
+})
+.ContentPadding(FMargin(4.0f, 4.0f))
+.OnClicked_Raw(<span class="keyword">this</span>, &amp;SPropertySettingTile::OnApplyButtonClicked)
+[
+	SAssignNew(ApplyRevertButtonLabel,STextBlock)
+	.Text(ApplyButtonLabel)
+	.Margin(2.0f)
+]
+</pre></div>
+<p>This illustrates a number of interesting points:</p>
+<h3 id="buttons-are-containers">Buttons are Containers</h3>
+<p>The SButton object draws a rectangle on the screen.  Any text on the button comes from
+child widgets of the button.  This part of the above code shows the creation of
+a text block which contains the text which appears on the button:</p>
+<div class="cplusplus"><pre>
+[
+	SAssignNew(ApplyRevertButtonLabel,STextBlock)
+	.Text(ApplyButtonLabel)
+	.Margin(2.0f)
+]
+</pre></div><h3 id="button-styles">Button Styles</h3>
+<p>The style used here is created with the code below when the plugin is initialized.  This code sets the 
+color to be used by the button when the button is in various states such as Normal, Hovered Over, and Disabled.
+The style is added to the StyleInstance object along with other styles and can be retrieved using the 
+&quot;PresetTile.ApplyButtonStyle&quot; key.</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> FEditorPresetsPluginStyle::Initialize()
+{
+	FColor ButtonColor = FColor::Green;
+	FButtonStyle ApplyButtonStyle = FAppStyle::Get().GetWidgetStyle&lt; FButtonStyle &gt;(<span class="string">&quot;SimpleButton&quot;</span>);
+	ApplyButtonStyle.SetNormal(FSlateColorBrush(ButtonColor));
+	ApplyButtonStyle.SetHovered(FSlateColorBrush(ButtonColor));
+	ApplyButtonStyle.SetDisabled(FSlateColorBrush(FSlateColor::UseSubduedForeground()));
+	ApplyButtonStyle.SetNormalForeground(FStyleColors::Black);
+	ApplyButtonStyle.SetHoveredForeground(FStyleColors::Black);
+	StyleInstance-&gt;Set(<span class="string">&quot;PresetTile.ApplyButtonStyle&quot;</span>, ApplyButtonStyle);
+}
+</pre></div>
+<p>To use the style specify the static StyleInstance object for the plugin and key &quot;PresetTile.ApplyButtonStyle&quot; like so:</p>
+<div class="cplusplus"><pre>
+SNew(SButton)
+.ButtonStyle( FEditorPresetsPluginStyle::Get(), <span class="string">&quot;PresetTile.ApplyButtonStyle&quot;</span> )
+</pre></div><h3 id="callbacks-and-events">Callbacks and Events</h3>
+<p>The lines</p>
+<div class="cplusplus"><pre>
+SNew(SButton)
+.IsEnabled(<span class="keyword">true</span>)
+</pre></div>
+<p>shows the simplest way of specifying a parameter to the IsEnabled method.  Other ways exist such as:</p>
+<pre><code class="language-IsEnabled(this,">make a shared pointer to the object.  It will fail if that object is still being constructed because shared_from_this() cannot be called
+on a partially constructed object.  This method does have the advantage that it uses a shared pointer to keep the referenced object alive.
+
+```IsEnabled_Raw(this, &amp;FMedia::IsAutoDetectEnabled)``` Takes a pointer to an object and method to be called on that object.  This version takes a raw pointer and will not call shared_from_this() 
+so can be called when the object has not finished construction.
+
+```IsEnabled_Lambda``` Takes a lambda returning a bool, for example:
+```cpp
+SNew(SButton)
+.IsEnabled_Lambda([this]() -&gt; bool
+{
+	return PresetSetting-&gt;EditorValueIsDifferent();
+})
+</code></pre>
+<p>This means the enabled state of the button can change when the data changes.</p>
+<pre><code class="language-IsEnabled_Static(&amp;FMedia::IsNotCustomEventOverride,">
+```IsEnabled_UObject(Item, &amp;FMedia::GetOwnerIsEnabled)``` Takes a pointer to a UObject and a member method
+
+```IsEnabled_UObject(this, &amp;FMedia::IsImportEnabled, ContextObject)``` Takes a reference to a method and an additional UObject parameter|
+
+### Events
+
+This code shows a callback when a button is clicked:
+```cpp
+SNew(SButton)
+.OnClicked_Raw(this, &amp;SPropertySettingTile::OnApplyButtonClicked )
+</code></pre>
+<p>Like the Callbacks section above, there are many variations of the OnClicked() method taking different parameters.</p>
+<p>The implementation of the OnApplyButtonClicked method looks like this:</p>
+<div class="cplusplus"><pre>
+FReply SPropertySettingTile::OnApplyButtonClicked()
+{
+	<span class="keyword">if</span> (EditorValueWidget.IsValid())
+	{
+		EditorValueWidget-&gt;SetText(FText::FromString(PresetSetting-&gt;EditorValue));
+	}
+	<span class="keyword">return</span> FReply::Handled();
+}
+</pre></div>
+<p>The only special detail to note is that it returns an FReply object telling the editor whether the 
+click was handled or not.</p>
+<h3 id="beware-of-logic-errors">Beware of Logic Errors</h3>
+<p>The behaviour of a specific widget sometimes depends on the widget it is contained in.
+For example this code creates an SListView widget which creates one row for each 
+of the ten entries in the <code>Data</code> collection:</p>
+<div class="cplusplus"><pre>
+SNew(SVerticalBox)
++ SVerticalBox::Slot()
+.AutoHeight() 
+[
+	SNew(SListView&lt; TSharedRef&lt; DataClass &gt; &gt;)
+	.ListItemsSource(&amp;Data)
+	.SelectionMode(ESelectionMode::None)
+	.OnGenerateRow(<span class="keyword">this</span>, &amp;SPresetBrowser::OnGenerateRow)
+	.ListViewStyle(FAppStyle::Get(), <span class="string">&quot;SimpleListView&quot;</span>)
+]
+</pre></div>
+<p>but the list view will display without a scrollbar. This is because there is a conflict between the way the height of the SListView is calculated
+and the way the height of the containing SVerticalBox is calculated.  The SListView needs to know the height of its container so it can calculate
+its own height and hence the position of the scrollbar, but because <code>.AutoHeight()</code> is specified on the SVerticalBox the
+height of the vertical box is in turn calculated. It is not possible to satisfy both these requirements.  </p>
+<h2 id="widget-reflector">Widget Reflector</h2>
+<p>This tool is found in the Unreal Editor under Tools|Debug|Widget Reflector.  It shows a windows like this:
+<img src="/images/WidgetReflector_1.png" alt="" /></p>
+<p>To use it click the &quot;Pick Hit-Testable Widgets&quot;, then click on a widget in your UI, then hit escape.  The Widget Reflector
+window will now show the hierarchy of widgets and their children like so:
+<img src="/images/WidgetReflector_2.png" alt="" /></p>
+<p>Picking a widget in the hierarchy will highlight it in the UI as shown in the above image by the green box around
+the selected widget.  You can also click on the &quot;Source&quot; column to jump to the line of code which created that widget.</p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

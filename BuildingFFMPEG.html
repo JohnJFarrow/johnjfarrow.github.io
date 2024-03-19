@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Building ffmpeg 6 on Windows 10 | unrealcode.net</title>
+<meta name="description" content="Building ffmpeg 6 on Windows 10">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Building ffmpeg 6 on Windows 10
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#approaches-to-building-ffmpeg">
+Approaches to building ffmpeg
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#using-msys2">
+Using MSYS2
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#using-the-right-compiler">
+Using the right compiler
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#preparation">
+Preparation
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#msys2-prerequisites">
+MSYS2 Prerequisites
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#setup-directories">
+Setup directories
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#building-x264--">
+Building x264  
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#checking-the-build-is-64-bits">
+Checking the build is 64 bits
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#building-ffmpeg">
+Building ffmpeg
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#get-the-source:">
+Get the source:
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#make-a-build-directory:">
+Make a build directory:
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#configure-the-build">
+Configure the build
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#build">
+Build
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#references">
+References
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Building ffmpeg 6 on Windows 10</h1>
+<h2 id="introduction">Introduction</h2>
+<p>ffmpeg is a cross-platform solution to record, convert, and stream audio and video. It can be used from Unreal Engine
+to change image formats, to record gameplay, and to convert content to and from various video formats.  Here
+I am using it just to show how an Unreal Engine plugin can be developed.</p>
+<p>ffmpeg can be downloaded from the <a href="https://ffmpeg.org/">https://ffmpeg.org/</a> or from <a href="https://git.ffmpeg.org/ffmpeg.git">https://git.ffmpeg.org/ffmpeg.git</a>. </p>
+<p>We download the source as a step in the build process.  This is important because 
+we use a Unix-like environment to configure and build the software, and 
+dowloading using git from Windows can result in line-endings which are
+incompatible with Unix line-endings.</p>
+<p>ffmpeg is cross-platform meaning it can be compiled for Windows, Linux, Macs and other 
+operating systems and architectures.  It has a Unix-based build system which 
+uses Unix tools for configuring the build and finding and building dependent libraries.  ffmpeg 
+supports many different video encoders and decoders, some of which are
+downloaded separately from different websites if they are needed for the version you are building.</p>
+<h2 id="approaches-to-building-ffmpeg">Approaches to building ffmpeg</h2>
+<p>We will be using a Unix-like terminal emulation approach to build ffmpeg.  There are many alternative approaches to building ffmpeg from different sites including:</p>
+<ul>
+<li> <a href="https://github.com/rdp/ffmpeg-windows-build-helpers">building in docker</a></li>
+<li> <a href="https://github.com/ShiftMediaProject/FFVS-Project-Generator">parsing the Linux configure files to generate a Visual Studio .sln file</a></li>
+<li> <a href="https://github.com/m-ab-s/media-autobuild_suite">downloading one big script that configures the build, downloads all the build tools, and builds in one go</a></li>
+</ul>
+<p>None of the above tools worked for me, whether because they were out of date or 
+my development system was not compatible I don't know.  I didn't have time to dig into them in any depth.</p>
+<h2 id="using-msys2">Using MSYS2</h2>
+<p>MSYS2 is a command line terminal which looks and behaves like a Unix terminal and 
+supports a collection of development tools.  It is not a virtual machine (VM) like VMWare, in that
+VMWare typically has its own disk space, whereas MSYS2 shares its file system with Windows, so you can 
+compile using the MSYS2 terminal and create executables and libraries are visible in the Windows
+file system.</p>
+<p>Another difference from a VM is that while you are inside the MSYS2 terminal you can use both Unix-style commands 
+and Windows commands. We will be using:</p>
+<ul>
+<li> a Unix-style &quot;configure&quot; command to create a makefile </li>
+<li> followed by a Unix-style &quot;make&quot; command which </li>
+<li> executes the Visual Studio C++ compiler  </li>
+</ul>
+<p>All this makes package management and diagnosing problems much more confusing then just using one operating system.</p>
+<h2 id="using-the-right-compiler">Using the right compiler</h2>
+<p>MSYS2 uses the Microsoft C/C++ compiler which is configured in the current environment.  To create a 64 bit version
+of ffmpeg we need to open the 64 bit command line; specifically the &quot;x86_x64 Cross Tools Command Prompt&quot;  <br />
+which is an option under Visual Studio 2022 on the start menu:</p>
+<p><img src="/images/plugin_002.png" alt="" /></p>
+<p>If you open the 32 bit &quot;x64_x86 Cross Tools Command Prompt&quot; everything below will work but you will end up with
+a 32 bit version of ffmpeg which will not work with Unreal.</p>
+<h2 id="preparation">Preparation</h2>
+<p>Download and install MSYS2 from <a href="https://www.msys2.org/">https://www.msys2.org/</a>.  I installed it to the d:\tools\msys64 directory so that is the path used in the examples below.</p>
+<p>Install nasm from <a href="https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/win64/">https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/win64/</a> to d:\tools\nasm.  </p>
+<p>Edit the msys2_shell.cmd command where MSYS2 is installed and uncomment one line, changing this line:</p>
+<pre><code>rem set MSYS2_PATH_TYPE=inherit
+</code></pre>
+<p>to: </p>
+<pre><code>set MSYS2_PATH_TYPE=inherit
+</code></pre>
+<p>Run MSYS2 with this command</p>
+<pre><code>d:\tools\msys64\msys2_shell.cmd -msys -use-full-path
+</code></pre>
+<p>Change the <code>d:\tools\msys64</code> part to wherever you installed MSYS2</p>
+<h2 id="msys2-prerequisites">MSYS2 Prerequisites</h2>
+<p>Running msys2_shell.cmd will open a command shell. Run these commands one at a time to download and install
+development tools (you can't run them
+all at once, some of them may want you to restart the MSYS2 terminal):</p>
+<pre><code>pacman -Syu
+pacman -S make
+pacman -S diffutils
+pacman -S yasm
+pacman -S nasm
+pacman -S mingw64/mingw-w64-x86_64-aom
+pacman -S git 
+pacman -S pkg-config
+mv /usr/bin/link.exe /usr/bin/link.exe.bak
+</code></pre>
+<h2 id="setup-directories">Setup directories</h2>
+<p>Execute these commands:</p>
+<pre><code>cd /d/tools
+mkdir ffmpeg6
+cd ffmpeg6
+mkdir build sources
+</code></pre>
+<h2 id="building-x264">Building x264  </h2>
+<p>Many encoders or decoders which  can be included in an  ffmpeg build come from different projects and vendors.
+If you want them to be part of your ffmpeg they might need to
+be downloaded and built separately.  </p>
+<p>The x264 encoder is an example of one such module. To build it execute the commands below.
+The &quot;CC=cl&quot; part of the configure command on line 9 sets the CC environment variable to tell the build process to use the Microsoft &quot;cl&quot; compiler command </p>
+<pre><code>cd /d/tools/ffmpeg6/sources
+git clone --depth 1 https://code.videolan.org/videolan/x264.git
+cd x264
+curl &quot;http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD&quot; &gt; config.guess
+sed -i 's/host_os = mingw/host_os = msys/' configure
+cd ../../build
+mkdir x264
+cd x264
+CC=cl ../../sources/x264/configure --prefix=./../../installed --enable-shared
+make -j 16
+make install
+mv ../../installed/lib/libx264.dll.lib ../../installed/lib/libx264.lib
+</code></pre>
+<h4 id="checking-the-build-is-64-bits">Checking the build is 64 bits</h4>
+<p>Execute this command:</p>
+<pre><code> file ../../installed/bin/libx264-164.dll
+</code></pre>
+<p>you should see something like:</p>
+<blockquote>
+<p>../../installed/bin/libx264-164.dll: PE32+ executable (DLL) (GUI) x86-64, for MS Windows,</p>
+</blockquote>
+<p>which indicates it is a 64 bit build.</p>
+<p>If you see this:</p>
+<blockquote>
+<p>../../installed/bin/libx264-164.dll: PE32 executable (DLL) (GUI) Intel 80386, for MS Windows</p>
+</blockquote>
+<p>You have accidently build a 32 bit version, probably because you have the wrong command prompt open.</p>
+<h2 id="building-ffmpeg">Building ffmpeg</h2>
+<p>While still in the MSYS2 terminal do these steps to build ffpmeg command tools (ffmpeg, ffplay, ffprobe) and shared libraries which can be loaded
+into Unreal Engine.</p>
+<h4 id="get-the-source">Get the source:</h4>
+<pre><code>cd /d/tools/ffmpeg6/sources
+git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git
+</code></pre>
+<h4 id="make-a-build-directory">Make a build directory:</h4>
+<pre><code>cd ../build
+mkdir ffmpeg
+cd ffmpeg
+</code></pre>
+<h4 id="configure-the-build">Configure the build</h4>
+<p>Running a separate configuration pre-pass is a common approach in cross-platform software.  This step
+uses all the MSYS2 packages we installed using the pacman command earlier.</p>
+<p>The command line below also:</p>
+<ul>
+<li> sets the CC environment variable to tell the build process to use the Microsoft cl compiler command </li>
+<li> adds a directory (../../installed/lib/pkgconfig) to the PKG_CONFIG_PATH environment variable so that the configure command can find the
+<code>x264.pc</code> package configuration file which was created when we built the x264 project.</li>
+</ul>
+<pre><code>CC=cl PKG_CONFIG_PATH=$PKG_CONFIG_PATH:../../installed/lib/pkgconfig \
+    ../../sources/ffmpeg/configure --prefix=../../installed \
+    --toolchain=msvc --target-os=win64 --arch=x86_64 \
+    --enable-x86asm --enable-asm --enable-shared  \
+    --enable-gpl --enable-libx264 --enable-nonfree --enable-debug --disable-optimizations \
+    --extra-ldflags=&quot;-LIBPATH:../../installed/lib&quot; \
+    --extra-cxxflags=&quot;-I../../installed/include/ -MTd -Od -Zi&quot; \
+    --extra-cflags=&quot;-I../../installed/include/ -MTd -Od -Zi&quot; 
+</code></pre>
+<p>This configure command can take quite a while to run, sometime longer than the build itself.</p>
+<h4 id="build">Build</h4>
+<p>Execute these make commands to do the build and install the libraries and commands.</p>
+<pre><code>make -j 14
+make install
+</code></pre>
+<p>The libraries which we built will be in /d/tools/ffmpeg6/installed/bin directory.</p>
+<h2 id="references">References</h2>
+<ul>
+<li> <a href="https://trac.ffmpeg.org/wiki/CompilationGuide">ffmpeg compilation guide</a></li>
+<li> <a href="https://www.youtube.com/watch?v=OIYGjzmJ2GI&amp;t=2598s">ffmpeg build guide</a></li>
+</ul>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

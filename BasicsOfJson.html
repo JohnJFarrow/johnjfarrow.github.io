@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Using the Unreal Engine Json classes | unrealcode.net</title>
+<meta name="description" content="Using the Unreal Engine Json classes">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Using the Unreal Engine Json classes
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#necessary-includes">
+Necessary Includes
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#using-constant-field-names">
+Using constant field names
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#creating-json">
+Creating Json
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#writing-json-to-a-file">
+Writing Json to a file
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#reading-json-from-a-file-">
+Reading Json from a file 
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#extracting-fields-from-the-reader">
+Extracting fields from the reader
+</a>
+</li>
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#reading-arrays-of-child-objects-">
+Reading arrays of child objects 
+</a>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Using the Unreal Engine Json classes</h1>
+<p>Updated for Unreal Engine 5.0</p>
+<p>This document describes the basics of reading and writing Json with Unreal Engine classes.  The code here
+reads and writes elements explicitly rather than reading and writing entire structs at one time.  This 
+is suitable for objects which are not using the UCLASS or UOBJECT macros to create reflection data.</p>
+<h2 id="necessary-includes">Necessary Includes</h2>
+<p>Include these header files:</p>
+<div class="cplusplus"><pre>
+#include <span class="string">&quot;Serialization/JsonTypes.h&quot;</span>
+#include <span class="string">&quot;Serialization/JsonWriter.h&quot;</span>
+#include <span class="string">&quot;Serialization/JsonSerializer.h&quot;</span>
+</pre></div><h2 id="using-constant-field-names">Using constant field names</h2>
+<p>To avoid spelling mistakes and make it easier to change Json field names, I suggest making the field names
+constants like so:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">namespace</span> JConstants
+{
+	<span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> ArrayValue(<span class="string">&quot;array-value&quot;</span>);
+	<span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> ArrayValueDisplayName(<span class="string">&quot;array-value-display-name&quot;</span>);
+	<span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> ArrayValues(<span class="string">&quot;array-values&quot;</span>);
+	<span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> AvailableClasses(<span class="string">&quot;available-classes&quot;</span>);
+	<span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> ClassConfigName(<span class="string">&quot;class-config-name&quot;</span>);
+	<span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> ClassName(<span class="string">&quot;class-name&quot;</span>);
+	<span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> ClassDisplayName(<span class="string">&quot;class-display-name&quot;</span>);
+	<span class="keyword">const</span> <span class="keyword">char</span>* <span class="keyword">const</span> ConsoleVariable(<span class="string">&quot;console-variable&quot;</span>);
+	...
+}
+</pre></div>
+<p>It is a bit more work up front but it reduces errors.</p>
+<h2 id="creating-json">Creating Json</h2>
+<p>To create Json make a Json object which will contain everything:</p>
+<div class="cplusplus"><pre>
+TSharedRef&lt; FJsonObject &gt; JsonClassObject = MakeShared&lt;FJsonObject&gt;();
+</pre></div>
+<p>Then you can add fields to it using SetXXX methods like so:</p>
+<div class="cplusplus"><pre>
+JsonClassObject-&gt;SetStringField( JConstants::ClassName, ClassName);
+JsonClassObject-&gt;SetBoolField( JConstants::RestartRequired, bRestartRequired);
+</pre></div>
+<p>If you need to add a list of child objects, create an array object to hold this list:</p>
+<div class="cplusplus"><pre>
+TArray &lt; TSharedPtr&lt;FJsonValue&gt; &gt; JsonPropertyList;
+</pre></div>
+<p>Then create each child object and add it to the list object, then finally add the list object
+to the containing object like so:</p>
+<div class="cplusplus"><pre>
+TSharedRef&lt; FJsonObject &gt; JsonOuterObject = MakeShared&lt;FJsonObject&gt;();
+
+<span class="keyword">for</span>( <span class="keyword">int</span> i = 0; i &lt; 10; ++i )
+{
+	<span class="comment">// make new child object</span>
+	TSharedRef&lt; FJsonObject &gt; ChildObject = MakeShared&lt;FJsonObject&gt;();
+	<span class="comment">// populate the child object</span>
+	ChildObject-&gt;SetStringField( JConstants::ClassConfigName, ClassConfigName );
+	ChildObject-&gt;SetStringField( JConstants::ClassDisplayName, ClassDisplayName );
+	<span class="comment">// add the child object to the collection</span>
+	JsonPropertyList.Add(MakeShared&lt;FJsonValueObject&gt;(ChildObject));
+}
+<span class="comment">// add the collection to the outer object which contains it</span>
+JsonOuterObject-&gt;SetArrayField(JConstants::Properties, JsonPropertyList);
+</pre></div><h3 id="writing-json-to-a-file">Writing Json to a file</h3>
+<p>First you need to write the Json object to a string, then serialize that string to file like this:</p>
+<div class="cplusplus"><pre>
+FString OutputString;
+TSharedRef&lt;TJsonWriter&lt;&gt;&gt; Writer = TJsonWriterFactory&lt;&gt;::Create(&amp;OutputString);
+FJsonSerializer::Serialize(JsonOuter, Writer);
+FFileHelper::SaveStringToFile(OutputString, *AvailableClassesFileName );
+Writer-&gt;Close();
+</pre></div><h2 id="reading-json-from-a-file">Reading Json from a file </h2>
+<p>The entire Json is read from the file into a string, then that string is parsed using the
+TJsonReader class, then each field and child object can be extracted.</p>
+<p>Reading from a file into string is like so:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">const</span> FString FileName = ResourceDirectory + <span class="string">&quot;\\Index.json&quot;</span>;
+FString Contents;
+<span class="keyword">if</span> (FFileHelper::LoadFileToString(Contents, *FileName))
+{
+	...
+}
+</pre></div>
+<p>Parsing the string into Json uses a TJsonReader and a static call on the FJsonSerializer class:</p>
+<div class="cplusplus"><pre>
+TSharedPtr&lt;FJsonObject&gt; FullJsonObject = MakeShared&lt;FJsonObject&gt;();
+TSharedRef&lt;TJsonReader&lt;&gt;&gt; Reader = TJsonReaderFactory&lt;&gt;::Create(Contents);
+
+<span class="keyword">if</span>( FJsonSerializer::Deserialize(Reader, FullJsonObject) )
+{
+	...
+}
+</pre></div><h3 id="extracting-fields-from-the-reader">Extracting fields from the reader</h3>
+<p>The most basic approach is to test for the existence of a field and, if it exists, read it from the Json like so:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">if</span> (JsonObject-&gt;HasTypedField&lt;EJson::String&gt;(JConstants::Title))
+{
+	JsonObject-&gt;GetStringField(PropertyName);
+}
+</pre></div>
+<p>With some templates shown below this can be simplified to one call per field:</p>
+<div class="cplusplus"><pre>
+Description = GetIfExists&lt;FString&gt;(JsonObject, JConstants::Description );
+Source = GetIfExists&lt;FString&gt;(JsonObject, JConstants::Source);
+SourceURL = GetIfExists&lt;FString&gt;(JsonObject, JConstants::SourceURL );
+Version = GetIfExists&lt;FString&gt;(JsonObject, JConstants::Version);
+</pre></div>
+<p>The GetIfExists() function uses templates which are specialized for each data type (to save space only the FString and bool specializations are shown below).
+First the <code>struct JsonEnum&lt;T&gt;</code> maps from a c++ data type such as FString to the corresponding EJson enumeration EJson::String.</p>
+<div class="cplusplus"><pre>
+<span class="keyword">template</span>&lt; <span class="keyword">typename</span> T &gt;
+<span class="keyword">struct</span> JsonEnum;
+
+<span class="keyword">template</span> &lt;&gt;
+<span class="keyword">struct</span> JsonEnum&lt;FString&gt;
+{
+	<span class="keyword">const</span> <span class="keyword">static</span> EJson Type = EJson::String;
+};
+
+<span class="keyword">template</span> &lt;&gt;
+<span class="keyword">struct</span> JsonEnum&lt;<span class="keyword">bool</span>&gt;
+{
+	<span class="keyword">const</span> <span class="keyword">static</span> EJson Type = EJson::Boolean;
+};
+</pre></div>
+<p>Then the <code>struct Extractor&lt;T&gt;</code> maps from a c++ data type such as FString to the corresponding GetXXX() call on the
+FJsonObject like this:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">template</span>&lt; <span class="keyword">typename</span> T &gt;
+<span class="keyword">struct</span> Extractor;
+
+<span class="keyword">template</span> &lt;&gt;
+<span class="keyword">struct</span> Extractor&lt;FString&gt;
+{
+	FString <span class="keyword">operator</span>()(<span class="keyword">const</span> TSharedPtr&lt;FJsonObject&gt;&amp; JsonObject, 
+	                   <span class="keyword">const</span> FString&amp; PropertyName)
+	{
+		<span class="keyword">return</span> JsonObject-&gt;GetStringField(PropertyName);
+	}
+};
+
+<span class="keyword">template</span> &lt;&gt;
+<span class="keyword">struct</span> Extractor&lt;<span class="keyword">bool</span>&gt;
+{
+	<span class="keyword">bool</span> <span class="keyword">operator</span>()(<span class="keyword">const</span> TSharedPtr&lt;FJsonObject&gt;&amp; JsonObject, 
+	                <span class="keyword">const</span> FString&amp; PropertyName)
+	{
+		<span class="keyword">return</span> JsonObject-&gt;GetBoolField(PropertyName);
+	}
+};
+</pre></div>
+<p>And finally the <code>GetIfExists()</code> function uses the two above templates:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">template</span>&lt; <span class="keyword">typename</span> T &gt;
+T GetIfExists(<span class="keyword">const</span> TSharedPtr&lt;FJsonObject&gt;&amp; JsonObject, 
+			  <span class="keyword">const</span> FString&amp; PropertyName)
+{
+	<span class="keyword">if</span> (JsonObject &amp;&amp; JsonObject-&gt;HasTypedField&lt; JsonEnum&lt;T&gt;::Type &gt;(PropertyName))
+	{
+		<span class="keyword">return</span> Extractor&lt;T&gt;{}(JsonObject, PropertyName);
+	}
+
+	<span class="keyword">return</span> T();
+}
+</pre></div><h3 id="reading-arrays-of-child-objects">Reading arrays of child objects </h3>
+<p>When the Json object has a child array of other objects, this can be accessed using the GetArrayField method:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">if</span> (JsonObject-&gt;HasTypedField&lt;EJson::Array&gt;(JConstants::Settings))
+{
+	<span class="keyword">const</span> TArray&lt;TSharedPtr&lt;FJsonValue&gt;&gt;&amp; Settings = 
+			JsonObject-&gt;GetArrayField(JConstants::Settings);
+
+	<span class="keyword">for</span> ( <span class="keyword">const</span> TSharedPtr&lt;FJsonValue&gt;&amp; Setting : Settings)
+	{
+		<span class="keyword">const</span> TSharedPtr&lt;FJsonObject&gt; Object = Setting-&gt;AsObject();
+		<span class="keyword">if</span> (Object)
+		{
+			TSharedRef&lt;FPresetSetting&gt; PresetSetting = MakeShared&lt;FPresetSetting&gt;();
+			PresetSetting-&gt;ClassConfigName = 
+			               GetIfExists&lt;FString&gt;( Object, JConstants::ClassConfig);
+			PresetSetting-&gt;ClassDisplayName = 
+			               GetIfExists&lt;FString&gt;(Object, JConstants::ClassDisplay);
+			PresetSetting-&gt;PropertyDisplayName = 
+			               GetIfExists&lt;FString&gt;(Object, JConstants::DisplayName);
+			...
+		}
+	}
+}
+</pre></div>
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

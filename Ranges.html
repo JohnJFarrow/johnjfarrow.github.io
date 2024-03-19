@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Using C++20 with Unreal | unrealcode.net</title>
+<meta name="description" content="Using C++20 with Unreal">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Using C++20 with Unreal
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#using-c++20-">
+Using C++20 
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#-project-configuration">
+ Project Configuration
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#subobjects">
+Subobjects
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#ranges">
+Ranges
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#structured-bindings">
+Structured Bindings
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#idioms">
+Idioms
+</a>
+<ul class="sidebar-sub-headers">
+<li class="sidebar-sub-header">
+<a class="sidebar-link" href="#anonymous-enums">
+Anonymous Enums
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="sidebar-link" href="#references">
+References
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Using C++20 with Unreal</h1>
+<p>Updated for Unreal Engine 5.1.1</p>
+<h2 id="using-c20">Using C++20 </h2>
+<p>These code here is developed and tested using Visual Studio 2022 setup as described <a href="BuildFromSource.html">here</a></p>
+<h2 id="project-configuration"> Project Configuration</h2>
+<p>As at April 2023 Unreal Engine is configured to use c++17 by default.</p>
+<p>To configure a project to use c++20 add this line to the Project.build.cs</p>
+<div class="csharp"><pre>
+CppStandard = CppStandardVersion.Cpp20;
+</pre></div><h2 id="subobjects">Subobjects</h2>
+<p>The USubobjectDataSubsystem class has methods for finding the 
+components which make up a blueprint. We will use this as a example.  The stages of getting from a blueprint
+to a specific component (whether by type or name) are:</p>
+<ul>
+<li> the USubobjectDataSubsystem gives us a list of FSubobjectDataHandle data handles</li>
+<li> from the FSubobjectDataHandle data handles we can get a list of FSubobjectData data items</li>
+<li> from the FSubobjectData data items we can get a list of UObject pointers (each of which is a component)</li>
+<li> then we can filter the UObject pointers to get the type we want</li>
+</ul>
+<p>The process of getting from the list of FSubobjectDataHandle data handles to
+a smaller list of components looks like this in python, using nested list comprehensions:</p>
+<div class="python"><pre>
+components = 
+    [ comp <span class="keyword">for</span> comp <span class="keyword">in</span> 
+		[ library<span class="number">.</span>get_object(subobject) <span class="keyword">for</span> subobject <span class="keyword">in</span> 
+			[ subsystem<span class="number">.</span>k2_find_subobject_data_from_handle(handle) <span class="keyword">for</span> handle <span class="keyword">in</span> 
+					subsystem<span class="number">.</span>k2_gather_subobject_data_for_blueprint(context=blueprint) ] 
+			]
+		<span class="keyword">if</span> comp<span class="number">.</span>get_class().get_name() == <span class="string">&quot;MyActorComponent&quot;</span>
+	]
+</pre></div><h2 id="ranges">Ranges</h2>
+<p>To do the same thing in c++ as the python code above does we will use the
+std::ranges classes, new in c++20.</p>
+<p>Having included the <code>&lt;ranges&gt;</code> header file we can write this like so:</p>
+<div class="cplusplus"><pre>
+UBlueprint* CarBlueprint = Cast&lt;UBlueprint&gt;( UEditorAssetLibrary::LoadAsset
+            (<span class="string">&quot;/Game/VehicleTemplate/Blueprints/SportsCar/SportsCar_Pawn&quot;</span>));
+
+TArray&lt; FSubobjectDataHandle &gt; SubobjectDataHandles;
+
+<span class="comment">// get the subobject data handles into an unreal TArray</span>
+SubobjectDataSubsystem-&gt;K2_GatherSubobjectDataForBlueprint(CarBlueprint, SubobjectDataHandles);
+
+<span class="comment">// copy from the TArray to a std::vector</span>
+std::vector&lt; FSubobjectDataHandle &gt; Handles(SubobjectDataHandles.Num());
+<span class="keyword">for</span> (<span class="keyword">int</span> j = 0; j &lt; SubobjectDataHandles.Num(); ++j)
+{
+    Handles[j] = SubobjectDataHandles[j];
+}
+
+<span class="comment">// create a range of USkeletalMeshComponent* from the vector of handles</span>
+
+<span class="keyword">auto</span> range = Handles
+    | std::views::transform([&amp;SubobjectDataSubsystem](<span class="keyword">const</span> FSubobjectDataHandle&amp; Handle) {
+        <span class="comment">// handles to FSubobjectData</span>
+        FSubobjectData Data;
+        SubobjectDataSubsystem-&gt;K2_FindSubobjectDataFromHandle(Handle, Data);
+        <span class="keyword">return</span> Data;
+    })
+    | std::views::transform([](<span class="keyword">const</span> FSubobjectData&amp; Data) {
+        <span class="comment">// FSubobjectData to UObject*</span>
+        <span class="keyword">return</span> USubobjectDataBlueprintFunctionLibrary::GetObject(Data);
+    })
+    | std::views::filter([](<span class="keyword">const</span> UObject* Object) {
+        <span class="comment">// just return the skeletal mesh components</span>
+        <span class="keyword">return</span> ( Cast&lt; <span class="keyword">const</span> USkeletalMeshComponent &gt;(Object) != <span class="keyword">nullptr</span> );
+    })
+    | std::views::transform([](<span class="keyword">const</span> UObject* Object) {
+        <span class="comment">// UObject* to USkeletalMeshComponent*&amp;</span>
+        <span class="keyword">return</span> Cast&lt; <span class="keyword">const</span> USkeletalMeshComponent &gt;(Object);
+    });
+</pre></div>
+<p>Each stage of the process is either a call to <code>std::views::transform</code> which transforms an item
+in the list from one type to another, or a call to <code>std::views::filter</code> which removes
+items from the list if they do not match the selection criteria.</p>
+<p>The result of the code above is  the objects <code>range</code> on which we can 
+use in a loop to iterate over all the USkeletalMeshComponent like so:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">for</span> (<span class="keyword">const</span> USkeletalMeshComponent* SkelMesh : range)
+{
+    CompareSkeletalMeshComponents( SkelMesh, OtherSkelMesh );
+}
+</pre></div><h2 id="structured-bindings">Structured Bindings</h2>
+<p>Given a C++ type such as FVector which has members X, Y, Z, structured bindings allows us to 
+deconstruct an FVector variable into three separate values like this:</p>
+<div class="cplusplus"><pre>
+FVector Vector(1.0f,2.0f,3.0f);
+<span class="keyword">auto</span> [x, v, z] = Vector;
+</pre></div>
+<p>We need to write come code to make the structured binding work.  Looking at <a href="https://en.cppreference.com/w/cpp/language/structured_binding">https://en.cppreference.com/w/cpp/language/structured_binding</a> we are using &quot;Case 2: binding a tuple-like type&quot;, so 
+we need to:</p>
+<ul>
+<li> implement <code>std::tuple_size&lt;&gt;</code> to tell the compiler how many variables an FVector will be deconstructed to</li>
+<li> implement <code>std::tuple_element&lt;&gt;</code> to tell the compiler the type of each element of the FVector</li>
+<li> implement <code>get&lt;&gt;()</code> to tell the compiler how to get each element from the FVector</li>
+</ul>
+<p>The FVector will be deconstructed into 3 separate varibales, so we implement <code>std::tuple_size&lt;&gt;</code> to tell the compiler how many variables a FVector will be deconstructed to like this:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">namespace</span> std
+{
+	<span class="keyword">template</span>&lt;&gt;
+	<span class="keyword">struct</span> tuple_size&lt;FVector&gt; 
+	{
+		<span class="keyword">static</span> constexpr <span class="keyword">int</span> <span class="keyword">value</span> = 3;
+	};
+}
+</pre></div>
+<p>We  implement <code>std::tuple_element&lt;&gt;</code> to tell the compiler the type of element
+of the FVector like this:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">namespace</span> std 
+{
+	<span class="keyword">template</span>&lt;size_t Index&gt;
+	<span class="keyword">struct</span> tuple_element&lt;Index, FVector&gt;
+	{
+		<span class="keyword">using</span> type = FVector::FReal;
+	};
+}
+</pre></div>
+<p>We  implement <code>get&lt;&gt;()</code> which is called for index values from 0 to std::tuple_size (i.e. 3). 
+Note that the <code>get&lt;&gt;()</code> function does not need to be in the std namespace.  The compiler using
+argument-dependent lookup; it looks for the <code>get&lt;&gt;()</code> function in the namespace
+which the FVector is in. FVector is declared like this:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">using</span> FVector = UE::Math::TVector&lt;<span class="keyword">double</span>&gt;;
+</pre></div>
+<p>so the compiler looks for the <code>get&lt;&gt;()</code> function in the UE::Math namespace, so we put it there:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">namespace</span> UE::Math
+{
+    <span class="keyword">template</span>&lt;size_t Index&gt;
+    constexpr <span class="keyword">auto</span> get(<span class="keyword">const</span> FVector&amp; Vector)
+    {
+    <span class="keyword">if</span> constexpr (Index == 0) <span class="keyword">return</span> Vector.X;
+    <span class="keyword">if</span> constexpr (Index == 1) <span class="keyword">return</span> Vector.Y;
+    <span class="keyword">if</span> constexpr (Index == 2) <span class="keyword">return</span> Vector.Z;
+    }
+}
+</pre></div>
+<p>Once we have the above code we can use structured binding to deconstruct an FVector variable
+like this:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> Test()
+{
+	FVector Vector(1.0f, 2.0f, 3.0f);
+	<span class="keyword">auto</span> [x, y, z] = Vector;
+}
+</pre></div><h2 id="idioms">Idioms</h2>
+<p>These are common patterns seen in the Unreal Engine source code, not necessarily
+specific to C++ 20.</p>
+<h3 id="anonymous-enums">Anonymous Enums</h3>
+<p>For example:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">template</span>&lt;&gt;
+<span class="keyword">struct</span> TMassExternalSubsystemTraits&lt;UMassTestGameInstanceSubsystem&gt;
+{
+	<span class="keyword">enum</span>
+	{
+		GameThreadOnly = <span class="keyword">false</span>,
+		ThreadSafeRead = <span class="keyword">true</span>,
+		ThreadSafeWrite = <span class="keyword">false</span>,
+	};
+};
+</pre></div>
+<p>This declares the three values specified in the enum without allocating any
+variables.  When the compiler sees  the variable 
+<code>TMassExternalSubsystemTraits&lt;UMassTestGameInstanceSubsystem&gt;::GameThreadOnly</code>
+it substitues the value <code>false</code>. Because no variable is allocated
+it does not take any memory and the  value cannot be changed.</p>
+<h2 id="references">References</h2>
+<p><a href="https://devblogs.microsoft.com/cppblog/documentation-for-cpp20-ranges/">Microsoft Ranges</a>    <br />
+<a href="https://timur.audio/how-to-make-a-container-from-a-c20-range">Making a Container from a C++20 Range</a>  <br />
+<a href="https://www.cppstories.com/2021/filter-cpp-containers/">Filtering Containers</a>  <br />
+<a href="https://en.cppreference.com/w/cpp/language/structured_binding">Structured Bindings</a>  </p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

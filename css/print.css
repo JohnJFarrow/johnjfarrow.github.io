@@ -1,0 +1,13 @@
+
+
+.navbar {
+    display:none;
+}
+
+h2 {
+    break-after:avoid;
+}
+
+h3 {
+    break-after:avoid;
+}

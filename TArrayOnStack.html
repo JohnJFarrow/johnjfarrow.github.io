@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Allocating a TArray on the stack | unrealcode.net</title>
+<meta name="description" content="Allocating a TArray on the stack">
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/styles.css">
+<link rel="stylesheet" href="./css/syntaxhighlightingstyles.css">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Allocating a TArray on the stack
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#array-elements-in-memory">
+Array Elements in Memory
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#reallocation">
+Reallocation
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#passing-different-array-types">
+Passing Different Array Types
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Allocating a TArray on the stack<h1>
+<h2 id="array-elements-in-memory">Array Elements in Memory</h2>
+<p>The TArray type is used in Unreal C++ to store a variable sized array of items.  </p>
+<p>Logically a TArray has two parts:</p>
+<ul>
+<li> the TArray variable which contains stuff like the capacity of the array and how many elements are stored in it, and</li>
+<li> the elements themselves.  By default the elements of an array are stored on the heap.  This imposes a performance cost because the memory required for this storage must be allocated when the array is created and deallocated when the array
+is destroyed.</li>
+</ul>
+<p>A TArray object can be configured to store its elements on the stack.  The allocation of memory on the stack is many times faster than on the heap.  To make a TArray store its elements on the stack, use a <code>TInlineAllocator</code>. For example we can declare an array of <code>UGameplayEffect</code> pointers  like this:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">const</span> TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects;
+</pre></div>
+<p>This example is from function in the Lyra source code:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> UAuraAbilitySystemFunctionLibrary::InitializeDefaultAttributes(
+	<span class="keyword">const</span> UObject* WorldContextObject, 
+	ECharacterClass CharacterClass, 
+	<span class="keyword">float</span> Level, 
+	UAbilitySystemComponent* AbilitySystemComponent )
+{
+	<span class="keyword">if</span>( !AbilitySystemComponent ) <span class="keyword">return</span>;
+	
+	<span class="keyword">if</span>( <span class="keyword">const</span> AAuraGameModeBase* Base = 
+		Cast&lt;AAuraGameModeBase&gt;( UGameplayStatics::GetGameMode(WorldContextObject) ) )
+	{
+		check(Base-&gt;CharacterClassInfo)
+
+		<span class="keyword">const</span> FCharacterClassDefaultInfo&amp; Info = 
+			Base-&gt;CharacterClassInfo-&gt;GetClassDefaultInfo( CharacterClass );
+
+		<span class="keyword">const</span> TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects {
+			Info.PrimaryAttributesGameplayEffect,
+			Base-&gt;CharacterClassInfo-&gt;SecondaryAttributesGameplayEffect,
+			Base-&gt;CharacterClassInfo-&gt;VitalAttributesGameplayEffect };
+
+		<span class="keyword">if</span>( <span class="keyword">const</span> AActor* Source = AbilitySystemComponent-&gt;GetAvatarActor() )
+		{
+			<span class="keyword">for</span>( <span class="keyword">const</span> TSubclassOf&lt;UGameplayEffect&gt;&amp; Effect : Effects  )
+			{
+				<span class="keyword">if</span>( Effect )
+				{
+					...
+				}
+			}
+		}
+	}
+}
+</pre></div>
+<p>The full array declaration from the above function is:</p>
+<pre><code class="language-ccp">const TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects {
+		Info.PrimaryAttributesGameplayEffect,
+		Base-&gt;CharacterClassInfo-&gt;SecondaryAttributesGameplayEffect,
+		Base-&gt;CharacterClassInfo-&gt;VitalAttributesGameplayEffect };
+</code></pre>
+<p> The number passed to the <code>TInlineAllocator</code> type is the initial capacity of the array, that is the number of elements for which memory has been allocated - this is not the number of elements in the array, it's just the number of elements for which space has been allocated.  A declaration like this:</p>
+<pre><code class="language-ccp"> TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects {
+		Info.PrimaryAttributesGameplayEffect,
+		Base-&gt;CharacterClassInfo-&gt;VitalAttributesGameplayEffect };
+</code></pre>
+<p>allocates an array with an initial capacity for 3 elements, which contains only 2 elements.  So 1 more element can be added without allocating more memory.</p>
+<h2 id="reallocation">Reallocation</h2>
+<p>Array elements are not guaranteed to be contiguous but are usually assumed to be so.  Once more elements are added to the array that then initial capacity passed to the <code>TInlineAllocator</code>, the array is reallocated.  This means a new area of heap memory is allocated and all the elements are copied to that area.  This new memory is not on the stack, it is on the heap, and this reallocation incurs the cost of allocation and deallocation we were trying to avoid by using the <code>TInlineAllocator</code>.  So it is important to avoid reallocation by determining the maximum size of the array when it is created and passing this to the <code>TInlineAllocator</code>.</p>
+<h2 id="passing-different-array-types">Passing Different Array Types</h2>
+<p>A function can be declared to take an array parameter like so:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> SumFunc(TArray&lt;<span class="keyword">int</span>&gt; View)
+{
+    UE_LOG(LogTemp, Warning, TEXT(<span class="string">&quot;viewsize %d&quot;</span>), View.Num());
+}
+</pre></div>
+<p>This will accept a parameter declared as a <code>TArray&lt;int&gt;</code> but will not accept one declared with a non-default allocator such as <code>TArray&lt; int32, TInlineAllocator&lt;3&gt; &gt;</code>, because this is a different type from a simple TArray.</p>
+<p>To write the function to a TArray which is declared either on the stack or on the heap, rewrite it to take a <code>TArrayView</code> parameter like so:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> SumFunc(TArrayView&lt;<span class="keyword">int</span>&gt; View)
+{
+	UE_LOG(LogTemp, Warning, TEXT(<span class="string">&quot;viewsize %d&quot;</span>), View.Num());
+}
+</pre></div>
+<p>This function will accept both <code>TArray&lt;int&gt;</code> and <code>TArray&lt; int32, TInlineAllocator&lt;3&gt; &gt;</code> parameters. </p>
+<p>There are a couple of complications:</p>
+<ul>
+<li> the <code>TArrayView</code> cannot be resized.  Individual elements can be changed but elements cannot be added or deleted.</li>
+<li> When passing a <code>TArray&lt; int32, TInlineAllocator&lt;3&gt; &gt;</code> parameter the compiler creates a <code>TArrayView&lt;int&gt;</code> object which wraps the original array.  As the <code>TArrayView&lt;int&gt;</code> is a temporary object passed to the function it cannot be passed by reference, a call to a function declared like this will not compile:</li>
+</ul>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> SumFuncByReference(TArrayView&lt;<span class="keyword">int</span>&gt;&amp; View)
+{
+	UE_LOG(LogTemp, Warning, TEXT(<span class="string">&quot;viewsize %d&quot;</span>), View.Num());
+}
+</pre></div>
+<p>This can be remedied by using an rvalue reference like this:</p>
+<div class="cplusplus"><pre>
+<span class="keyword">void</span> SumFuncByRValueReference(TArrayView&lt;<span class="keyword">int</span>&gt;&amp;&amp; View)
+{
+	UE_LOG(LogTemp, Warning, TEXT(<span class="string">&quot;viewsize %d&quot;</span>), View.Num());
+}
+</pre></div>
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

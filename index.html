@@ -3,11 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
 <title>unrealcode.net</title>
 <meta name="description" content="">
-<meta charset="utf-8">
-<link rel="stylesheet" type="text/css" href="./css/styles.css">
-<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
 </head>
 <body>
 <div id="app" data-server-rendered="true">
@@ -52,6 +56,19 @@ Experiments with Unreal Engine
 </header>
 <div class="theme-default-content custom content__default">
 <div>
+<div>
+<h2>
+<a href="ChangingComponentInParent.html">
+Changing a Component in a Parent Object
+</a>
+</h2>
+<p>
+Changing the class of a component in ones parent object
+</p>
+<a href="ChangingComponentInParent.html">
+Read more
+</a>
+</div>
 <div>
 <h2>
 <a href="TArrayOnStack.html">

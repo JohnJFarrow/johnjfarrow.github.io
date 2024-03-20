@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
+<title>Changing a Component in a Parent Object | unrealcode.net</title>
+<meta name="description" content="Changing a Component in a Parent Object">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Changing a Component in a Parent Object
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#the-idea">
+The Idea
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#an-example">
+An Example 
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Changing a Component in a Parent Object </h1>
+<h2 id="the-idea">The Idea</h2>
+<p>If we derive a C++ class from an existing Unreal class, and that existing class 
+contains components, we can extend (subclass)  those components without changing the source
+code of the base class.  </p>
+<h2 id="an-example">An Example </h2>
+<p>The ACharacter class contains a number of different components, 
+specifically these:</p>
+<p><img src="/images/baseclass_001_001.png" alt="" /></p>
+<p>Say for example we want to replace the UCharacterMovementComponent 
+with an extended version - the UMyNewCharacterMovementComponent
+which we have created and which is derived from UCharacterMovementComponent.</p>
+<p>We want to change from this:</p>
+<div class="mermaid">classDiagram
+    ACharacter --> UCharacterMovementComponent
+</div>
+<p>to this:</p>
+<div class="mermaid">classDiagram
+    ACharacter &lt;|-- AMyCharacter
+    ACharacter --> UMyNewCharacterMovementComponent
+    UCharacterMovementComponent &lt;|-- UMyNewCharacterMovementComponent
+</div>
+<p>The UMyNewCharacterMovementComponent is shown below; for the purposes
+of this article we have added a constructor which changes the GravityScale 
+member of UCharacterMovementComponent to 0.5 from its default value of 1.0.</p>
+<div class="cplusplus"><pre>
+#pragma once
+
+#include <span class="string">&quot;CoreMinimal.h&quot;</span>
+#include <span class="string">&quot;GameFramework/CharacterMovementComponent.h&quot;</span>
+#include <span class="string">&quot;MyNewCharacterMovementComponent.generated.h&quot;</span>
+
+UCLASS()
+<span class="keyword">class</span> TEST_API UMyNewCharacterMovementComponent : <span class="keyword">public</span> UCharacterMovementComponent
+{
+	GENERATED_BODY()
+<span class="keyword">public</span>:
+	UMyNewCharacterMovementComponent();
+};
+</pre></div>
+<p>The implementation of the constructor is:</p>
+<div class="cplusplus"><pre>
+#include <span class="string">&quot;MyNewCharacterMovementComponent.h&quot;</span>
+UMyNewCharacterMovementComponent::UMyNewCharacterMovementComponent()
+{
+	GravityScale = 0.5f;
+}
+</pre></div>
+<p>If we create a C++ class called AMyCharacter derived from
+ACharacter the code looks like this:</p>
+<div class="cplusplus"><pre>
+#pragma once
+
+#include <span class="string">&quot;CoreMinimal.h&quot;</span>
+#include <span class="string">&quot;GameFramework/Character.h&quot;</span>
+#include <span class="string">&quot;MyCharacter.generated.h&quot;</span>
+
+UCLASS()
+<span class="keyword">class</span> TEST_API AMyCharacter : <span class="keyword">public</span> ACharacter
+{
+	GENERATED_BODY()
+
+<span class="keyword">public</span>:
+	<span class="comment">// Sets default values for this character&#39;s properties</span>
+	AMyCharacter();
+
+<span class="keyword">protected</span>:
+	<span class="comment">// Called when the game starts or when spawned</span>
+	<span class="keyword">virtual</span> <span class="keyword">void</span> BeginPlay() override;
+
+<span class="keyword">public</span>:	
+	<span class="comment">// Called every frame</span>
+	<span class="keyword">virtual</span> <span class="keyword">void</span> Tick(<span class="keyword">float</span> DeltaTime) override;
+
+	<span class="comment">// Called to bind functionality to input</span>
+	<span class="keyword">virtual</span> <span class="keyword">void</span> SetupPlayerInputComponent(<span class="keyword">class</span> UInputComponent* PlayerInputComponent) override;
+};
+</pre></div>
+<p>What we want to do is replace the UCharacterMovementComponent created in
+the ACharacter base class with our new UMyNewCharacterMovementComponent.  To do this we add
+a FObjectInitializer&amp; parameter to the class constructor in MyCharacter.h:</p>
+<div class="cplusplus"><pre>
+AMyCharacter(<span class="keyword">const</span> FObjectInitializer&amp; OI);
+</pre></div>
+<p>and in MyCharacter.cpp we change the constructor to this:</p>
+<div class="cplusplus"><pre>
+AMyCharacter::AMyCharacter(<span class="keyword">const</span> FObjectInitializer&amp; OI)
+	: Super( OI.SetDefaultSubobjectClass&lt;UMyNewCharacterMovementComponent&gt;(ACharacter::CharacterMovementComponentName))
+{
+	PrimaryActorTick.bCanEverTick = <span class="keyword">true</span>;
+}
+</pre></div>
+<p>The call to <code>Super(OI.SetDefaultSubobjectClass)</code> is what changes the
+component associated with the <code>ACharacter::CharacterMovementComponentName</code>
+name from the <code>UCharacterMovementComponent</code> to our <code>UMyNewCharacterMovementComponent</code>
+so that when the <code>AMyCharacter</code> object is created it now has a 
+<code>UMyNewCharacterMovementComponent</code> component. </p>
+<p>If you drop a MyCharacter actor into the world map an look at its components we can see
+that:</p>
+<ul>
+<li> the Character Movement component is now a UMyNewCharacterMovementComponent object</li>
+<li> the gravity scale property has a value of 0.5, showing our component constructor
+was executed:</li>
+</ul>
+<p><img src="/images/baseclass_001_002.png" alt="" /></p>
+<p>Note that you can only change a component to one which is derived
+from the original component.  If you try to change it to something
+unrelated the engine will log a message like this:</p>
+<pre><code>Error: Class /Script/Test.Unrelated is not a legal override for component CharMoveComp because it does not derive 
+from Class /Script/Engine.CharacterMovementComponent.  Using Class /Script/Engine.CharacterMovementComponent to construct
+component.
+</code></pre>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

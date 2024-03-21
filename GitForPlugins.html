@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
+<title>Using Git for Ureal Engine Plugins | unrealcode.net</title>
+<meta name="description" content="Using Git for Ureal Engine Plugins">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Using Git for Ureal Engine Plugins
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#projects-using-multiple-copies-of-the-same-plugin">
+Projects using multiple copies of the same plugin
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#using-one-git-directory-for-multiple-projects">
+Using one git directory for multiple projects
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Using Git for Ureal Engine Plugins</h1>
+<h2 id="introduction">Introduction</h2>
+<p>Often an Unreal plugin is held in a subdirectory of the main project in a <a href="https://git-scm.com/book/en/v2/Git-Tools-Submodules">git submodule</a> which
+allows version control of the plugin to be conducted separately from the main project.</p>
+<p>The way submodules work is that every submodule must reference a unique git repository.  If you want more than one copy of the plugin
+to exist under the same base directory submodules do not work.  This is because the .gitmodules file, which stores information about
+submodules, is structured like this:</p>
+<div class="cplusplus"><pre>
+[submodule <span class="string">&quot;AirSim&quot;</span>]
+    path = Unreal/Plugins/AirSim
+	url = https:<span class="comment">//github.com/GitName/AirSimPlugin</span>
+</pre></div>
+<p>The submodule name, &quot;AirSim&quot; in this example, is a unique key - there cannot be two submodules with the same name, so you cannot
+reference the same plugin twice in the same directory tree.</p>
+<h2 id="projects-using-multiple-copies-of-the-same-plugin">Projects using multiple copies of the same plugin</h2>
+<p>One example of a project which has more than one copy of the same plugin is
+the <a href="https://github.com/microsoft/AirSim">Microsoft Airsim</a> project.  This
+has a base directory containing documentation, source code, build scripts and test files, and an Unreal specific
+directory containing both:</p>
+<ul>
+<li> the AirSim plugin</li>
+<li> a demonstration Unreal project, which contains another copy of the Airsim plugin</li>
+</ul>
+<p>The overall project build process does the following:</p>
+<ul>
+<li> create the libraries which the plugin needs</li>
+<li> copy these libraries into directories within the plugin source tree</li>
+<li> builds the actual plugin.</li>
+</ul>
+<p>The copy of the plugin in the demonstration project is not in 
+version control.  The copy in the AirSim plugin directory is in git, and the copy
+in the demonstration project is specifically excluded from git using the
+.gitignore file.  Any change made in either plugin directory must be manually
+copied to the other - the project provides scripts for doing this in update_to_git.bat
+and update_from_git.bat.  </p>
+<h2 id="using-one-git-directory-for-multiple-projects">Using one git directory for multiple projects</h2>
+<p>Instead of having multiple copies of the source, some of which are not in 
+git, or having mutiple submodules with the same code (which git does not support) it
+is possible to have multiple subdirectories which reference the same .git directory
+and so emulate having the same submodule in the project more than once.</p>
+<p>This is achieved by having the plugin in its own git repository, the &quot;plugin repository&quot;, and then configuring
+each subdirectory which contains a copy of that repository.</p>
+<p>For example, if the whole project is in d:\ExampleProject, and the plugin
+is in <a href="https://github.com/JohnJFarrow/AirSimPlugin">https://github.com/JohnJFarrow/AirSimPlugin</a> we can clone it
+into its own local repos which is outside the main project, for example d:\AirSimPlugin:</p>
+<pre><code>cd d:\
+git clone https://github.com/JohnJFarrow/AirSimPlugin AirSimPlugin
+</code></pre>
+<p>The key thing to note here is that cloning the repository has created a .git directory located
+in d:\AirSimPlugin.git.</p>
+<p>Then we can make multiple submodules, once for each copy of the plugin, which reference
+the .git file in d:\AirSimPlugin:</p>
+<pre><code>rem initialise the main project
+mkdir d:\ExampleProject
+cd d:\ExampleProject
+git init
+</code></pre>
+<pre><code>rem make and initialise submodule for Project1
+mkdir d:\ExampleProject\Project1\Plugins\AirSim
+cd d:\ExampleProject\Project1\Plugins\AirSim
+git submodule init
+echo gitdir: ../../../../AirSimPlugin/.git&gt; .git
+rem 'dev' is the main branch 
+git checkout dev
+git checkout -- .
+</code></pre>
+<p>What this does is make a .git file which contains this line:</p>
+<pre><code>gitdir: ../../../../AirSimPlugin/.git
+</code></pre>
+<p>So any git operations in the directory d:\ExampleProject\Project1\Plugins\AirSim will use the .git directory 
+at d:\AirSimPlugin.git.</p>
+<p>We can then make another directory which references the same .git file
+from the plugin, like so:</p>
+<pre><code>mkdir d:\ExampleProject\Project2\Plugins\AirSim
+cd d:\ExampleProject\Project2\Plugins\AirSim
+git submodule init
+echo gitdir: ../../../../AirSimPlugin/.git&gt; .git
+git checkout dev
+git checkout -- .
+</code></pre>
+<p>So now we have two copies of the same plugin in the same project, and can use
+normal git operations to commit changes in one project and update then in the
+other without having to write scripts like update_from_git.bat and remember
+which one to use.  We can also easily extend this approach when we use
+the plugin in more projects.</p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

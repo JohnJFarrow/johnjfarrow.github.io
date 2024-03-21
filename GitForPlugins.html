@@ -85,12 +85,12 @@ submodules, is structured like this:</p>
 reference the same plugin twice in the same directory tree.</p>
 <h2 id="projects-using-multiple-copies-of-the-same-plugin">Projects using multiple copies of the same plugin</h2>
 <p>One example of a project which has more than one copy of the same plugin is
-the <a href="https://github.com/microsoft/AirSim">Microsoft Airsim</a> project.  This
+the <a href="https://github.com/microsoft/AirSim">Microsoft AirSim</a> project.  This
 has a base directory containing documentation, source code, build scripts and test files, and an Unreal specific
 directory containing both:</p>
 <ul>
 <li> the AirSim plugin</li>
-<li> a demonstration Unreal project, which contains another copy of the Airsim plugin</li>
+<li> a demonstration Unreal project, which contains another copy of the AirSim plugin</li>
 </ul>
 <p>The overall project build process does the following:</p>
 <ul>
@@ -106,7 +106,7 @@ copied to the other - the project provides scripts for doing this in update_to_g
 and update_from_git.bat.  </p>
 <h2 id="using-one-git-directory-for-multiple-projects">Using one git directory for multiple projects</h2>
 <p>Instead of having multiple copies of the source, some of which are not in 
-git, or having mutiple submodules with the same code (which git does not support) it
+git, or having multiple submodules with the same code (which git does not support) it
 is possible to have multiple subdirectories which reference the same .git directory
 and so emulate having the same submodule in the project more than once.</p>
 <p>This is achieved by having the plugin in its own git repository, the &quot;plugin repository&quot;, and then configuring

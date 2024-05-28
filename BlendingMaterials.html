@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
+<title>Blending Materials | unrealcode.net</title>
+<meta name="description" content="Blending Materials">
+</head>
+<body>
+<div id="app" data-server-rendered="true">
+<div class="theme-container">
+</div>
+<header class="navbar">
+<div class="sidebar-button">
+</div>
+<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
+<span class="site-name">
+unrealcode.net
+</span>
+</a>
+<div class="links">
+<nav class="nav-links can-hide">
+<div class="nav-item">
+<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+Home
+</a>
+</div>
+</nav>
+</div>
+</header>
+<div class="sidebar-mask">
+</div>
+<aside class="sidebar">
+<ul class="sidebar-links">
+<li>
+<section class="sidebar-group depth-0">
+<p class="sidebar-heading open">
+<span>
+Blending Materials
+</span>
+</p>
+<ul class="sidebar-links sidebar-group-items">
+<li>
+<a class="sidebar-link" href="#introduction">
+Introduction
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#importing-from-quixel">
+Importing from Quixel
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#selecting-material-instances">
+Selecting Material Instances
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#using-the-material">
+Using the Material
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#mesh-painting">
+Mesh Painting
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#nanite">
+Nanite
+</a>
+</li>
+<li>
+<a class="sidebar-link" href="#reference">
+Reference
+</a>
+</li>
+</ul>
+</section>
+</li>
+</ul>
+</aside>
+<main class="page">
+<div class="theme-default-content content__default">
+<h1>Blend Materials</h1>
+<h2 id="introduction">Introduction</h2>
+<p>A blend material is one which combines multiple material instances
+and controls the way in which they mix together to produce
+the final color.</p>
+<p>These are the steps to import textures from Quixel and blend them 
+into one Unreal material instance.</p>
+<h2 id="importing-from-quixel">Importing from Quixel</h2>
+<p>In this example we are applying our blend material to a road, so we want 3 
+Quixel textures  which could be used on a road. The Unreal material instance
+blends 1, 2 or 3 materials - here we will be using 3.</p>
+<p>👉Use the Window | Quixel Bridge menu to open Quixel.  </p>
+<p>👉On the right hand tree view select Surfaces | Asphalt to display surfaces:</p>
+<p><img src="../images/blending_001.png" alt="" /></p>
+<p>We want to select 3 materials:</p>
+<ul>
+<li> Rough Asphalt for the base layer (asset id wjvnagr)</li>
+<li> Damaged Asphalt for the middle layer (asset id vizcebf)</li>
+<li> Destroyed Asphalt for the top layer (asset id sinobcga)</li>
+</ul>
+<p>👉Click on each of these and click the Download button the the Add button to download the texture and add it to the project.</p>
+<p>👉Minimize the Quixel window.</p>
+<p>The materials which we added now appear in the Unreal content browser as material instances, like so:</p>
+<p><img src="../images/blending_003.png" alt="" /></p>
+<p>For the next step we need to select mutiple material instances, one way to do this is to select the Surfaces directory and use a filter which selects only material instances, so we see this:</p>
+<p><img src="../images/blending_004.png" alt="" /></p>
+<h2 id="selecting-material-instances">Selecting Material Instances</h2>
+<p>We need to select 3 material instances to blend.  The order in which they are selected determines the role they play in the blend material.</p>
+<ul>
+<li> 👉first select the base layer MI_Rough_Asphalt_wjvnagr_2K</li>
+<li> 👉then select the second layer MI_Damaged_Asphalt_vizcebf_2K (by control-clicking on it)</li>
+<li> 👉then select the third layer MI_Destroyed_Asphalt_sinobcga_2K (by control-clicking on it)</li>
+</ul>
+<p>With these there material instances selected:</p>
+<p>👉 Use Window | Quixel Bridge to open the Quixel window</p>
+<p>👉 In the Quixel window, on the left side tree view select Surfaces | Asphalt | Fine and click on the first surface; all we want here is for the right hand window to appear with the selected asset - which asset is chosen does not matter:</p>
+<p><img src="/images/blending_005.png" alt="" /></p>
+<p>👉 In the right side next to &quot;Medium Quality&quot; is a small button, click this:</p>
+<p><img src="/images/blending_006.png" alt="" /></p>
+<p>This will open the Megascans window:</p>
+<p><img src="/images/blending_007.png" alt="" /></p>
+<p>When we press the &quot;Create Material Blend&quot; button this will create the material with the name specified by the &quot;Material Name&quot; property in the directory specified by the &quot;Destination Path&quot; property.</p>
+<p>👉Set the material name and path, then press the &quot;Create Material Blend&quot; button</p>
+<p>Pressing the button creates the material in the specified folder.  Using the defaults will create the material
+in a (possibly) new folder in the content browser.  If we open that material and open and click on the &quot;02 - Base Layer&quot;, &quot;O3 - Middle Layer&quot; and &quot;04 - Top Layer&quot; we can should see the new material is using the material instances we selected:</p>
+<p><img src="/images/blending_009.png" alt="" /></p>
+<h2 id="using-the-material">Using the Material</h2>
+<p>To test the material we need a mesh to drop it on.  </p>
+<p>👉Change to Modeling Mode using the dropdown on the toolbar:</p>
+<p><img src="/images/blending_010.png" alt="" /></p>
+<p>👉click the Rectangle option 
+👉change the Width Subdivisions and Depth Subdivisions to 100  <br />
+👉change the material to the one we just created</p>
+<p>The rectangle creation should look like this:</p>
+<p><img src="/images/blending_011.png" alt="" /></p>
+<p>👉click the Accept button to create the rectangle  <br />
+👉duplicate it many times using the <code>XForm | Pattern</code> option 
+to create a small road-like strip:</p>
+<p><img src="/images/blending_002.png" alt="" /></p>
+<p>This creates one mesh for some length of the road.</p>
+<p>Just resizing the first rectangle to the size of a long road will not work - if you view the result
+in the viewport with Wireframe on you will see this extends the triangles in the mesh to the length of 
+the road.  Mesh painting applies colors at vertices not the faces, so we need more vertices than this
+approach provides.</p>
+<h2 id="mesh-painting">Mesh Painting</h2>
+<p>Once we have create the mesh for the road section and applied our blend material we have this:</p>
+<p><img src="/images/blending_014.png" alt="" /></p>
+<p>Mesh painting is one way to change the appearance of the material we are using, and to control the mixing of the 3 material instances which make up the blend material.</p>
+<p>👉Change to Mesh Paint Mode using the dropdown on the toolbar:</p>
+<p><img src="/images/blending_010.png" alt="" /></p>
+<p>👉With the Colors tab selected click the Paint icon to display the painting options:</p>
+<p><img src="/images/blending_013.png" alt="" /></p>
+<p>The most important thing here is the &quot;Channels&quot; section at the bottom - the selections here, despite the labelling, are not Red/Gree/Blue, they instead correspond to the channels being blended:</p>
+<ul>
+<li> the 'red' channel corresponds to the middle layer</li>
+<li> the 'green' channel corresponds to the top layer</li>
+<li> the 'blue' channel corresponds to the puddle later</li>
+</ul>
+<p>The Paint Color property determines if you are painting the selected color on
+or removing it. Painting is done by holding down the left mouse key and
+moving the mouse.  Either press X to toggle between the two states, or hold
+the shift key to select the opposite state.</p>
+<p>To use the 'blue' puddle channel first you must enable it using the 00-Global|Use Puddle Layer
+property.</p>
+<h2 id="nanite">Nanite</h2>
+<p>Mesh painting is vertex painting, i.e. colors are assigned at each vertex in the mesh.  The nanite rendering process simplifies meshes by removing vertices depending on distance
+from the camera (and other things).  So one would expect the colors to change
+as vertices are removed.  In fact enabling nanite on a mesh such as the road 
+example used above sets the color to the base layer material only, removing
+any mesh painting effects.</p>
+<h2 id="reference">Reference</h2>
+<p><a href="https://docs.unrealengine.com/5.0/en-US/delegates-and-lamba-functions-in-unreal-engine/">Epic Delegates</a></p>
+
+</div>
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</body>
+</html>

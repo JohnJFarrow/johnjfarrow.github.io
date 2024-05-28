@@ -76,6 +76,14 @@ allows version control of the plugin to be conducted separately from the main pr
 <p>The way submodules work is that every submodule must reference a unique git repository.  If you want more than one copy of the plugin
 to exist under the same base directory submodules do not work.  This is because the .gitmodules file, which stores information about
 submodules, is structured like this:</p>
+<p>THE ABOVE IS WRONG CAN USE 2 NAMES</p>
+<p>but with shared .git directories just a commit is required to
+copy between projects, with two different submodules it needs a 
+push to the server as well to test - still true with see below</p>
+<p>when u use 2 copies of a plugin with different submodule names, it realises this and
+shares the .git file:</p>
+<p>d:\work\learn\AirSim\Unreal\Plugins\AirSim&gt;more .git
+gitdir: ../../../.git/modules/AirSim</p>
 <div class="cplusplus"><pre>
 [submodule <span class="string">&quot;AirSim&quot;</span>]
     path = Unreal/Plugins/AirSim

@@ -2487,12 +2487,11 @@ summary {
 }
 
 .main-header-part1 {
+    padding-top: 50px;
+    padding-bottom:10px;
     font-weight: 600;
     color: rgba(236,236,241,.8);
     font-size: 2rem;
-    margin: 13.8rem auto;
-    padding-bottom:100px;
-    
 }
 
 .main-header-part2 {

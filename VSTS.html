@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Using Visual Studio Team Services with Unreal Engine | unrealcode.net</title>
 <meta name="description" content="Using Visual Studio Team Services with Unreal Engine">
 </head>
@@ -63,6 +67,11 @@ DevOps Organization
 </a>
 </li>
 </ul>
+</li>
+<li>
+<a class="sidebar-link" href="#normal-usage">
+Normal Usage
+</a>
 </li>
 <li>
 <a class="sidebar-link" href="#about-git-lfs">
@@ -134,6 +143,8 @@ can be created - to change this use ths &quot;organization policies&quot; link o
 <p><img src="/images/devops_005.png" alt="" /></p>
 <p>Enter the project name and press the &quot;Create Project&quot; button.</p>
 <p>Once the project has been created, on the left hand side of the screen select &quot;Repos&quot; to create a new git repository.</p>
+<h2 id="normal-usage">Normal Usage</h2>
+<p>Once the logins and organization has been setup you can do directly to <a href="https://dev.azure.com/unrealcodenet/">https://dev.azure.com/ORGNAME/</a></p>
 <h2 id="about-git-lfs">About Git LFS</h2>
 <p>Git LFS stores large binary files (which is most Unreal assets) differently to normal source
 code files.  It also provides the ability to checkout and lock files to prevent multiple people changing them

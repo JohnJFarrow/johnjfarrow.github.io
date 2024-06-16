@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Experiments With Chaos Physics - Using Blueprints | unrealcode.net</title>
 <meta name="description" content="Experiments With Chaos Physics - Using Blueprints">
 </head>
@@ -148,7 +152,7 @@ in England.</p>
 <li> the ramp</li>
 </ol>
 <p>Each of these was exported from Blender in FBX format using these options </p>
-<img class="center" src="/images/chaos_003.png"/>
+<p><img src="/images/chaos_003.png" alt="offset" /></p>
 <h3 id="exporting-at-the-origin">Exporting at the Origin </h3>
 <p>Before exporting it, each component was moved to the origin in Blender.  This makes it easier to
 work with the meshes once they are imported into Unreal. It makes the local coordinate 
@@ -240,18 +244,18 @@ on the left hand side choose Collision, you will see this screen:</p>
 you can see we have already added a custom channel cells &quot;CustomBaseChannel&quot;</p>
 <p>Edit the BP_Trebuchet blueprint and select the Base StaticMesh component.</p>
 <p>Set the collision properties like this:</p>
-<p><img src="/images/chaos_032.png" alt="" /></p>
+<p><img src="/images/chaos_032.png" alt="offset" /></p>
 <p>This tells Unreal that when resolving collisions the base should be considered to 
 be of type &quot;CustomBaseChannel&quot;.</p>
 <p>Next select the Arm component and configure the collision properties like this:</p>
-<p><img src="/images/chaos_033.png" alt="" /></p>
+<p><img src="/images/chaos_033.png" alt="offset" /></p>
 <p>This tells Unreal that when the arm collides with something of the &quot;CustomBaseChannel&quot;
 type, to ignore that collision.</p>
 <h3 id="constraining-the-arm">Constraining the Arm</h3>
 <p>We want the arm to pivot around the axle.  If we change all the Linear Limits to Locked, and
 change Swing 1 Motion and Swing 2 Motion to locked, leaving Twist Motion as Free, the only
 way the arm can move is to pivot is around the X axis.</p>
-<p><img src="/images/chaos_013.png" alt="" /></p>
+<p><img src="/images/chaos_013.png" alt="offset" /></p>
 <p>Looking at the tooltip for Twist Limit it sort of explains what Twist Motion does: &quot;Symmetric angle of roll along the X-axis&quot;. This
 tells us the Twist Motion properties control the twist around <strong>the X-axis of the constraint, not the X-Axis of the 
 constrained components</strong>.  You can see this by changing the yaw angle (rotation around the local X-axis) of the constraint - at 45 degrees
@@ -260,11 +264,11 @@ the arm just tips over slightly, at 90 degrees nothing happens at all.</p>
 which is what we want.</p>
 <p><img src="/images/chaos_014.png" alt="" /></p>
 <p>If we press the Simulate button from this position the arm pivots around the position of the constraint like so:</p>
-<p><img src="/images/chaos_014.gif" alt="" /></p>
+<p><img src="/images/chaos_014.gif" alt="offset" /></p>
 <p>If we position the constraint where the axle is like this:</p>
-<p><img src="/images/chaos_015.png" alt="" /></p>
+<p><img src="/images/chaos_015.png" alt="offset" /></p>
 <p>Then we get the arm swinging in the way we want:</p>
-<p><img src="/images/chaos_016.gif" alt="" /></p>
+<p><img src="/images/chaos_016.gif" alt="offset" /></p>
 <h3 id="adding-the-counterweight">Adding the Counterweight</h3>
 <p>Add another Static Mesh component:</p>
 <ul>
@@ -298,15 +302,15 @@ which is what we want.</p>
 is necessary because the base is using a simple collision volume.  Open the SM_Base mesh
 and click Show | Simple Collision, this shows that the base is using a collision volume which 
 includes the area where the weight swings:</p>
-<p><img src="/images/chaos_019.png" alt="" /></p>
+<p><img src="/images/chaos_019.png" alt="offset" /></p>
 <p>An alternative to adding the BaseWeightConstraint constraint is to use the complex collision
 volume for the base.  Click Show | Complex Collision to show the more complex and better
 fitting collision volume:</p>
-<p><img src="/images/chaos_020.png" alt="" /></p>
+<p><img src="/images/chaos_020.png" alt="offset" /></p>
 <p>We can use this by changing the Collision Complexity property of the SM_Mesh to &quot;Use Complex Collision as Simple&quot;
 which will make Unreal use the complex collision volume in all cases. </p>
 <p>Now when simulating the weight should pull the arm down like so:</p>
-<p><img src="/images/chaos_018.gif" alt="" /></p>
+<p><img src="/images/chaos_018.gif" alt="offset" /></p>
 <h3 id="adding-the-ramp">Adding the Ramp</h3>
 <p>The ramp is a separate mesh which the projectile slides along when it is launched.  It is added
 by:</p>
@@ -317,7 +321,7 @@ by:</p>
 <li> set its mobility property to &quot;Static&quot;; this will change Collision Presets to BlockAll</li>
 <li> position it like this:</li>
 </ul>
-<p><img src="/images/chaos_021.png" alt="" /></p>
+<p><img src="/images/chaos_021.png" alt="offset" /></p>
 <h3 id="adding-the-projectile">Adding the Projectile</h3>
 <p>The projectile is Sphere component.  In theory it could be a separate actor because there can be many
 projectiles, and when they are thrown the move far away from the trebuchet, but for the purposes of learning chaos physics a component will suffice.</p>
@@ -330,7 +334,7 @@ projectiles, and when they are thrown the move far away from the trebuchet, but 
 <li> set Enable Gravity to checked</li>
 <li> position it on the ramp like this:</li>
 </ul>
-<p><img src="/images/chaos_022.png" alt="" /></p>
+<p><img src="/images/chaos_022.png" alt="offset" /></p>
 <p>When the real trebuchet fires the arm is positioned close to the ground as shown in the 
 top picture, so rotate the arm to a similar position like this:</p>
 <p><img src="/images/chaos_023.png" alt="" /></p>
@@ -346,7 +350,7 @@ top picture, so rotate the arm to a similar position like this:</p>
 </ul>
 <p><img src="/images/chaos_024.png" alt="" /></p>
 <p>Now pressing Play in the editor should result in this motion:</p>
-<p><img src="/images/chaos_025.gif" alt="" /></p>
+<p><img src="/images/chaos_025.gif" alt="offset" /></p>
 <h3 id="releasing-the-projectile">Releasing the Projectile</h3>
 <p>The ball swings in the manner we want, but it remains connected to the arm.  We need to find a way to break
 the constraint connecting the ball to the arm.  There are several ways to do this, we could for example:</p>
@@ -363,15 +367,15 @@ the constraint connecting the ball to the arm.  There are several ways to do thi
 <li> print the angle of the velocity at the end of each vector</li>
 </ul>
 <p>The output looks like this:</p>
-<p><img src="/images/chaos_027.gif" alt="" /></p>
+<p><img src="/images/chaos_027.gif" alt="offset" /></p>
 <p>This is the last frame:</p>
 <p><img src="/images/chaos_028.png" alt="" /></p>
 <p>If we arbitrarily decide to fire when the angle is about 45 degrees, we can calculate the angle of the projectile from the velocity, and break the constraint between the arm and the ball as soon as the angle is &lt;= 45 degrees.</p>
 <p>We update the blueprint by adding a variable to track if the constraint has been broken, 
 and break the constraint the first time the angle is &lt;= 45 degrees:</p>
-<ImageExpando :imagePath="$withBase('/images/chaos_029.png')" imageId="BP2"/>
+<p><img src="/images/chaos_029.png" alt="" /></p>
 <p>And we get this result:</p>
-<p><img src="/images/chaos_030.gif" alt="" /></p>
+<p><img src="/images/chaos_030.gif" alt="offset" /></p>
 <h3 id="references">References</h3>
 <p><a href="https://docs.unrealengine.com/5.0/en-US/add-a-custom-object-type-to-your-project-in-unreal-engine/">Custom Channels - https://docs.unrealengine.com</a></p>
 

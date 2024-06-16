@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Allocating a TArray on the stack | unrealcode.net</title>
 <meta name="description" content="Allocating a TArray on the stack">
 </head>
@@ -79,37 +83,35 @@ Passing Different Array Types
 is destroyed.</li>
 </ul>
 <p>A TArray object can be configured to store its elements on the stack.  The allocation of memory on the stack is many times faster than on the heap.  To make a TArray store its elements on the stack, use a <code>TInlineAllocator</code>. For example we can declare an array of <code>UGameplayEffect</code> pointers  like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">const</span> TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects;
-</pre></div>
+<pre><code class="language-cpp">const TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects;
+</code></pre>
 <p>This example is from function in the Lyra source code:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> UAuraAbilitySystemFunctionLibrary::InitializeDefaultAttributes(
-	<span class="keyword">const</span> UObject* WorldContextObject, 
+<pre><code class="language-cpp">void UAuraAbilitySystemFunctionLibrary::InitializeDefaultAttributes(
+	const UObject* WorldContextObject, 
 	ECharacterClass CharacterClass, 
-	<span class="keyword">float</span> Level, 
+	float Level, 
 	UAbilitySystemComponent* AbilitySystemComponent )
 {
-	<span class="keyword">if</span>( !AbilitySystemComponent ) <span class="keyword">return</span>;
+	if( !AbilitySystemComponent ) return;
 	
-	<span class="keyword">if</span>( <span class="keyword">const</span> AAuraGameModeBase* Base = 
+	if( const AAuraGameModeBase* Base = 
 		Cast&lt;AAuraGameModeBase&gt;( UGameplayStatics::GetGameMode(WorldContextObject) ) )
 	{
 		check(Base-&gt;CharacterClassInfo)
 
-		<span class="keyword">const</span> FCharacterClassDefaultInfo&amp; Info = 
+		const FCharacterClassDefaultInfo&amp; Info = 
 			Base-&gt;CharacterClassInfo-&gt;GetClassDefaultInfo( CharacterClass );
 
-		<span class="keyword">const</span> TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects {
+		const TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects {
 			Info.PrimaryAttributesGameplayEffect,
 			Base-&gt;CharacterClassInfo-&gt;SecondaryAttributesGameplayEffect,
 			Base-&gt;CharacterClassInfo-&gt;VitalAttributesGameplayEffect };
 
-		<span class="keyword">if</span>( <span class="keyword">const</span> AActor* Source = AbilitySystemComponent-&gt;GetAvatarActor() )
+		if( const AActor* Source = AbilitySystemComponent-&gt;GetAvatarActor() )
 		{
-			<span class="keyword">for</span>( <span class="keyword">const</span> TSubclassOf&lt;UGameplayEffect&gt;&amp; Effect : Effects  )
+			for( const TSubclassOf&lt;UGameplayEffect&gt;&amp; Effect : Effects  )
 			{
-				<span class="keyword">if</span>( Effect )
+				if( Effect )
 				{
 					...
 				}
@@ -117,15 +119,15 @@ is destroyed.</li>
 		}
 	}
 }
-</pre></div>
+</code></pre>
 <p>The full array declaration from the above function is:</p>
-<pre><code class="language-ccp">const TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects {
+<pre><code class="language-cpp">const TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects {
 		Info.PrimaryAttributesGameplayEffect,
 		Base-&gt;CharacterClassInfo-&gt;SecondaryAttributesGameplayEffect,
 		Base-&gt;CharacterClassInfo-&gt;VitalAttributesGameplayEffect };
 </code></pre>
 <p> The number passed to the <code>TInlineAllocator</code> type is the initial capacity of the array, that is the number of elements for which memory has been allocated - this is not the number of elements in the array, it's just the number of elements for which space has been allocated.  A declaration like this:</p>
-<pre><code class="language-ccp"> TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects {
+<pre><code class="language-cpp"> TArray&lt; TSubclassOf&lt;UGameplayEffect&gt;, TInlineAllocator&lt;3&gt; &gt; Effects {
 		Info.PrimaryAttributesGameplayEffect,
 		Base-&gt;CharacterClassInfo-&gt;VitalAttributesGameplayEffect };
 </code></pre>
@@ -134,39 +136,36 @@ is destroyed.</li>
 <p>Array elements are not guaranteed to be contiguous but are usually assumed to be so.  Once more elements are added to the array that then initial capacity passed to the <code>TInlineAllocator</code>, the array is reallocated.  This means a new area of heap memory is allocated and all the elements are copied to that area.  This new memory is not on the stack, it is on the heap, and this reallocation incurs the cost of allocation and deallocation we were trying to avoid by using the <code>TInlineAllocator</code>.  So it is important to avoid reallocation by determining the maximum size of the array when it is created and passing this to the <code>TInlineAllocator</code>.</p>
 <h2 id="passing-different-array-types">Passing Different Array Types</h2>
 <p>A function can be declared to take an array parameter like so:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> SumFunc(TArray&lt;<span class="keyword">int</span>&gt; View)
+<pre><code class="language-cpp">void SumFunc(TArray&lt;int&gt; View)
 {
-    UE_LOG(LogTemp, Warning, TEXT(<span class="string">&quot;viewsize %d&quot;</span>), View.Num());
+    UE_LOG(LogTemp, Warning, TEXT(&quot;viewsize %d&quot;), View.Num());
 }
-</pre></div>
+</code></pre>
 <p>This will accept a parameter declared as a <code>TArray&lt;int&gt;</code> but will not accept one declared with a non-default allocator such as <code>TArray&lt; int32, TInlineAllocator&lt;3&gt; &gt;</code>, because this is a different type from a simple TArray.</p>
 <p>To write the function to a TArray which is declared either on the stack or on the heap, rewrite it to take a <code>TArrayView</code> parameter like so:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> SumFunc(TArrayView&lt;<span class="keyword">int</span>&gt; View)
+<pre><code class="language-cpp">void SumFunc(TArrayView&lt;int&gt; View)
 {
-	UE_LOG(LogTemp, Warning, TEXT(<span class="string">&quot;viewsize %d&quot;</span>), View.Num());
+	UE_LOG(LogTemp, Warning, TEXT(&quot;viewsize %d&quot;), View.Num());
 }
-</pre></div>
+</code></pre>
 <p>This function will accept both <code>TArray&lt;int&gt;</code> and <code>TArray&lt; int32, TInlineAllocator&lt;3&gt; &gt;</code> parameters. </p>
 <p>There are a couple of complications:</p>
 <ul>
 <li> the <code>TArrayView</code> cannot be resized.  Individual elements can be changed but elements cannot be added or deleted.</li>
 <li> When passing a <code>TArray&lt; int32, TInlineAllocator&lt;3&gt; &gt;</code> parameter the compiler creates a <code>TArrayView&lt;int&gt;</code> object which wraps the original array.  As the <code>TArrayView&lt;int&gt;</code> is a temporary object passed to the function it cannot be passed by reference, a call to a function declared like this will not compile:</li>
 </ul>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> SumFuncByReference(TArrayView&lt;<span class="keyword">int</span>&gt;&amp; View)
+<pre><code class="language-cpp">void SumFuncByReference(TArrayView&lt;int&gt;&amp; View)
 {
-	UE_LOG(LogTemp, Warning, TEXT(<span class="string">&quot;viewsize %d&quot;</span>), View.Num());
+	UE_LOG(LogTemp, Warning, TEXT(&quot;viewsize %d&quot;), View.Num());
 }
-</pre></div>
+</code></pre>
 <p>This can be remedied by using an rvalue reference like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> SumFuncByRValueReference(TArrayView&lt;<span class="keyword">int</span>&gt;&amp;&amp; View)
+<pre><code class="language-cpp">void SumFuncByRValueReference(TArrayView&lt;int&gt;&amp;&amp; View)
 {
-	UE_LOG(LogTemp, Warning, TEXT(<span class="string">&quot;viewsize %d&quot;</span>), View.Num());
+	UE_LOG(LogTemp, Warning, TEXT(&quot;viewsize %d&quot;), View.Num());
 }
-</pre></div>
+</code></pre>
+
 </div>
 <footer class="no-sidebar">
 <div>

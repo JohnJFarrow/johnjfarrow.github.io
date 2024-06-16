@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Clang has better error messages | unrealcode.net</title>
 <meta name="description" content="Clang has better error messages">
 </head>
@@ -58,20 +62,19 @@ Clang has better error messages
 <p>Comparing the error messages created by Clang and by MSVC.</p>
 <!-- more -->
 <p>Consider this code:</p>
-<div class="cplusplus"><pre>
-#include &lt;memory&gt;
+<pre><code class="language-cpp">#include &lt;memory&gt;
 
-<span class="keyword">struct</span> SPDeleter
+struct SPDeleter
 {
-    <span class="keyword">void</span> <span class="keyword">operator</span>()(<span class="keyword">int</span>) <span class="keyword">const</span> {}
+    void operator()(int) const {}
 };
 
-<span class="keyword">int</span> main()
+int main()
 {
-    <span class="keyword">using</span> T = <span class="keyword">int</span>;
-    std::shared_ptr&lt;T&gt; X( <span class="keyword">new</span> T(), SPDeleter() );
+    using T = int;
+    std::shared_ptr&lt;T&gt; X( new T(), SPDeleter() );
 }
-</pre></div>
+</code></pre>
 <p>The problem here is that that <code>operator()()</code> on the <code>SPDeleter</code> should take an <code>int*</code> not just an <code>int</code>.</p>
 <p>MSVC gives this error message:</p>
 <pre><code>error C2661: 'std::shared_ptr&lt;T&gt;::shared_ptr': no overloaded function takes 2 arguments

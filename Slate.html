@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Using Slate UI Classes from C++ | unrealcode.net</title>
 <meta name="description" content="Using Slate UI Classes from C++">
 </head>
@@ -115,6 +119,11 @@ Callbacks and Events
 </a>
 </li>
 <li class="sidebar-sub-header">
+<a class="sidebar-link" href="#events">
+Events
+</a>
+</li>
+<li class="sidebar-sub-header">
 <a class="sidebar-link" href="#beware-of-logic-errors">
 Beware of Logic Errors
 </a>
@@ -148,8 +157,7 @@ the current settings, as shown here:</p>
 Slate is used by the default code generated when
 creating a new plugin.</p>
 <p>When creating a new plugin the generated code for the main window of the plugin looks like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">class</span> SPresetBrowser : <span class="keyword">public</span> SCompoundWidget
+<pre><code class="language-cpp">class SPresetBrowser : public SCompoundWidget
 {
 	SLATE_BEGIN_ARGS(SPresetBrowser)
 	{
@@ -157,12 +165,12 @@ creating a new plugin.</p>
 
 	SLATE_END_ARGS()
 
-	<span class="keyword">virtual</span> ~SPresetBrowser();
+	virtual ~SPresetBrowser();
 
-	<span class="comment">/** Widget constructor */</span>
-	<span class="keyword">void</span> Construct(<span class="keyword">const</span> FArguments&amp; Args, <span class="keyword">const</span> TArray&lt; TSharedRef&lt;FPreset&gt; &gt;&amp; );
+	/** Widget constructor */
+	void Construct(const FArguments&amp; Args, const TArray&lt; TSharedRef&lt;FPreset&gt; &gt;&amp; );
 };
-</pre></div>
+</code></pre>
 <p>This shows two key features of Slate:</p>
 <ol>
 <li> The use of the SLATE_BEGIN_ARGS/SLATE_END_ARGS macros to declare arguments</li>
@@ -239,19 +247,18 @@ to create its child widgets.</p>
 </ul>
 <h3 id="the-construct-method">The Construct method</h3>
 <p>The SPresetBrowser Construct method looks like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> SPresetBrowser::Construct(<span class="keyword">const</span> FArguments&amp; Args, 
-       <span class="keyword">const</span> TArray&lt; TSharedRef&lt;FPreset&gt; &gt;&amp; InPresets )
+<pre><code class="language-cpp">void SPresetBrowser::Construct(const FArguments&amp; Args, 
+       const TArray&lt; TSharedRef&lt;FPreset&gt; &gt;&amp; InPresets )
 {
 	TSharedRef&lt;SBorder&gt; MainContent = SNew(SBorder)
-		.BorderImage(FAppStyle::Get().GetBrush(<span class="string">&quot;Brushes.Panel&quot;</span>))
+		.BorderImage(FAppStyle::Get().GetBrush(&quot;Brushes.Panel&quot;))
 		.Padding(0.f)
 		[
 			SNew(SVerticalBox)
 			+ SVerticalBox::Slot()
 			.VAlign(VAlign_Top)
 			[
-				SAssignNew(PresetListWidget, SPresetTileList, SharedThis(<span class="keyword">this</span>))
+				SAssignNew(PresetListWidget, SPresetTileList, SharedThis(this))
 			]
 		];
 
@@ -260,7 +267,7 @@ to create its child widgets.</p>
 		MainContent
 	];
 }
-</pre></div>
+</code></pre>
 <p>This shows the basic idea of constructing a UI declaratively using c++.</p>
 <h3 id="the-snew-macro">The SNew macro</h3>
 <p>This creates a widget, as in SNew(SVerticalBox) and makes it available for other calls such as VAlign() as shown above</p>
@@ -286,12 +293,11 @@ to the application.  Making changes to the look of an application is easier beca
 <p>Widgets can be created and stored in variables, or created inline.  The two code samples below do the same thing, the first
 stores the SVerticalBox widget in a variable and then adds it to the child slot, the second creates it in the child
 slot directly:</p>
-<div class="cplusplus"><pre>
-TSharedRef&lt;SBorder&gt; Variable = SNew(SVerticalBox)
+<pre><code class="language-cpp">TSharedRef&lt;SBorder&gt; Variable = SNew(SVerticalBox)
 	+ SVerticalBox::Slot()
 	.VAlign(VAlign_Top)
 	[
-		SAssignNew(PresetListWidget, SPresetTileList, SharedThis(<span class="keyword">this</span>))
+		SAssignNew(PresetListWidget, SPresetTileList, SharedThis(this))
 	]
 ];
 
@@ -299,164 +305,155 @@ ChildSlot
 [
 	Variable 
 ];
-</pre></div><div class="cplusplus"><pre>
-ChildSlot
+</code></pre>
+<pre><code class="language-cpp">ChildSlot
 [
 	SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
 		.VAlign(VAlign_Top)
 		[
-			SAssignNew(PresetListWidget, SPresetTileList, SharedThis(<span class="keyword">this</span>))
+			SAssignNew(PresetListWidget, SPresetTileList, SharedThis(this))
 		]
 	];
 ];
-</pre></div>
+</code></pre>
 <p>Some widgets automatically create child widgets.  The SListView widget is constructed like this:</p>
-<div class="cplusplus"><pre>
-PresetListViewWidget =
+<pre><code class="language-cpp">PresetListViewWidget =
 	SNew(SListView&lt; TSharedRef&lt;FPreset&gt; &gt;)
 	.SelectionMode(ESelectionMode::Single)
 	.ListItemsSource(&amp;PresetListItems)
-	.OnGenerateRow(<span class="keyword">this</span>, &amp;SPresetTileList::PresetListView_OnGenerateRow)
-	.ListViewStyle(FAppStyle::Get(), <span class="string">&quot;SimpleListView&quot;</span>);
-</pre></div>
+	.OnGenerateRow(this, &amp;SPresetTileList::PresetListView_OnGenerateRow)
+	.ListViewStyle(FAppStyle::Get(), &quot;SimpleListView&quot;);
+</code></pre>
 <p>These lines:</p>
-<div class="cplusplus"><pre>
-.ListItemsSource(&amp;PresetListItems)
-.OnGenerateRow(<span class="keyword">this</span>, &amp;SPresetTileList::PresetListView_OnGenerateRow)
-</pre></div>
+<pre><code class="language-cpp">.ListItemsSource(&amp;PresetListItems)
+.OnGenerateRow(this, &amp;SPresetTileList::PresetListView_OnGenerateRow)
+</code></pre>
 <p>pass the SListView a list of FPreset objects, and tell it to call PresetListView_OnGenerateRow() once for every row.
 The PresetListView_OnGenerateRow() method creates and returns the widget(s) which represent one row:</p>
-<div class="cplusplus"><pre>
-TSharedRef&lt;ITableRow&gt; SPresetTileList::PresetListView_OnGenerateRow(
+<pre><code class="language-cpp">TSharedRef&lt;ITableRow&gt; SPresetTileList::PresetListView_OnGenerateRow(
 	TSharedRef&lt;FPreset&gt; Item, 
-	<span class="keyword">const</span> TSharedRef&lt;STableViewBase&gt;&amp; OwnerTable)
+	const TSharedRef&lt;STableViewBase&gt;&amp; OwnerTable)
 {
-	<span class="keyword">return</span>
+	return
 		SNew(STableRow&lt; TSharedRef&lt;FPreset&gt; &gt;, OwnerTable)
 		[
-			SNew(SPresetTile, SharedThis(<span class="keyword">this</span>), Item)
+			SNew(SPresetTile, SharedThis(this), Item)
 		];
 }
-</pre></div><h2 id="buttons">Buttons</h2>
+</code></pre>
+<h2 id="buttons">Buttons</h2>
 <p>Buttons are implemented using the SButton class and styled using the SButtonStyle class.  This code
 shows creation of a button widget:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">const</span> FText ApplyButtonLabel = LOCTEXT(<span class="string">&quot;WindowWidgetText&quot;</span>, <span class="string">&quot;Apply&quot;</span>);
+<pre><code class="language-cpp">const FText ApplyButtonLabel = LOCTEXT(&quot;WindowWidgetText&quot;, &quot;Apply&quot;);
 
 SNew(SButton)
-.ButtonStyle( FEditorPresetsPluginStyle::Get(), <span class="string">&quot;PresetTile.ApplyButtonStyle&quot;</span> )
+.ButtonStyle( FEditorPresetsPluginStyle::Get(), &quot;PresetTile.ApplyButtonStyle&quot; )
 .HAlign(HAlign_Center)
 .VAlign(VAlign_Center)
-.IsEnabled_Lambda([<span class="keyword">this</span>]() -&gt; <span class="keyword">bool</span>
+.IsEnabled_Lambda([this]() -&gt; bool
 {
-	<span class="keyword">return</span> PresetSetting-&gt;EditorValueIsDifferent() || PresetSetting-&gt;bRevertable;
+	return PresetSetting-&gt;EditorValueIsDifferent() || PresetSetting-&gt;bRevertable;
 })
 .ContentPadding(FMargin(4.0f, 4.0f))
-.OnClicked_Raw(<span class="keyword">this</span>, &amp;SPropertySettingTile::OnApplyButtonClicked)
+.OnClicked_Raw(this, &amp;SPropertySettingTile::OnApplyButtonClicked)
 [
 	SAssignNew(ApplyRevertButtonLabel,STextBlock)
 	.Text(ApplyButtonLabel)
 	.Margin(2.0f)
 ]
-</pre></div>
+</code></pre>
 <p>This illustrates a number of interesting points:</p>
 <h3 id="buttons-are-containers">Buttons are Containers</h3>
 <p>The SButton object draws a rectangle on the screen.  Any text on the button comes from
 child widgets of the button.  This part of the above code shows the creation of
 a text block which contains the text which appears on the button:</p>
-<div class="cplusplus"><pre>
-[
+<pre><code class="language-cpp">[
 	SAssignNew(ApplyRevertButtonLabel,STextBlock)
 	.Text(ApplyButtonLabel)
 	.Margin(2.0f)
 ]
-</pre></div><h3 id="button-styles">Button Styles</h3>
+</code></pre>
+<h3 id="button-styles">Button Styles</h3>
 <p>The style used here is created with the code below when the plugin is initialized.  This code sets the 
 color to be used by the button when the button is in various states such as Normal, Hovered Over, and Disabled.
 The style is added to the StyleInstance object along with other styles and can be retrieved using the 
 &quot;PresetTile.ApplyButtonStyle&quot; key.</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> FEditorPresetsPluginStyle::Initialize()
+<pre><code class="language-cpp">void FEditorPresetsPluginStyle::Initialize()
 {
 	FColor ButtonColor = FColor::Green;
-	FButtonStyle ApplyButtonStyle = FAppStyle::Get().GetWidgetStyle&lt; FButtonStyle &gt;(<span class="string">&quot;SimpleButton&quot;</span>);
+	FButtonStyle ApplyButtonStyle = FAppStyle::Get().GetWidgetStyle&lt; FButtonStyle &gt;(&quot;SimpleButton&quot;);
 	ApplyButtonStyle.SetNormal(FSlateColorBrush(ButtonColor));
 	ApplyButtonStyle.SetHovered(FSlateColorBrush(ButtonColor));
 	ApplyButtonStyle.SetDisabled(FSlateColorBrush(FSlateColor::UseSubduedForeground()));
 	ApplyButtonStyle.SetNormalForeground(FStyleColors::Black);
 	ApplyButtonStyle.SetHoveredForeground(FStyleColors::Black);
-	StyleInstance-&gt;Set(<span class="string">&quot;PresetTile.ApplyButtonStyle&quot;</span>, ApplyButtonStyle);
+	StyleInstance-&gt;Set(&quot;PresetTile.ApplyButtonStyle&quot;, ApplyButtonStyle);
 }
-</pre></div>
+</code></pre>
 <p>To use the style specify the static StyleInstance object for the plugin and key &quot;PresetTile.ApplyButtonStyle&quot; like so:</p>
-<div class="cplusplus"><pre>
-SNew(SButton)
-.ButtonStyle( FEditorPresetsPluginStyle::Get(), <span class="string">&quot;PresetTile.ApplyButtonStyle&quot;</span> )
-</pre></div><h3 id="callbacks-and-events">Callbacks and Events</h3>
+<pre><code class="language-cpp">SNew(SButton)
+.ButtonStyle( FEditorPresetsPluginStyle::Get(), &quot;PresetTile.ApplyButtonStyle&quot; )
+</code></pre>
+<h3 id="callbacks-and-events">Callbacks and Events</h3>
 <p>The lines</p>
-<div class="cplusplus"><pre>
-SNew(SButton)
-.IsEnabled(<span class="keyword">true</span>)
-</pre></div>
-<p>shows the simplest way of specifying a parameter to the IsEnabled method.  Other ways exist such as:</p>
-<pre><code class="language-IsEnabled(this,">make a shared pointer to the object.  It will fail if that object is still being constructed because shared_from_this() cannot be called
-on a partially constructed object.  This method does have the advantage that it uses a shared pointer to keep the referenced object alive.
-
-```IsEnabled_Raw(this, &amp;FMedia::IsAutoDetectEnabled)``` Takes a pointer to an object and method to be called on that object.  This version takes a raw pointer and will not call shared_from_this() 
-so can be called when the object has not finished construction.
-
-```IsEnabled_Lambda``` Takes a lambda returning a bool, for example:
-```cpp
-SNew(SButton)
+<pre><code class="language-cpp">SNew(SButton)
+.IsEnabled(true)
+</code></pre>
+<p>show the simplest way of specifying a parameter to the IsEnabled method.  Other ways exist such as:</p>
+<ul>
+<li> using <code>IsEnabled(this, &amp;FMedia::IsAutoDetectEnabled)</code> which takes a pointer to an object and a method to be called on that object.  This version calls shared_from_this() on the object parameter to 
+make a shared pointer to the object.  It will fail if that object is still being constructed because shared_from_this() cannot be called
+on a partially constructed object.  This method does have the advantage that it uses a shared pointer to keep the referenced object alive.</li>
+<li> using <code>IsEnabled_Raw(this, &amp;FMedia::IsAutoDetectEnabled)</code> which takes a pointer to an object and method to be called on that object.  This version takes a raw pointer and will not call shared_from_this() 
+so can be called when the object has not finished construction.</li>
+<li> usin <code>IsEnabled_Lambda</code> which takes a lambda returning a bool, for example:</li>
+</ul>
+<pre><code class="language-cpp">SNew(SButton)
 .IsEnabled_Lambda([this]() -&gt; bool
 {
 	return PresetSetting-&gt;EditorValueIsDifferent();
 })
 </code></pre>
 <p>This means the enabled state of the button can change when the data changes.</p>
-<pre><code class="language-IsEnabled_Static(&amp;FMedia::IsNotCustomEventOverride,">
-```IsEnabled_UObject(Item, &amp;FMedia::GetOwnerIsEnabled)``` Takes a pointer to a UObject and a member method
-
-```IsEnabled_UObject(this, &amp;FMedia::IsImportEnabled, ContextObject)``` Takes a reference to a method and an additional UObject parameter|
-
-### Events
-
-This code shows a callback when a button is clicked:
-```cpp
-SNew(SButton)
+<ul>
+<li> using <code>IsEnabled_Static(&amp;FMedia::IsNotCustomEventOverride, FunctionEntryNodePtr)</code> which takes a static function and a parameter</li>
+<li> using <code>IsEnabled_UObject(Item, &amp;FMedia::GetOwnerIsEnabled)</code> which takes a pointer to a UObject and a member method</li>
+<li> using <code>IsEnabled_UObject(this, &amp;FMedia::IsImportEnabled, ContextObject)</code> which  takes a reference to a method and an additional UObject parameter|</li>
+</ul>
+<h3 id="events">Events</h3>
+<p>This code shows a callback when a button is clicked:</p>
+<pre><code class="language-cpp">SNew(SButton)
 .OnClicked_Raw(this, &amp;SPropertySettingTile::OnApplyButtonClicked )
 </code></pre>
 <p>Like the Callbacks section above, there are many variations of the OnClicked() method taking different parameters.</p>
 <p>The implementation of the OnApplyButtonClicked method looks like this:</p>
-<div class="cplusplus"><pre>
-FReply SPropertySettingTile::OnApplyButtonClicked()
+<pre><code class="language-cpp">FReply SPropertySettingTile::OnApplyButtonClicked()
 {
-	<span class="keyword">if</span> (EditorValueWidget.IsValid())
+	if (EditorValueWidget.IsValid())
 	{
 		EditorValueWidget-&gt;SetText(FText::FromString(PresetSetting-&gt;EditorValue));
 	}
-	<span class="keyword">return</span> FReply::Handled();
+	return FReply::Handled();
 }
-</pre></div>
+</code></pre>
 <p>The only special detail to note is that it returns an FReply object telling the editor whether the 
 click was handled or not.</p>
 <h3 id="beware-of-logic-errors">Beware of Logic Errors</h3>
 <p>The behaviour of a specific widget sometimes depends on the widget it is contained in.
 For example this code creates an SListView widget which creates one row for each 
 of the ten entries in the <code>Data</code> collection:</p>
-<div class="cplusplus"><pre>
-SNew(SVerticalBox)
+<pre><code class="language-cpp">SNew(SVerticalBox)
 + SVerticalBox::Slot()
 .AutoHeight() 
 [
 	SNew(SListView&lt; TSharedRef&lt; DataClass &gt; &gt;)
 	.ListItemsSource(&amp;Data)
 	.SelectionMode(ESelectionMode::None)
-	.OnGenerateRow(<span class="keyword">this</span>, &amp;SPresetBrowser::OnGenerateRow)
-	.ListViewStyle(FAppStyle::Get(), <span class="string">&quot;SimpleListView&quot;</span>)
+	.OnGenerateRow(this, &amp;SPresetBrowser::OnGenerateRow)
+	.ListViewStyle(FAppStyle::Get(), &quot;SimpleListView&quot;)
 ]
-</pre></div>
+</code></pre>
 <p>but the list view will display without a scrollbar. This is because there is a conflict between the way the height of the SListView is calculated
 and the way the height of the containing SVerticalBox is calculated.  The SListView needs to know the height of its container so it can calculate
 its own height and hence the position of the scrollbar, but because <code>.AutoHeight()</code> is specified on the SVerticalBox the

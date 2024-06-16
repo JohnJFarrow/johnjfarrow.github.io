@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Understanding the Game Features Subsystem | unrealcode.net</title>
 <meta name="description" content="Understanding the Game Features Subsystem">
 </head>
@@ -306,61 +310,57 @@ from whatever it is to &quot;Active&quot;.  This will load the plugin and activa
 </ol>
 <p>The UGameFeaturesSubsystem in the engine knows about our UGameFeatureAction_AddInputContextMapping because it 
 maintains a list of plugins:</p>
-<div class="cplusplus"><pre>
-TMap&lt;FGameFeaturePluginIdentifier, TObjectPtr&lt;UGameFeaturePluginStateMachine&gt;&gt; GameFeaturePluginStateMachines;
-</pre></div>
+<pre><code class="language-cpp">TMap&lt;FGameFeaturePluginIdentifier, TObjectPtr&lt;UGameFeaturePluginStateMachine&gt;&gt; GameFeaturePluginStateMachines;
+</code></pre>
 <p>from which it can retrieve the actions:</p>
-<div class="cplusplus"><pre>
-UGameFeaturePluginStateMachine* UGameFeaturesSubsystem::FindOrCreateGameFeaturePluginStateMachine(<span class="keyword">const</span> FString&amp; PluginURL)
+<pre><code class="language-cpp">UGameFeaturePluginStateMachine* UGameFeaturesSubsystem::FindOrCreateGameFeaturePluginStateMachine(const FString&amp; PluginURL)
 {
-	<span class="keyword">if</span> (UGameFeaturePluginStateMachine* ExistingStateMachine = FindGameFeaturePluginStateMachine(PluginURL))
+	if (UGameFeaturePluginStateMachine* ExistingStateMachine = FindGameFeaturePluginStateMachine(PluginURL))
 	{
-		<span class="keyword">return</span> ExistingStateMachine;
+		return ExistingStateMachine;
 	}
 
-	UGameFeaturePluginStateMachine* NewStateMachine = NewObject&lt;UGameFeaturePluginStateMachine&gt;(<span class="keyword">this</span>);
+	UGameFeaturePluginStateMachine* NewStateMachine = NewObject&lt;UGameFeaturePluginStateMachine&gt;(this);
 	GameFeaturePluginStateMachines.Add(PluginURL, NewStateMachine);
 	NewStateMachine-&gt;InitStateMachine(PluginURL);
 
-	<span class="keyword">return</span> NewStateMachine;
+	return NewStateMachine;
 }
-</pre></div>
+</code></pre>
 <ul>
 <li> <code>UGameFeatureAction_AddInputContextMapping::OnGameFeatureActivating()</code> calls it's base class to
 loop through all world contexts and call <code>AddToWorld()</code> on each of them:</li>
 </ul>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> UGameFeatureAction_WorldActionBase::OnGameFeatureActivating()
+<pre><code class="language-cpp">void UGameFeatureAction_WorldActionBase::OnGameFeatureActivating()
 {
-	GameInstanceStartHandle = FWorldDelegates::OnStartGameInstance.AddUObject(<span class="keyword">this</span>, 
+	GameInstanceStartHandle = FWorldDelegates::OnStartGameInstance.AddUObject(this, 
 				&amp;UGameFeatureAction_WorldActionBase::HandleGameInstanceStart);
 
-	<span class="comment">// Add to any worlds with associated game instances that have already been initialized</span>
-	<span class="keyword">for</span> (<span class="keyword">const</span> FWorldContext&amp; WorldContext : GEngine-&gt;GetWorldContexts())
+	// Add to any worlds with associated game instances that have already been initialized
+	for (const FWorldContext&amp; WorldContext : GEngine-&gt;GetWorldContexts())
 	{
 		AddToWorld(WorldContext);
 	}
 }
-</pre></div>
+</code></pre>
 <ul>
 <li> <code>AddToWorld()</code> does this:</li>
 </ul>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> UGameFeatureAction_AddInputContextMapping::AddToWorld(<span class="keyword">const</span> FWorldContext&amp; WorldContext)
+<pre><code class="language-cpp">void UGameFeatureAction_AddInputContextMapping::AddToWorld(const FWorldContext&amp; WorldContext)
 {
 	UWorld* World = WorldContext.World();
 	UGameInstance* GameInstance = WorldContext.OwningGameInstance;
 
-	<span class="keyword">if</span> ((GameInstance != <span class="keyword">nullptr</span>) &amp;&amp; (World != <span class="keyword">nullptr</span>) &amp;&amp; World-&gt;IsGameWorld())
+	if ((GameInstance != nullptr) &amp;&amp; (World != nullptr) &amp;&amp; World-&gt;IsGameWorld())
 	{
-		<span class="keyword">if</span> (UGameFrameworkComponentManager* ComponentMan = 
+		if (UGameFrameworkComponentManager* ComponentMan = 
 		      UGameInstance::GetSubsystem&lt;UGameFrameworkComponentManager&gt;(GameInstance))
 		{
-			<span class="keyword">if</span> (!InputMapping.IsNull())
+			if (!InputMapping.IsNull())
 			{
 				UGameFrameworkComponentManager::FExtensionHandlerDelegate AddAbilitiesDelegate = 
 					UGameFrameworkComponentManager::FExtensionHandlerDelegate::CreateUObject(
-						<span class="keyword">this</span>, &amp;UGameFeatureAction_AddInputContextMapping::HandleControllerExtension);
+						this, &amp;UGameFeatureAction_AddInputContextMapping::HandleControllerExtension);
 
 				TSharedPtr&lt;FComponentRequestHandle&gt; ExtensionRequestHandle = 
 					ComponentMan-&gt;AddExtensionHandler(APlayerController::StaticClass(), AddAbilitiesDelegate);
@@ -370,37 +370,35 @@ loop through all world contexts and call <code>AddToWorld()</code> on each of th
 		}
 	}
 }
-</pre></div>
+</code></pre>
 <p>The key line is:</p>
-<div class="cplusplus"><pre>
-	TSharedPtr&lt;FComponentRequestHandle&gt; ExtensionRequestHandle = 
+<pre><code class="language-cpp">	TSharedPtr&lt;FComponentRequestHandle&gt; ExtensionRequestHandle = 
 		ComponentMan-&gt;AddExtensionHandler(APlayerController::StaticClass(), AddAbilitiesDelegate);
-</pre></div>
+</code></pre>
 <ul>
 <li> <code>AddExtensionHandler()</code> does this:</li>
 </ul>
-<div class="cplusplus"><pre>
-TSharedPtr&lt;FComponentRequestHandle&gt; UGameFrameworkComponentManager::AddExtensionHandler(
-			<span class="keyword">const</span> TSoftClassPtr&lt;AActor&gt;&amp; ReceiverClass, FExtensionHandlerDelegate ExtensionHandler)
+<pre><code class="language-cpp">TSharedPtr&lt;FComponentRequestHandle&gt; UGameFrameworkComponentManager::AddExtensionHandler(
+			const TSoftClassPtr&lt;AActor&gt;&amp; ReceiverClass, FExtensionHandlerDelegate ExtensionHandler)
 {
 	FComponentRequestReceiverClassPath ReceiverClassPath(ReceiverClass);
 	FExtensionHandlerEvent&amp; HandlerEvent = ReceiverClassToEventMap.FindOrAdd(ReceiverClassPath);
 
-	<span class="comment">// This is a fake multicast delegate using a map</span>
+	// This is a fake multicast delegate using a map
 	FDelegateHandle DelegateHandle(FDelegateHandle::EGenerateNewHandleType::GenerateNewHandle);
 	HandlerEvent.Add(DelegateHandle, ExtensionHandler);
 
-	<span class="keyword">if</span> (UClass* ReceiverClassPtr = ReceiverClass.Get())
+	if (UClass* ReceiverClassPtr = ReceiverClass.Get())
 	{
 		UGameInstance* LocalGameInstance = GetGameInstance();
-		<span class="keyword">if</span> (ensure(LocalGameInstance))
+		if (ensure(LocalGameInstance))
 		{
 			UWorld* LocalWorld = LocalGameInstance-&gt;GetWorld();
-			<span class="keyword">if</span> (ensure(LocalWorld))
+			if (ensure(LocalWorld))
 			{
-				<span class="keyword">for</span> (TActorIterator&lt;AActor&gt; ActorIt(LocalWorld, ReceiverClassPtr); ActorIt; ++ActorIt)
+				for (TActorIterator&lt;AActor&gt; ActorIt(LocalWorld, ReceiverClassPtr); ActorIt; ++ActorIt)
 				{
-					<span class="keyword">if</span> (ActorIt-&gt;IsActorInitialized())
+					if (ActorIt-&gt;IsActorInitialized())
 					{
 						ExtensionHandler.Execute(*ActorIt, NAME_ExtensionAdded);
 					}
@@ -409,18 +407,16 @@ TSharedPtr&lt;FComponentRequestHandle&gt; UGameFrameworkComponentManager::AddExt
 		}
 	}
 
-	<span class="keyword">return</span> MakeShared&lt;FComponentRequestHandle&gt;(<span class="keyword">this</span>, ReceiverClass, DelegateHandle);
+	return MakeShared&lt;FComponentRequestHandle&gt;(this, ReceiverClass, DelegateHandle);
 }
-</pre></div>
+</code></pre>
 <p>The key line is:</p>
-<div class="cplusplus"><pre>
-TActorIterator&lt;AActor&gt; ActorIt(LocalWorld, ReceiverClassPtr); ActorIt; ++ActorIt)
-</pre></div>
+<pre><code class="language-cpp">TActorIterator&lt;AActor&gt; ActorIt(LocalWorld, ReceiverClassPtr); ActorIt; ++ActorIt)
+</code></pre>
 <p>which finds all the actors in the world of the required class.  In the case of adding an Input Mapping Context
 it finds all the actors of the <code>PlayerController</code> class and invokes the ExtensionHandler on each actor:</p>
-<div class="cplusplus"><pre>
-ExtensionHandler.Execute(*ActorIt, NAME_ExtensionAdded);
-</pre></div>
+<pre><code class="language-cpp">ExtensionHandler.Execute(*ActorIt, NAME_ExtensionAdded);
+</code></pre>
 <p>The invocation of the extension handler calls <code>UGameFeatureAction_AddInputContextMapping::HandleControllerExtension()</code>
 which calls <code>InputSystem-&gt;AddMappingContext()</code> to add the Input Mapping Context</p>
 <h2 id="reference">Reference</h2>

@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Installing and Configuring Visual Studio 2022 for Unreal Engine | unrealcode.net</title>
 <meta name="description" content="Installing and Configuring Visual Studio 2022 for Unreal Engine">
 </head>
@@ -114,13 +118,13 @@ References
 <h2 id="installing-visual-studio-2022">Installing Visual Studio 2022</h2>
 <p>If you do not already have Visual Studio 2022 installed, install it from <a href="https://visualstudio.microsoft.com/vs/">visualstudio.microsoft.com</a>.</p>
 <p>Install at least these options:</p>
-<p><img src="/images/vsinstall_1.png" alt="" /></p>
+<p><img src="/images/vsinstall_1.png" alt="offset" /></p>
 <p>and</p>
-<p><img src="/images/vsinstall_010.png" alt="" /></p>
+<p><img src="/images/vsinstall_010.png" alt="offset" /></p>
 <p>and</p>
-<p><img src="/images/vsinstall_2.png" alt="" /></p>
+<p><img src="/images/vsinstall_2.png" alt="offset" /></p>
 <p>For the &quot;Game Development with C++&quot; workload, these are the options I use:</p>
-<p><img src="/images/vsinstall_011.png" alt="" /></p>
+<p><img src="/images/vsinstall_011.png" alt="offset" /></p>
 <h2 id="configuring-visual-studio-2022">Configuring Visual Studio 2022</h2>
 <p>Some useful options you might like to set are:</p>
 <h3 id="disabling-the-error-list">Disabling the Error List</h3>
@@ -176,21 +180,20 @@ a plugin to be part of either your engine installation or your project.</p>
 <li> edit the .uproject file and add the &quot;VisualStudioTools&quot; plugin to the
 list of enabled plugins, so it looks similar to this:</li>
 </ul>
-<div class="csharp"><pre>
-	<span class="string">&quot;Plugins&quot;</span>: [
+<pre><code class="language-cs">	&quot;Plugins&quot;: [
 		{
-			<span class="string">&quot;Name&quot;</span>: <span class="string">&quot;ModelingToolsEditorMode&quot;</span>,
-			<span class="string">&quot;Enabled&quot;</span>: <span class="keyword">true</span>,
-			<span class="string">&quot;TargetAllowList&quot;</span>: [
-				<span class="string">&quot;Editor&quot;</span>
+			&quot;Name&quot;: &quot;ModelingToolsEditorMode&quot;,
+			&quot;Enabled&quot;: true,
+			&quot;TargetAllowList&quot;: [
+				&quot;Editor&quot;
 			]
 		},
 		{
-			<span class="string">&quot;Name&quot;</span>: <span class="string">&quot;VisualStudioTools&quot;</span>,
-			<span class="string">&quot;Enabled&quot;</span>: <span class="keyword">true</span>
+			&quot;Name&quot;: &quot;VisualStudioTools&quot;,
+			&quot;Enabled&quot;: true
 		}
 	]
-</pre></div>
+</code></pre>
 <ul>
 <li> run Explorer, right click on the .uproject files and &quot;Generate Visual Studio project files&quot;</li>
 <li> if Visual Studio is running it should detect the project files have been changed,
@@ -212,13 +215,12 @@ in the directory tree, so it needs to be in the Source directory.</p>
 <p>This will make the compilation process emit an error or warning
 if it finds a class name which does not conform to Unreal standards. For example
 this code:</p>
-<div class="cplusplus"><pre>
-UCLASS()
-<span class="keyword">class</span> MYPROJECT23_API Derived : <span class="keyword">public</span> UObject
+<pre><code class="language-cpp">UCLASS()
+class MYPROJECT23_API Derived : public UObject
 {
 	GENERATED_BODY()
 };
-</pre></div>
+</code></pre>
 <p>will cause this message:</p>
 <pre><code>Warning	lnt-naming-convention	Identifier does not follow the naming convention.
 </code></pre>

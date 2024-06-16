@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Using C++20 with Unreal | unrealcode.net</title>
 <meta name="description" content="Using C++20 with Unreal">
 </head>
@@ -99,13 +103,13 @@ References
 <h1>Using C++20 with Unreal</h1>
 <p>Updated for Unreal Engine 5.1.1</p>
 <h2 id="using-c20">Using C++20 </h2>
-<p>These code here is developed and tested using Visual Studio 2022 setup as described <a href="BuildFromSource.html">here</a></p>
+<p>The code here is developed and tested using Visual Studio 2022 setup as described <a href="VisualStudio2022.html">here</a></p>
 <h2 id="project-configuration"> Project Configuration</h2>
 <p>As at April 2023 Unreal Engine is configured to use c++17 by default.</p>
 <p>To configure a project to use c++20 add this line to the Project.build.cs</p>
-<div class="csharp"><pre>
-CppStandard = CppStandardVersion.Cpp20;
-</pre></div><h2 id="subobjects">Subobjects</h2>
+<pre><code class="language-cs">CppStandard = CppStandardVersion.Cpp20;
+</code></pre>
+<h2 id="subobjects">Subobjects</h2>
 <p>The USubobjectDataSubsystem class has methods for finding the 
 components which make up a blueprint. We will use this as a example.  The stages of getting from a blueprint
 to a specific component (whether by type or name) are:</p>
@@ -117,74 +121,72 @@ to a specific component (whether by type or name) are:</p>
 </ul>
 <p>The process of getting from the list of FSubobjectDataHandle data handles to
 a smaller list of components looks like this in python, using nested list comprehensions:</p>
-<div class="python"><pre>
-components = 
-    [ comp <span class="keyword">for</span> comp <span class="keyword">in</span> 
-		[ library<span class="number">.</span>get_object(subobject) <span class="keyword">for</span> subobject <span class="keyword">in</span> 
-			[ subsystem<span class="number">.</span>k2_find_subobject_data_from_handle(handle) <span class="keyword">for</span> handle <span class="keyword">in</span> 
-					subsystem<span class="number">.</span>k2_gather_subobject_data_for_blueprint(context=blueprint) ] 
+<pre><code class="language-py">components = 
+    [ comp for comp in 
+		[ library.get_object(subobject) for subobject in 
+			[ subsystem.k2_find_subobject_data_from_handle(handle) for handle in 
+					subsystem.k2_gather_subobject_data_for_blueprint(context=blueprint) ] 
 			]
-		<span class="keyword">if</span> comp<span class="number">.</span>get_class().get_name() == <span class="string">&quot;MyActorComponent&quot;</span>
+		if comp.get_class().get_name() == &quot;MyActorComponent&quot;
 	]
-</pre></div><h2 id="ranges">Ranges</h2>
+</code></pre>
+<h2 id="ranges">Ranges</h2>
 <p>To do the same thing in c++ as the python code above does we will use the
 std::ranges classes, new in c++20.</p>
 <p>Having included the <code>&lt;ranges&gt;</code> header file we can write this like so:</p>
-<div class="cplusplus"><pre>
-UBlueprint* CarBlueprint = Cast&lt;UBlueprint&gt;( UEditorAssetLibrary::LoadAsset
-            (<span class="string">&quot;/Game/VehicleTemplate/Blueprints/SportsCar/SportsCar_Pawn&quot;</span>));
+<pre><code class="language-cpp">UBlueprint* CarBlueprint = Cast&lt;UBlueprint&gt;( UEditorAssetLibrary::LoadAsset
+            (&quot;/Game/VehicleTemplate/Blueprints/SportsCar/SportsCar_Pawn&quot;));
 
 TArray&lt; FSubobjectDataHandle &gt; SubobjectDataHandles;
 
-<span class="comment">// get the subobject data handles into an unreal TArray</span>
+// get the subobject data handles into an unreal TArray
 SubobjectDataSubsystem-&gt;K2_GatherSubobjectDataForBlueprint(CarBlueprint, SubobjectDataHandles);
 
-<span class="comment">// copy from the TArray to a std::vector</span>
+// copy from the TArray to a std::vector
 std::vector&lt; FSubobjectDataHandle &gt; Handles(SubobjectDataHandles.Num());
-<span class="keyword">for</span> (<span class="keyword">int</span> j = 0; j &lt; SubobjectDataHandles.Num(); ++j)
+for (int j = 0; j &lt; SubobjectDataHandles.Num(); ++j)
 {
     Handles[j] = SubobjectDataHandles[j];
 }
 
-<span class="comment">// create a range of USkeletalMeshComponent* from the vector of handles</span>
+// create a range of USkeletalMeshComponent* from the vector of handles
 
-<span class="keyword">auto</span> range = Handles
-    | std::views::transform([&amp;SubobjectDataSubsystem](<span class="keyword">const</span> FSubobjectDataHandle&amp; Handle) {
-        <span class="comment">// handles to FSubobjectData</span>
+auto range = Handles
+    | std::views::transform([&amp;SubobjectDataSubsystem](const FSubobjectDataHandle&amp; Handle) {
+        // handles to FSubobjectData
         FSubobjectData Data;
         SubobjectDataSubsystem-&gt;K2_FindSubobjectDataFromHandle(Handle, Data);
-        <span class="keyword">return</span> Data;
+        return Data;
     })
-    | std::views::transform([](<span class="keyword">const</span> FSubobjectData&amp; Data) {
-        <span class="comment">// FSubobjectData to UObject*</span>
-        <span class="keyword">return</span> USubobjectDataBlueprintFunctionLibrary::GetObject(Data);
+    | std::views::transform([](const FSubobjectData&amp; Data) {
+        // FSubobjectData to UObject*
+        return USubobjectDataBlueprintFunctionLibrary::GetObject(Data);
     })
-    | std::views::filter([](<span class="keyword">const</span> UObject* Object) {
-        <span class="comment">// just return the skeletal mesh components</span>
-        <span class="keyword">return</span> ( Cast&lt; <span class="keyword">const</span> USkeletalMeshComponent &gt;(Object) != <span class="keyword">nullptr</span> );
+    | std::views::filter([](const UObject* Object) {
+        // just return the skeletal mesh components
+        return ( Cast&lt; const USkeletalMeshComponent &gt;(Object) != nullptr );
     })
-    | std::views::transform([](<span class="keyword">const</span> UObject* Object) {
-        <span class="comment">// UObject* to USkeletalMeshComponent*&amp;</span>
-        <span class="keyword">return</span> Cast&lt; <span class="keyword">const</span> USkeletalMeshComponent &gt;(Object);
+    | std::views::transform([](const UObject* Object) {
+        // UObject* to USkeletalMeshComponent*&amp;
+        return Cast&lt; const USkeletalMeshComponent &gt;(Object);
     });
-</pre></div>
+</code></pre>
 <p>Each stage of the process is either a call to <code>std::views::transform</code> which transforms an item
 in the list from one type to another, or a call to <code>std::views::filter</code> which removes
 items from the list if they do not match the selection criteria.</p>
 <p>The result of the code above is  the objects <code>range</code> on which we can 
 use in a loop to iterate over all the USkeletalMeshComponent like so:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">for</span> (<span class="keyword">const</span> USkeletalMeshComponent* SkelMesh : range)
+<pre><code class="language-cpp">for (const USkeletalMeshComponent* SkelMesh : range)
 {
     CompareSkeletalMeshComponents( SkelMesh, OtherSkelMesh );
 }
-</pre></div><h2 id="structured-bindings">Structured Bindings</h2>
+</code></pre>
+<h2 id="structured-bindings">Structured Bindings</h2>
 <p>Given a C++ type such as FVector which has members X, Y, Z, structured bindings allows us to 
 deconstruct an FVector variable into three separate values like this:</p>
-<div class="cplusplus"><pre>
-FVector Vector(1.0f,2.0f,3.0f);
-<span class="keyword">auto</span> [x, v, z] = Vector;
-</pre></div>
+<pre><code class="language-cpp">FVector Vector(1.0f,2.0f,3.0f);
+auto [x, v, z] = Vector;
+</code></pre>
 <p>We need to write come code to make the structured binding work.  Looking at <a href="https://en.cppreference.com/w/cpp/language/structured_binding">https://en.cppreference.com/w/cpp/language/structured_binding</a> we are using &quot;Case 2: binding a tuple-like type&quot;, so 
 we need to:</p>
 <ul>
@@ -193,73 +195,68 @@ we need to:</p>
 <li> implement <code>get&lt;&gt;()</code> to tell the compiler how to get each element from the FVector</li>
 </ul>
 <p>The FVector will be deconstructed into 3 separate varibales, so we implement <code>std::tuple_size&lt;&gt;</code> to tell the compiler how many variables a FVector will be deconstructed to like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">namespace</span> std
+<pre><code class="language-cpp">namespace std
 {
-	<span class="keyword">template</span>&lt;&gt;
-	<span class="keyword">struct</span> tuple_size&lt;FVector&gt; 
+	template&lt;&gt;
+	struct tuple_size&lt;FVector&gt; 
 	{
-		<span class="keyword">static</span> constexpr <span class="keyword">int</span> <span class="keyword">value</span> = 3;
+		static constexpr int value = 3;
 	};
 }
-</pre></div>
+</code></pre>
 <p>We  implement <code>std::tuple_element&lt;&gt;</code> to tell the compiler the type of element
 of the FVector like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">namespace</span> std 
+<pre><code class="language-cpp">namespace std 
 {
-	<span class="keyword">template</span>&lt;size_t Index&gt;
-	<span class="keyword">struct</span> tuple_element&lt;Index, FVector&gt;
+	template&lt;size_t Index&gt;
+	struct tuple_element&lt;Index, FVector&gt;
 	{
-		<span class="keyword">using</span> type = FVector::FReal;
+		using type = FVector::FReal;
 	};
 }
-</pre></div>
+</code></pre>
 <p>We  implement <code>get&lt;&gt;()</code> which is called for index values from 0 to std::tuple_size (i.e. 3). 
 Note that the <code>get&lt;&gt;()</code> function does not need to be in the std namespace.  The compiler using
 argument-dependent lookup; it looks for the <code>get&lt;&gt;()</code> function in the namespace
 which the FVector is in. FVector is declared like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">using</span> FVector = UE::Math::TVector&lt;<span class="keyword">double</span>&gt;;
-</pre></div>
+<pre><code class="language-cpp">using FVector = UE::Math::TVector&lt;double&gt;;
+</code></pre>
 <p>so the compiler looks for the <code>get&lt;&gt;()</code> function in the UE::Math namespace, so we put it there:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">namespace</span> UE::Math
+<pre><code class="language-cpp">namespace UE::Math
 {
-    <span class="keyword">template</span>&lt;size_t Index&gt;
-    constexpr <span class="keyword">auto</span> get(<span class="keyword">const</span> FVector&amp; Vector)
+    template&lt;size_t Index&gt;
+    constexpr auto get(const FVector&amp; Vector)
     {
-    <span class="keyword">if</span> constexpr (Index == 0) <span class="keyword">return</span> Vector.X;
-    <span class="keyword">if</span> constexpr (Index == 1) <span class="keyword">return</span> Vector.Y;
-    <span class="keyword">if</span> constexpr (Index == 2) <span class="keyword">return</span> Vector.Z;
+    if constexpr (Index == 0) return Vector.X;
+    if constexpr (Index == 1) return Vector.Y;
+    if constexpr (Index == 2) return Vector.Z;
     }
 }
-</pre></div>
+</code></pre>
 <p>Once we have the above code we can use structured binding to deconstruct an FVector variable
 like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> Test()
+<pre><code class="language-cpp">void Test()
 {
 	FVector Vector(1.0f, 2.0f, 3.0f);
-	<span class="keyword">auto</span> [x, y, z] = Vector;
+	auto [x, y, z] = Vector;
 }
-</pre></div><h2 id="idioms">Idioms</h2>
+</code></pre>
+<h2 id="idioms">Idioms</h2>
 <p>These are common patterns seen in the Unreal Engine source code, not necessarily
 specific to C++ 20.</p>
 <h3 id="anonymous-enums">Anonymous Enums</h3>
 <p>For example:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">template</span>&lt;&gt;
-<span class="keyword">struct</span> TMassExternalSubsystemTraits&lt;UMassTestGameInstanceSubsystem&gt;
+<pre><code class="language-cpp">template&lt;&gt;
+struct TMassExternalSubsystemTraits&lt;UMassTestGameInstanceSubsystem&gt;
 {
-	<span class="keyword">enum</span>
+	enum
 	{
-		GameThreadOnly = <span class="keyword">false</span>,
-		ThreadSafeRead = <span class="keyword">true</span>,
-		ThreadSafeWrite = <span class="keyword">false</span>,
+		GameThreadOnly = false,
+		ThreadSafeRead = true,
+		ThreadSafeWrite = false,
 	};
 };
-</pre></div>
+</code></pre>
 <p>This declares the three values specified in the enum without allocating any
 variables.  When the compiler sees  the variable 
 <code>TMassExternalSubsystemTraits&lt;UMassTestGameInstanceSubsystem&gt;::GameThreadOnly</code>

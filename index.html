@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>unrealcode.net</title>
 <meta name="description" content="">
 </head>
@@ -51,6 +55,19 @@ Experiments with Unreal Engine
 </header>
 <div class="theme-default-content custom content__default">
 <div>
+<div>
+<h2>
+<a href="SwitchingToSourceEngine.html">
+Changing a Project to use the Engine Source Code
+</a>
+</h2>
+<p>
+Changing a Project to use the Engine Source Code
+</p>
+<a href="SwitchingToSourceEngine.html">
+Read more
+</a>
+</div>
 <div>
 <h2>
 <a href="Optimization_Part1.html">
@@ -196,19 +213,6 @@ Read more
 </div>
 <div>
 <h2>
-<a href="LyraPart2.html">
-Looking into Lyra - GAS 1 Inputs and the Gameplay Ability System
-</a>
-</h2>
-<p>
-Looking at how the Epic Lyra example processes inputs and uses the Gameplay Ability System
-</p>
-<a href="LyraPart2.html">
-Read more
-</a>
-</div>
-<div>
-<h2>
 <a href="LyraPart1.html">
 Looking into Lyra - Experiences
 </a>
@@ -249,11 +253,11 @@ Read more
 <div>
 <h2>
 <a href="PythonScripting.html">
-Using Python to Create Unreal Engine Objects
+Experiments With Chaos Physics - Using Python
 </a>
 </h2>
 <p>
-Creating Blueprints in Python
+Notes on using Chaos Physics and Python in Unreal Engine
 </p>
 <a href="PythonScripting.html">
 Read more

@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Optimization Part 1 - Build Configurations | unrealcode.net</title>
 <meta name="description" content="Optimization Part 1 - Build Configurations">
 </head>
@@ -89,9 +93,13 @@ Reference
 <p>Unreal Engine projects can be built with different configurations which serve different purposes.  The solution configurations available depend on the whether you are building with the Unreal Engine source code.  </p>
 <p>If you create a project by launching Unreal Editor from the Epic Launcher, then you are using the engine compiled by Epic
  and you will see these configuration options in Visual Studio:</p>
-<p><img src="/images/devops_020.png" alt="" /></p>
+<p><img src="/images/devops_020.png" alt="offset" /></p>
 <p>If you are compiling the engine from source code, you will see these  configuration options in Visual Studio:</p>
-<p><img src="/images/devops_021.png" alt="" /></p>
+<p><img src="/images/devops_021.png" alt="offset" /></p>
+<p>In Rider with a non-source build the options are the same:</p>
+<p><img src="/images/devops_025.png" alt="offset" /></p>
+<p>In Rider with an engine source build is it more obvious you are selecting one configuration and one target:</p>
+<p><img src="/images/devops_024.png" alt="offset" /></p>
 <p>These configurations reflect:</p>
 <ul>
 <li> if you are compiling the engine source code or not.  Engine source code builds offer more configurations but take a long time to compile the engine initially</li>
@@ -329,7 +337,7 @@ Reference
 <p>Some configurations (such as &quot;Debug&quot;) run using files which are 
 created by cooking or packaging the project. If you have never cooked or packaged the project you get 
 this error message:</p>
-<p><img src="/images/devops_022.png" alt="" /></p>
+<p><img src="/images/devops_022.png" alt="offset" /></p>
 <p>And in the log you will see  something like this:</p>
 <blockquote>
 <p>LogShaderLibrary: Display: Logical shader library 'Global' component count 0, new components: 0  <br />

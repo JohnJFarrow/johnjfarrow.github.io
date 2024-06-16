@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Mass - Cache Concepts | unrealcode.net</title>
 <meta name="description" content="Mass - Cache Concepts">
 </head>
@@ -168,71 +172,68 @@ be used, and also that no data is copied from main memory to the CPU which is no
 <h2 id="a-simple-example">A simple example </h2>
 <p>Say we have a Robot class and each instance of the Robot class robot has a position, a velocity, 
 a size and an active flag like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">struct</span> FRobot
+<pre><code class="language-cpp">struct FRobot
 {
-	FVector Position;   <span class="comment">// 3x8 = 24 bytes</span>
-	FVector Velocity;   <span class="comment">// 3x8 = 24 bytes</span>
-	FVector Size;       <span class="comment">// 3x8 = 24 bytes</span>
-	<span class="keyword">bool</span> bActive;       <span class="comment">// 1 byte</span>
+	FVector Position;   // 3x8 = 24 bytes
+	FVector Velocity;   // 3x8 = 24 bytes
+	FVector Size;       // 3x8 = 24 bytes
+	bool bActive;       // 1 byte
 };
-</pre></div>
+</code></pre>
 <p>We have a array of 1 million Robots, and we want to set the bActive property to true on every tick event.  This code will do that:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">namespace</span>
+<pre><code class="language-cpp">namespace
 {
-	<span class="keyword">struct</span> FRobot
+	struct FRobot
 	{
-		FVector Position;   <span class="comment">// 3x8 = 24 bytes</span>
-		FVector Velocity;   <span class="comment">// 3x8 = 24 bytes</span>
-		FVector Size;       <span class="comment">// 3x8 = 24 bytes</span>
-		<span class="keyword">bool</span> bActive;
+		FVector Position;   // 3x8 = 24 bytes
+		FVector Velocity;   // 3x8 = 24 bytes
+		FVector Size;       // 3x8 = 24 bytes
+		bool bActive;
 	};
 
 	TArray&lt;FRobot&gt; RobotArray;
 
-	<span class="keyword">void</span> ActivateRobots()
+	void ActivateRobots()
 	{
 		TRACE_CPUPROFILER_EVENT_SCOPE(ActivateRobots)
 		{
-			<span class="keyword">for</span> (FRobot&amp; Robot : RobotArray)
+			for (FRobot&amp; Robot : RobotArray)
 			{
-				Robot.bActive = <span class="keyword">true</span>;
+				Robot.bActive = true;
 			}
 		}
 	}
 }
 
-<span class="keyword">void</span> AMyCharacter::BeginPlay()
+void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	<span class="comment">// initialize array</span>
+	// initialize array
 	size_t N = 1024 * 1024;
 	RobotArray.AddDefaulted(N);
 }
 
-<span class="keyword">void</span> AMyCharacter::Tick(<span class="keyword">float</span> DeltaTime)
+void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	ActivateRobots();
 }
 
-</pre></div>
+</code></pre>
 <p>Using Unreal Insights we can see the ActivateRobots call takes 7.38ms (2400ms for 325 calls):</p>
-<p><img src="/images/mass_001_004.PNG" alt="" /></p>
+<p><img src="/images/mass_001_004.PNG" alt="offset" /></p>
 <p>If we restructured the code to save each Robot property in a separate array, so we have one
 array for Ages, one for Positions etc. we have this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">namespace</span> {
+<pre><code class="language-cpp">namespace {
 
-	<span class="keyword">struct</span> FRobots
+	struct FRobots
 	{
 		TArray&lt;FVector&gt; Positions;
 		TArray&lt;FVector&gt; Velocities;
 		TArray&lt;FVector&gt; Sizes;
-		TArray&lt;<span class="keyword">bool</span>&gt; Actives;
+		TArray&lt;bool&gt; Actives;
 
-		<span class="keyword">void</span> AddDefaulted(<span class="keyword">const</span> size_t N)
+		void AddDefaulted(const size_t N)
 		{
 			Positions.AddDefaulted(N);
 			Velocities.AddDefaulted(N);
@@ -243,57 +244,56 @@ array for Ages, one for Positions etc. we have this:</p>
 
 	FRobots Robots;
 
-	<span class="keyword">void</span> ActivateRobots_SOA()
+	void ActivateRobots_SOA()
 	{
 		TRACE_CPUPROFILER_EVENT_SCOPE(ActivateRobots_SOA)
 		{
-			<span class="keyword">for</span>( <span class="keyword">bool</span>&amp; bActive : Robots.Actives)
+			for( bool&amp; bActive : Robots.Actives)
 			{
-				bActive = <span class="keyword">true</span>;
+				bActive = true;
 			}
 		}
 	}
 }
 
-<span class="keyword">void</span> AMyCharacter::BeginPlay()
+void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	size_t N = 1024 * 1024;
 	Robots.AddDefaulted(N);
 }
 
-<span class="keyword">void</span> AMyCharacter::Tick(<span class="keyword">float</span> DeltaTime)
+void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	ActivateRobots_SOA(Robots);
 }
-</pre></div>
+</code></pre>
 <p>Here the _SOA appended to the name to distinguish the two approaches
 refers to Structure-of-Arrays.  This terminology comes from the fact that the first approach uses an Array-of-Structures, the
 second approach as a single structure which contains the data in arrays.</p>
 <p>Using Unreal Insights we can see the ActivateRobots_SOA call takes 1.18ms (385ms for 325 calls):</p>
-<p><img src="/images/mass_001_006.PNG" alt="" /></p>
+<p><img src="/images/mass_001_006.PNG" alt="offset" /></p>
 <p>So by changing to storing the data in arrays we have made the function  go 6 times faster.  This
 is what the Mass entity component system tries to do for objects in Unreal Engine, it 
 enables support for much larger numbers of objects than would be support by a strictly
 object oriented approach.</p>
 <h2 id="data-types-and-sizes">Data Types and Sizes</h2>
 <p>Storing data in arrays not only increases performance but it also saves memory:  </p>
-<div class="cplusplus"><pre>
-<span class="keyword">struct</span> FRobot
+<pre><code class="language-cpp">struct FRobot
 {
-	FVector Position;   <span class="comment">// 3x8 = 24 bytes</span>
-	FVector Velocity;   <span class="comment">// 3x8 = 24 bytes</span>
-	FVector Size;       <span class="comment">// 3x8 = 24 bytes</span>
-	<span class="keyword">bool</span> bActive;
+	FVector Position;   // 3x8 = 24 bytes
+	FVector Velocity;   // 3x8 = 24 bytes
+	FVector Size;       // 3x8 = 24 bytes
+	bool bActive;
 };
-</pre></div>
+</code></pre>
 <p>When an array is filled with FRobot objects they align according to c++ alignment rules.  The alignment 
 of a struct is usually the maximum alignment of each of its members, so in this case  the alignment 
 alignof(FRobot) is alignof(FVector) which is 24 bytes - so we waste 23 bytes for each
 FRobot object.</p>
 <p>Changing the bool to an int32 type has an observable effect:</p>
-<p><img src="/images/mass_001_007.PNG" alt="" /></p>
+<p><img src="/images/mass_001_007.PNG" alt="offset" /></p>
 <p>The ActivateRobots call changes takes 7.41ms (2500ms for 337 calls), an insignificant change from 7.38.</p>
 <p>The ActivateRobots_SOA call changes takes 0.87ms (295ms for 337 calls), an 26% improvement from 1.18ms.  This
 is probably due to the int32 property having better alignment than the single byte bool property.</p>
@@ -306,90 +306,87 @@ it will already be in the cache.</p>
 <h2 id="threading-and-false-sharing">Threading and False Sharing</h2>
 <p>Cache lines need to be considered when using threading to speed up tasks. </p>
 <p>We can create a background task which counts the  number of active robots like so:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">class</span> FCountActiveRobotsTask : <span class="keyword">public</span> FNonAbandonableTask
+<pre><code class="language-cpp">class FCountActiveRobotsTask : public FNonAbandonableTask
 {
-<span class="keyword">public</span>:
-	FCountActiveRobotsTask(<span class="keyword">const</span> int32 InStart, <span class="keyword">const</span> int32 InNum, int32&amp; InCount )
+public:
+	FCountActiveRobotsTask(const int32 InStart, const int32 InNum, int32&amp; InCount )
 		: Start(InStart), Num(InNum), Count(InCount)
 	{
 	}
 
-	<span class="keyword">void</span> DoWork()
+	void DoWork()
 	{
-		<span class="keyword">for</span> (<span class="keyword">int</span> i = Start; i &lt; Start + Num; ++i)
+		for (int i = Start; i &lt; Start + Num; ++i)
 		{
-			<span class="keyword">if</span> (Robots.Actives[i])
+			if (Robots.Actives[i])
 			{
 				Count++;
 			}
 		}
 	}
 
-	TStatId GetStatId() <span class="keyword">const</span> { <span class="keyword">return</span> TStatId(); }
+	TStatId GetStatId() const { return TStatId(); }
 
-<span class="keyword">private</span>:
+private:
 	int32 Start;
 	int32 Num;
 	int32&amp; Count;
 };
-</pre></div>
+</code></pre>
 <p>We launch this background task for one thread only like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> Count_Robots_Background_Thread()
+<pre><code class="language-cpp">void Count_Robots_Background_Thread()
 {
 	int32 Count = 0;
 	TRACE_CPUPROFILER_EVENT_SCOPE(Count_Robots_Background_Thread)
 	{
-		<span class="keyword">auto</span> Task = 
+		auto Task = 
 		  MakeUnique&lt;FAsyncTask&lt;FCountActiveRobotsTask&gt;&gt;( 0, Robots.Actives.Num(), Count );
-		<span class="keyword">if</span> (Task)
+		if (Task)
 		{
 			Task-&gt;StartBackgroundTask();
-			Task-&gt;EnsureCompletion(<span class="keyword">true</span>, <span class="keyword">true</span>);
+			Task-&gt;EnsureCompletion(true, true);
 		}
 	}
 }
-</pre></div>
+</code></pre>
 <p>Comparing running on the main thread with doing the same task on a single background thread we see these
 timings:</p>
-<p><img src="/images/mass_001_008.PNG" alt="" /></p>
+<p><img src="/images/mass_001_008.PNG" alt="offset" /></p>
 <p>Running on the background thread is very slightly slower because of the overhead if starting and managing the thread.</p>
 <p>We can change from running on one background thread to four like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> Count_Robots_Background_Threads()
+<pre><code class="language-cpp">void Count_Robots_Background_Threads()
 {
 	int32 Count = 0;
 	TRACE_CPUPROFILER_EVENT_SCOPE(Count_Robots_Background_Threads)
 	{
-		constexpr <span class="keyword">int</span> NumTasks = 4;
-		std::<span class="keyword">array</span>&lt;int32, NumTasks&gt; Counts;
+		constexpr int NumTasks = 4;
+		std::array&lt;int32, NumTasks&gt; Counts;
 		std::fill(Counts.begin(), Counts.end(), 0);
-		std::<span class="keyword">array</span>&lt; TUniquePtr&lt; FAsyncTask&lt;FCountActiveRobotsTask&gt; &gt;, NumTasks &gt; Tasks;
+		std::array&lt; TUniquePtr&lt; FAsyncTask&lt;FCountActiveRobotsTask&gt; &gt;, NumTasks &gt; Tasks;
 
 		int32 StepSize = Robots.Actives.Num() / NumTasks;
 
-		<span class="comment">// create</span>
-		<span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i &lt; NumTasks; ++i)
+		// create
+		for (int i = 0; i &lt; NumTasks; ++i)
 		{
 			Tasks[i] = 
 			  MakeUnique&lt;FAsyncTask&lt;FCountActiveRobotsTask&gt;&gt;(StepSize * i, StepSize, Counts[i]);
 		}
-		<span class="comment">// launch</span>
-		<span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i &lt; NumTasks; ++i)
+		// launch
+		for (int i = 0; i &lt; NumTasks; ++i)
 		{
 			Tasks[i]-&gt;StartBackgroundTask();
 		}
-		<span class="comment">// wait</span>
-		<span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i &lt; NumTasks; ++i)
+		// wait
+		for (int i = 0; i &lt; NumTasks; ++i)
 		{
-			Tasks[i]-&gt;EnsureCompletion(<span class="keyword">true</span>, <span class="keyword">true</span>);
+			Tasks[i]-&gt;EnsureCompletion(true, true);
 		}
 
 		Count = std::accumulate(Counts.begin(), Counts.end(), 0);
 	}
 }
-</pre></div>
+</code></pre>
 <p>In this code we:</p>
 <ul>
 <li> allocate 4 background task objects which will run on background threads</li>
@@ -398,7 +395,7 @@ timings:</p>
 <li> after all the threads are finished we accumulate the 4 count objects into one value</li>
 </ul>
 <p>Now we get these timings:</p>
-<p><img src="/images/mass_001_009.PNG" alt="" /></p>
+<p><img src="/images/mass_001_009.PNG" alt="offset" /></p>
 <p>Running on four background threads takes 4 times longer than running on one.  What is happening
 here is an issue of cache coherency and false sharing.  </p>
 <p>Here is the diagram of the cache layout on a Ryzen 8 core CPU again:</p>
@@ -429,39 +426,36 @@ so they are not on the cache line</li>
 <li> we could accumulate the values into property in a structure which was padded to be
 64 bytes long, so that the values are not on the same cache line, like:</li>
 </ul>
-<div class="cplusplus"><pre>
-<span class="keyword">struct</span> PaddedValue
+<pre><code class="language-cpp">struct PaddedValue
 {
 	int32 Value = 0;
-	<span class="keyword">char</span> Padding[ 64-<span class="keyword">sizeof</span>(int32)];
+	char Padding[ 64-sizeof(int32)];
 };
-</pre></div>
+</code></pre>
 <ul>
 <li> we could accumulate the values into property in a structure which was aligned
 to 64 bytes long, so that the values are not on the same cache line, like:</li>
 </ul>
-<div class="cplusplus"><pre>
-<span class="keyword">struct</span> alignas(64) AlignedValue
+<pre><code class="language-cpp">struct alignas(64) AlignedValue
 {
 	int32 Value = 0;
 };
-</pre></div>
+</code></pre>
 <p>The code to accumulate into a local variable looks like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">class</span> FCountActiveRobotsTaskLocalCount : <span class="keyword">public</span> FNonAbandonableTask
+<pre><code class="language-cpp">class FCountActiveRobotsTaskLocalCount : public FNonAbandonableTask
 {
-<span class="keyword">public</span>:
-	FCountActiveRobotsTaskLocalCount(<span class="keyword">const</span> int32 InStart, <span class="keyword">const</span> int32 InNum, int32&amp; InCount)
+public:
+	FCountActiveRobotsTaskLocalCount(const int32 InStart, const int32 InNum, int32&amp; InCount)
 		: Start(InStart), Num(InNum), Count(InCount)
 	{
 	}
 
-	<span class="keyword">void</span> DoWork()
+	void DoWork()
 	{
 		int32 LocalCount = 0;
-		<span class="keyword">for</span> (<span class="keyword">int</span> i = Start; i &lt; Start + Num; ++i)
+		for (int i = Start; i &lt; Start + Num; ++i)
 		{
-			<span class="keyword">if</span> (Robots.Actives[i])
+			if (Robots.Actives[i])
 			{
 				LocalCount++;
 			}
@@ -469,49 +463,48 @@ to 64 bytes long, so that the values are not on the same cache line, like:</li>
 		Count = LocalCount;
 	}
 
-	TStatId GetStatId() <span class="keyword">const</span> { <span class="keyword">return</span> TStatId(); }
-<span class="keyword">private</span>:
+	TStatId GetStatId() const { return TStatId(); }
+private:
 	int32 Start;
 	int32 Num;
 	int32&amp; Count;
 };
-</pre></div>
+</code></pre>
 <p>and the code to pad the Counts array and only use every 16th element looks like this:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> Count_Robots_Background_Threads_Padding()
+<pre><code class="language-cpp">void Count_Robots_Background_Threads_Padding()
 {
 	int32 Count = 0;
 	TRACE_CPUPROFILER_EVENT_SCOPE(Count_Robots_Background_Threads_Padding)
 	{
-		constexpr <span class="keyword">int</span> NumTasks = 4;
-		std::<span class="keyword">array</span>&lt;int32, NumTasks * 16 &gt; Counts;
+		constexpr int NumTasks = 4;
+		std::array&lt;int32, NumTasks * 16 &gt; Counts;
 		std::fill(Counts.begin(), Counts.end(), 0);
-		std::<span class="keyword">array</span>&lt; TUniquePtr&lt; FAsyncTask&lt;FCountActiveRobotsTask&gt; &gt;, NumTasks &gt; Tasks;
+		std::array&lt; TUniquePtr&lt; FAsyncTask&lt;FCountActiveRobotsTask&gt; &gt;, NumTasks &gt; Tasks;
 
 		int32 StepSize = Robots.Actives.Num() / NumTasks;
 
-		<span class="comment">// create</span>
-		<span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i &lt; NumTasks; ++i)
+		// create
+		for (int i = 0; i &lt; NumTasks; ++i)
 		{
 			Tasks[i] =
 			 MakeUnique&lt;FAsyncTask&lt;FCountActiveRobotsTask&gt;&gt;(StepSize*i, StepSize, Counts[i*16]);
 		}
-		<span class="comment">// launch</span>
-		<span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i &lt; NumTasks; ++i)
+		// launch
+		for (int i = 0; i &lt; NumTasks; ++i)
 		{
 			Tasks[i]-&gt;StartBackgroundTask();
 		}
-		<span class="comment">// wait</span>
-		<span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i &lt; NumTasks; ++i)
+		// wait
+		for (int i = 0; i &lt; NumTasks; ++i)
 		{
-			Tasks[i]-&gt;EnsureCompletion(<span class="keyword">true</span>, <span class="keyword">true</span>);
+			Tasks[i]-&gt;EnsureCompletion(true, true);
 		}
 		Count = std::accumulate(Counts.begin(), Counts.end(), 0);
 	}
 }
-</pre></div>
+</code></pre>
 <p>This picture shows the results:</p>
-<p><img src="/images/mass_001_010.PNG" alt="" /></p>
+<p><img src="/images/mass_001_010.PNG" alt="offset" /></p>
 <p>We can see that either using local variables or using padding eliminates the false sharing
 and reduces the time from 1,300ms to 140ms.</p>
 <h2 id="references">References</h2>

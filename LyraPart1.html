@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Looking into Lyra - Experiences | unrealcode.net</title>
 <meta name="description" content="Looking into Lyra - Experiences">
 </head>
@@ -170,7 +174,7 @@ on the left hand side.  The screenshot below shows how the project is configured
 <p>In Lyra experiences equate to game modes such as the main menu, the core shooter mode, the top down arena mode etc.</p>
 <p>Lyra has a <code>ULyraExperienceManagerComponent</code> component which manages the 
 launching of experiences with methods such as <code>StartExperienceLoad()</code> and <code>OnExperienceFullLoadCompleted()</code></p>
-<p><img src="/images/lyra_009.png" alt="" /></p>
+<p><img src="/images/lyra_009.png" alt="offset" /></p>
 <p>When an experience is selected from the opening level <code>LyraExperienceManagerComponent::StartExperienceLoad()</code>
 is called.  This method:</p>
 <ul>
@@ -180,19 +184,18 @@ is called.  This method:</p>
 has completed</li>
 </ul>
 <p>Then it starts the async loading of identified assets with these lines:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">const</span> TSharedPtr&lt;FStreamableHandle&gt; BundleLoadHandle = 
+<pre><code class="language-cpp">const TSharedPtr&lt;FStreamableHandle&gt; BundleLoadHandle = 
       AssetManager.ChangeBundleStateForPrimaryAssets( BundleAssetList.Array(), 
-                                                      BundlesToLoad, {}, <span class="keyword">false</span>, 
+                                                      BundlesToLoad, {}, false, 
                                                       FStreamableDelegate(), 
                                                       FStreamableManager::AsyncLoadHighPriority);
 
-<span class="keyword">const</span> TSharedPtr&lt;FStreamableHandle&gt; RawLoadHandle = 
+const TSharedPtr&lt;FStreamableHandle&gt; RawLoadHandle = 
       AssetManager.LoadAssetList( RawAssetList.Array(), 
                                   FStreamableDelegate(), 
                                   FStreamableManager::AsyncLoadHighPriority, 
-                                  TEXT(<span class="string">&quot;StartExperienceLoad()&quot;</span>));
-</pre></div>
+                                  TEXT(&quot;StartExperienceLoad()&quot;));
+</code></pre>
 <p>Once the load is completed <code>OnExperienceLoadComplete()</code> is called. This:</p>
 <ul>
 <li> identifies game features which have been loaded in plugins by calling <code>CollectGameFeaturePluginURLs()</code></li>

@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Creating a Blueprint Node in C++ | unrealcode.net</title>
 <meta name="description" content="Creating a Blueprint Node in C++">
 </head>
@@ -119,67 +123,63 @@ exercise I decided to write one.  </p>
 the UBlueprintFunctionLibrary class.  To create such a node use the <code>Tools | New C++ Class</code> menu option and create a class
 derived from UBlueprintFunctionLibrary.  In this example the new class is called &quot;UtilityFunctionLibrary&quot;.</p>
 <p>Unreal will create the header and implementation files.  The header looks like this:</p>
-<div class="cplusplus"><pre>
-#pragma once
-#include <span class="string">&quot;CoreMinimal.h&quot;</span>
-#include <span class="string">&quot;Kismet/BlueprintFunctionLibrary.h&quot;</span>
-#include <span class="string">&quot;UtilityFunctionLibrary.generated.h&quot;</span>
+<pre><code class="language-cpp">#pragma once
+#include &quot;CoreMinimal.h&quot;
+#include &quot;Kismet/BlueprintFunctionLibrary.h&quot;
+#include &quot;UtilityFunctionLibrary.generated.h&quot;
 
 UCLASS()
-<span class="keyword">class</span> MYPROJECT8_API UUtilityFunctionLibrary : <span class="keyword">public</span> UBlueprintFunctionLibrary
+class MYPROJECT8_API UUtilityFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 };
-</pre></div>
+</code></pre>
 <p>There are no methods on the new class.  We can add one like so:</p>
-<div class="cplusplus"><pre>
-#pragma once
-#include <span class="string">&quot;CoreMinimal.h&quot;</span>
-#include <span class="string">&quot;Kismet/BlueprintFunctionLibrary.h&quot;</span>
-#include <span class="string">&quot;UtilityFunctionLibrary.generated.h&quot;</span>
+<pre><code class="language-cpp">#pragma once
+#include &quot;CoreMinimal.h&quot;
+#include &quot;Kismet/BlueprintFunctionLibrary.h&quot;
+#include &quot;UtilityFunctionLibrary.generated.h&quot;
 
 UCLASS()
-<span class="keyword">class</span> MYPROJECT8_API UUtilityFunctionLibrary : <span class="keyword">public</span> UBlueprintFunctionLibrary
+class MYPROJECT8_API UUtilityFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
-	UFUNCTION(BlueprintCallable, Category = <span class="string">&quot;Utility&quot;</span>)
-	<span class="keyword">static</span> <span class="keyword">void</span> RotateActorAroundPivot( 
+	UFUNCTION(BlueprintCallable, Category = &quot;Utility&quot;)
+	static void RotateActorAroundPivot( 
 		AActor* Actor,
-		<span class="keyword">const</span> FVector&amp; PivotLocation,
-		<span class="keyword">const</span> FRotator&amp; DeltaRotation );	
+		const FVector&amp; PivotLocation,
+		const FRotator&amp; DeltaRotation );	
 };
-</pre></div>
+</code></pre>
 <p>The new function RotateActorAroundPivot takes as parameters the actor object we want to rotate, the pivot point 
 we want to rotate it around, and the size of the rotation.</p>
 <h3 id="ufunction-declaration">UFUNCTION Declaration</h3>
 <p>There are a couple of improvements we can make to the declaration of the RotateActorAroundPivot function, which currently 
 looks like this:</p>
-<p><img src="/images/rotn_004.png" alt="" /></p>
+<p><img src="/images/rotn_004.png" alt="offset" /></p>
 <ul>
 <li> we can make the Actor parameter default to &quot;self&quot;, which is the actor which this blueprint is a part of, by adding <code>meta = (DefaultToSelf = &quot;Actor&quot;)</code>
 to the UFUNCTION declaration</li>
 <li> we can make the node easier to use by making the parameters optional (so they will be replaced by default values), by making them values, not references.</li>
 </ul>
 <p>The updated declaration looks this this:</p>
-<div class="cplusplus"><pre>
-UFUNCTION(BlueprintCallable, Category = <span class="string">&quot;Utility&quot;</span>, meta = (DefaultToSelf = <span class="string">&quot;Actor&quot;</span>))
-<span class="keyword">static</span> <span class="keyword">void</span> RotateActorAroundPivot(
+<pre><code class="language-cpp">UFUNCTION(BlueprintCallable, Category = &quot;Utility&quot;, meta = (DefaultToSelf = &quot;Actor&quot;))
+static void RotateActorAroundPivot(
 	AActor* Actor,
-	<span class="keyword">const</span> FVector PivotLocation,
-	<span class="keyword">const</span> FRotator DeltaRotation);
-</pre></div>
+	const FVector PivotLocation,
+	const FRotator DeltaRotation);
+</code></pre>
 <p>and the node now looks like this:</p>
-<p><img src="/images/rotn_005.png" alt="" /></p>
+<p><img src="/images/rotn_005.png" alt="offset" /></p>
 <h3 id="implementation">Implementation</h3>
 <p>The implementation of the node contains the maths operations needed to rotate the actor around the pivot point:</p>
-<div class="cplusplus"><pre>
-<span class="keyword">void</span> UUtilityFunctionLibrary::RotateActorAroundPivot(
+<pre><code class="language-cpp">void UUtilityFunctionLibrary::RotateActorAroundPivot(
 	AActor* Actor,
-	<span class="keyword">const</span> FVector PivotLocation,
-	<span class="keyword">const</span> FRotator DeltaRotation)
+	const FVector PivotLocation,
+	const FRotator DeltaRotation)
 {
-	<span class="keyword">if</span> (!Actor) <span class="keyword">return</span>;
+	if (!Actor) return;
 	Actor-&gt;AddActorWorldRotation(DeltaRotation);
 	FVector NewActorLocation = Actor-&gt;GetActorLocation();
 	NewActorLocation -= PivotLocation;
@@ -189,11 +189,11 @@ UFUNCTION(BlueprintCallable, Category = <span class="string">&quot;Utility&quot;
 	NewActorLocation -= Actor-&gt;GetActorLocation();
 	Actor-&gt;AddActorWorldOffset(NewActorLocation);
 }
-</pre></div>
+</code></pre>
 <p>This code is very substantially based on the code the editor uses to implement manual rotation.</p>
 <h3 id="usage">Usage</h3>
 <p>This blueprint shows an example usage:</p>
-<ImageExpando :imagePath="$withBase('/images/rotn_006.png')" imageId="BP2"/>
+<p><img src="/images/rotn_006.png" alt="offset" /></p>
 <p>Every tick it:</p>
 <ul>
 <li> multiplies the tick duration by a factor (the Rotation Step variable) to calculate a rotation amount</li>
@@ -202,9 +202,9 @@ UFUNCTION(BlueprintCallable, Category = <span class="string">&quot;Utility&quot;
 </ul>
 <p>(This does not need sockets to work, the pivot location could come from anywhere.)</p>
 <p>If the socket name is left blank, so the socket location is (0,0,0), the mesh rotates around its origin like so:</p>
-<p><img src="/images/rotn_020.gif" alt="" /></p>
+<p><img src="/images/rotn_020.gif" alt="offset" /></p>
 <p>Whereas if a socket is chosen which is on the narrow end of the arm mesh, the rotation is like this:</p>
-<p><img src="/images/rotn_021.gif" alt="" /></p>
+<p><img src="/images/rotn_021.gif" alt="offset" /></p>
 
 </div>
 <footer class="no-sidebar">

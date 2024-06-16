@@ -10,6 +10,10 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
 </script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
 <title>Using Git for Ureal Engine Plugins | unrealcode.net</title>
 <meta name="description" content="Using Git for Ureal Engine Plugins">
 </head>
@@ -84,11 +88,10 @@ push to the server as well to test - still true with see below</p>
 shares the .git file:</p>
 <p>d:\work\learn\AirSim\Unreal\Plugins\AirSim&gt;more .git
 gitdir: ../../../.git/modules/AirSim</p>
-<div class="cplusplus"><pre>
-[submodule <span class="string">&quot;AirSim&quot;</span>]
+<pre><code class="language-cpp">[submodule &quot;AirSim&quot;]
     path = Unreal/Plugins/AirSim
-	url = https:<span class="comment">//github.com/GitName/AirSimPlugin</span>
-</pre></div>
+	url = https://github.com/GitName/AirSimPlugin
+</code></pre>
 <p>The submodule name, &quot;AirSim&quot; in this example, is a unique key - there cannot be two submodules with the same name, so you cannot
 reference the same plugin twice in the same directory tree.</p>
 <h2 id="projects-using-multiple-copies-of-the-same-plugin">Projects using multiple copies of the same plugin</h2>

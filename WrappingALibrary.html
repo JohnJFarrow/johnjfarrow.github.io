@@ -18,137 +18,47 @@ mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkM
 <meta name="description" content="Wrapping a third party library using an Unreal Engine Plugin">
 </head>
 <body>
-<div id="app" data-server-rendered="true">
+<div id="app">
 <div class="theme-container">
-</div>
-<header class="navbar">
-<div class="sidebar-button">
-</div>
-<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
-<span class="site-name">
-unrealcode.net
-</span>
-</a>
-<div class="links">
-<nav class="nav-links can-hide">
-<div class="nav-item">
-<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
-Home
-</a>
-</div>
-</nav>
-</div>
-</header>
-<div class="sidebar-mask">
-</div>
-<aside class="sidebar">
-<ul class="sidebar-links">
-<li>
-<section class="sidebar-group depth-0">
-<p class="sidebar-heading open">
-<span>
-Wrapping a third party library using an Unreal Engine Plugin
-</span>
-</p>
-<ul class="sidebar-links sidebar-group-items">
-<li>
-<a class="sidebar-link" href="#introduction">
-Introduction
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#understanding-import-libraries">
-Understanding Import Libraries
-</a>
-<ul class="sidebar-sub-headers">
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#minor-details">
-Minor Details
-</a>
-</li>
-</ul>
-</li>
-<li>
-<a class="sidebar-link" href="#plugin-directory-structures">
-Plugin Directory Structures
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#plugin-build-files">
-Plugin Build Files
-</a>
-<ul class="sidebar-sub-headers">
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#files-we-don't-need">
-Files we don't need
-</a>
-</li>
-</ul>
-</li>
-<li>
-<a class="sidebar-link" href="#binary-files">
-Binary files
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#import-libraries">
-Import Libraries
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#delayed-loading-of-dlls">
-Delayed Loading of DLLs
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#delayed-load-dll-ordering">
-Delayed Load DLL Ordering
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#building-a-plugin-from-the-command-line">
-Building a plugin from the command line
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#troubleshooting">
-Troubleshooting
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#other-plugin-features">
-Other plugin features
-</a>
-<ul class="sidebar-sub-headers">
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#include-paths">
-Include Paths
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#alternative-names-for-debug-files">
-Alternative names for debug files
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#defining-variables">
-Defining variables
-</a>
-</li>
-</ul>
-</li>
-<li>
-<a class="sidebar-link" href="#references">
-References
-</a>
-</li>
-</ul>
-</section>
-</li>
-</ul>
-</aside>
+<div class="main-container">
 <main class="page">
-<div class="theme-default-content content__default">
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
 <h1>Wrapping a third party library using an Unreal Engine Plugin</h1>
 <h2 id="introduction">Introduction</h2>
 <p>Unreal Engine supports plugins, which contain code and game content. They can also
@@ -451,7 +361,6 @@ PublicAdditionalLibraries.Add(Path.Combine(LibPath, LibName + &quot;.lib&quot;))
 <h2 id="references">References</h2>
 <p><a href="https://docs.unrealengine.com/5.1/en-US/integrating-third-party-libraries-into-unreal-engine/">Epic Integrating third-party libraries into Unreal Engine</a></p>
 
-</div>
 <footer class="no-sidebar">
 <div>
 <p class="page-footer">
@@ -461,6 +370,8 @@ MIT Licensed | Copyright © 2020-2024 John Farrow
 </div>
 </footer>
 </main>
+</div>
+</div>
 </div>
 </body>
 </html>

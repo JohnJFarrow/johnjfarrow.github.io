@@ -18,120 +18,47 @@ mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkM
 <meta name="description" content="Experiments With Chaos Physics - Using Blueprints">
 </head>
 <body>
-<div id="app" data-server-rendered="true">
+<div id="app">
 <div class="theme-container">
-</div>
-<header class="navbar">
-<div class="sidebar-button">
-</div>
-<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
-<span class="site-name">
-unrealcode.net
-</span>
-</a>
-<div class="links">
-<nav class="nav-links can-hide">
-<div class="nav-item">
-<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
-Home
-</a>
-</div>
-</nav>
-</div>
-</header>
-<div class="sidebar-mask">
-</div>
-<aside class="sidebar">
-<ul class="sidebar-links">
-<li>
-<section class="sidebar-group depth-0">
-<p class="sidebar-heading open">
-<span>
-Experiments With Chaos Physics - Using Blueprints
-</span>
-</p>
-<ul class="sidebar-links sidebar-group-items">
-<li>
-<a class="sidebar-link" href="#introduction">
-Introduction
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#blender-model">
-Blender Model
-</a>
-<ul class="sidebar-sub-headers">
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#exporting-at-the-origin">
-Exporting at the Origin 
-</a>
-</li>
-</ul>
-</li>
-<li>
-<a class="sidebar-link" href="#using-chaos-physics">
-Using Chaos Physics
-</a>
-<ul class="sidebar-sub-headers">
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#things-fly-apart">
-Things fly apart
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#preventing-collisions-using-constraints">
-Preventing Collisions using Constraints
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#preventing-collisions-using-channels">
-Preventing Collisions using Channels
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#constraining-the-arm">
-Constraining the Arm
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#adding-the-counterweight">
-Adding the Counterweight
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#preventing-collisions-using-collision-meshes">
-Preventing Collisions using Collision Meshes
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#adding-the-ramp">
-Adding the Ramp
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#adding-the-projectile">
-Adding the Projectile
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#releasing-the-projectile">
-Releasing the Projectile
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#references">
-References
-</a>
-</li>
-</ul>
-</li>
-</ul>
-</section>
-</li>
-</ul>
-</aside>
+<div class="main-container">
 <main class="page">
-<div class="theme-default-content content__default">
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
 <h1>Experiments With Chaos Physics - Using Blueprints</h1>
 <h2 id="introduction">Introduction</h2>
 <p>This describes some initial steps in using chaos physics in Unreal Engine 5.0.2. </p>
@@ -160,21 +87,21 @@ system meaningful.</p>
 <p>Taking the arm component as an example, 
 if it is centered on the world origin in Blender and then exported, in Unreal it looks
 like this:</p>
-<p><img src="/images/chaos_004.png" alt="" /></p>
+<p><img src="/images/chaos_004.png" alt="width80" /></p>
 <p>If it is not centered on the world origin in Blender, in Unreal it looks
 like this:</p>
-<p><img src="/images/chaos_005.png" alt="" /></p>
+<p><img src="/images/chaos_005.png" alt="width80" /></p>
 <p>The difference in the position of the arm's origin effects how it easy it is to manipulate
 once the FBX file has been imported as a mesh and referenced by a Static Mesh component in blueprint.  As this image shows, when the 
 arm is positioned at the world origin in Blender, the
 Unreal transform gizmo (using world coordinates) is centered on the arm origin:</p>
-<p><img src="/images/chaos_006.png" alt="" /></p>
+<p><img src="/images/chaos_006.png" alt="width80" /></p>
 <p>and when using local coordinates the Unreal transform gizmo is centered on the arm origin
 and aligned parallel with the arm to make it easy to position and rotate the arm.</p>
-<p><img src="/images/chaos_008.png" alt="" /></p>
+<p><img src="/images/chaos_008.png" alt="width80" /></p>
 <p>If the arm is not centered on the world origin in Blender before it is exported, this is what
 it looks like in Unreal:</p>
-<p><img src="/images/chaos_007.png" alt="" /></p>
+<p><img src="/images/chaos_007.png" alt="width80" /></p>
 <p>The Unreal transform gizmo is not positioned on the arm, making it harder to position, and
 the local and world coordinate systems are the same, making it difficult to rotate without
  manually changing the pivot point.</p>
@@ -379,7 +306,6 @@ and break the constraint the first time the angle is &lt;= 45 degrees:</p>
 <h3 id="references">References</h3>
 <p><a href="https://docs.unrealengine.com/5.0/en-US/add-a-custom-object-type-to-your-project-in-unreal-engine/">Custom Channels - https://docs.unrealengine.com</a></p>
 
-</div>
 <footer class="no-sidebar">
 <div>
 <p class="page-footer">
@@ -389,6 +315,8 @@ MIT Licensed | Copyright © 2020-2024 John Farrow
 </div>
 </footer>
 </main>
+</div>
+</div>
 </div>
 </body>
 </html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
+<title>Optimization Part 5 Analysing the Test Project | unrealcode.net</title>
+<meta name="description" content="Optimization Part 5 Analysing the Test Project">
+</head>
+<body>
+<div id="app">
+<div class="theme-container">
+<div class="main-container">
+<main class="page">
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
+<h1 id="what-unreal-insights-tells-us-about-the-test-project">What Unreal Insights tells us about the test project</h1>
+<p>Considering for a moment what we see in the Callees view is data like this:</p>
+<p><img src="images/insights_036.png" alt="width80" /></p>
+<p>This is not a hierarchy of function names, it is a hierarchy of timing event names.  Sometimes
+the event name is the same as the function name generating the event.
+Sometimes a &quot;::&quot; in a function name has been replaced by a &quot;_&quot;.  Sometimes the event name
+is the name of the asset being processed. Mousing over the icon next to the event name in the Callees view 
+sometimes tells us the source location, sometimes it just says &quot;N/A&quot;.  This makes it a slow process to find out where the named event is actually generated in the engine.</p>
+<p>This table shows the correspondence between the event name and the function name for the above Callee view.  The &quot;Function Name&quot;
+column holds the name of the function which either:</p>
+<ul>
+<li> contains a macro (such as SCOPED_NAMED_EVENT) which creates the timing event</li>
+<li> directly contains a scoped object such as <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Runtime/CoreUObject/UObject/FScopeCycleCounterUObject"><code>FScopeCycleCounterUObject</code></a> which creates the timing event</li>
+<li> directly calls macros like UE_TRACE_LOG which write directly to the trace log to create timing events</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Event Name</th>
+<th style="text-align: left;">Function Name</th>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">FActorComponentTickFunction::ExecuteTick</td>
+<td style="text-align: left;">FActorComponentTickFunction::ExecuteTick()</td>
+<td style="text-align: left;">Matching event name and function name</td>
+</tr>
+<tr>
+<td style="text-align: left;">CharacterMesh0</td>
+<td style="text-align: left;">FActorComponentTickFunction::ExecuteTickHelper()</td>
+<td style="text-align: left;">This is the name of  the mesh which is being processed</td>
+</tr>
+<tr>
+<td style="text-align: left;">SKM_Quinn_Simple</td>
+<td style="text-align: left;">FActorComponentTickFunction::ExecuteTickHelper()</td>
+<td style="text-align: left;">This is the name of the skeletal mesh being processed</td>
+</tr>
+<tr>
+<td style="text-align: left;">USkinnedMeshComponent_TickComponent</td>
+<td style="text-align: left;">USkinnedMeshComponent_TickComponent</td>
+<td style="text-align: left;">Similar event name and function name</td>
+</tr>
+<tr>
+<td style="text-align: left;">USkeletalMeshComponent_TickAnimation</td>
+<td style="text-align: left;">USkeletalMeshComponent::TickAnimation()</td>
+<td style="text-align: left;">Similar event name and function name</td>
+</tr>
+</tbody>
+</table>
+<p>If we run the Development build of the test project while the session browser is open, we see this 
+in the callers window:</p>
+<p><img src="images/insights_035.png" alt="width80" /></p>
+<p>We can see that we are calling the tick function on a lot of stuff:</p>
+<ul>
+<li> we are running <code>USkinnedMeshComponent_TickComponent()</code> to update animation for each spawned actor, when 
+  they are not moving</li>
+<li> we are calling the <code>UCharacterMovementComponent_TickComponent()</code> on each spawned actor when they are 
+not moving</li>
+<li> the actor we are using has a unnecessary camera component which is ticking</li>
+<li> we are using <code>Tick()</code> to unnecessarily update characters we cannot see.</li>
+</ul>
+<h2 id="which-actors-can-we-see">Which Actors can we see</h2>
+<p>Logically we can determine which actors the player character can see by casting a ray from the head of the player character
+to points on the target actor.  The ray will either hit the target actor if they can be see or some intervening object, such as a wall,
+if they cannot.</p>
+<p>GET ONE OF THE EXISTING IMAGES</p>
+<p> whats this all about???</p>
+<p>USkeletalMeshComponentBudgeted
+IAnimationBudgetAllocator</p>
+<p>from discord</p>
+<p>void UMyGameInstance<span>Init()
+{
+    Super</span>Init();
+    USkeletalMeshComponentBudgeted<span>OnCalculateSignificance().BindUObject(this, &amp;UMyGameInstance</span>HandleSkelMeshBudget);
+}</p>
+<p>FTransform CurInstanceTransform;
+wd</p>
+<p>replace distant actors with simpler ones a proxy</p>
+<ul>
+<li> move randomly no ai</li>
+<li> remove them entirely use a pool respawn when close</li>
+<li> stop simulating physics after a few seconds on objects so they rest, reenable
+  when hit by plyer or other objects</li>
+<li> distance enemies have simpler LOD mesh, limited animations,
+  update only every ~3 frames </li>
+</ul>
+<p>r.VisualizeOccludedPrimitive 1</p>
+<p><a href="https://forums.unrealengine.com/t/how-to-enable-actors-source-of-function-calls-in-unreal-insights/462655">profilin</a></p>
+<p><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/visibility-and-occlusion-culling-in-unreal-engine?application_version=5.4">culling</a>  </p>
+<h2 id="reference">Reference</h2>
+<p><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine">Advanced Debugging In Unreal Engine</a>  </p>
+<p><a href="https://www.youtube.com/watch?v=SxIXnEik2Xk">PCG New Features in 5.4</a>  </p>
+<p><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine">Advanced Debugging</a></p>
+<p><a href="https://www.intel.com/content/www/us/en/developer/articles/training/unreal-engine-4-optimization-tutorial-part-2.html">Intel Unreal Optimization</a>  </p>
+<p><a href="https://www.intel.com/content/www/us/en/developer/articles/training/unreal-engine-4-optimization-tutorial-part-4.html">Intel Lightmap Density</a>  </p>
+
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,11 +1,3 @@
-pre code.hljs {
-  display: block;
-  overflow-x: auto;
-  padding: 1em
-}
-code.hljs {
-  padding: 3px 5px
-}
 /*!
   Theme: Default
   Description: Original highlight.js style
@@ -24,7 +16,8 @@ Typically this "required" baseline CSS is added by `makestuff.js` during build.
 pre code.hljs {
   display: block;
   overflow-x: auto;
-  padding: 1em
+  padding: 1em;
+  max-width:100%;
 }
 code.hljs {
   padding: 3px 5px

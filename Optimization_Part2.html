@@ -14,118 +14,62 @@ mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkM
 <link rel = "stylesheet" href="./css/hljs_overrides.css">
 <script src = "./css/highlight/highlight.min.js" ></script>
 <script> hljs.highlightAll();</script>
-<title>Optimization Part 2 - A Simple Test Program | unrealcode.net</title>
-<meta name="description" content="Optimization Part 2 - A Simple Test Program">
+<title>Optimization Part 2 A Simple Test Program | unrealcode.net</title>
+<meta name="description" content="Optimization Part 2 A Simple Test Program">
 </head>
 <body>
-<div id="app" data-server-rendered="true">
+<div id="app">
 <div class="theme-container">
-</div>
-<header class="navbar">
-<div class="sidebar-button">
-</div>
-<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
-<span class="site-name">
-unrealcode.net
-</span>
-</a>
-<div class="links">
-<nav class="nav-links can-hide">
-<div class="nav-item">
-<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
-Home
-</a>
-</div>
-</nav>
-</div>
-</header>
-<div class="sidebar-mask">
-</div>
-<aside class="sidebar">
-<ul class="sidebar-links">
-<li>
-<section class="sidebar-group depth-0">
-<p class="sidebar-heading open">
-<span>
-Optimization Part 2 - A Simple Test Program
-</span>
-</p>
-<ul class="sidebar-links sidebar-group-items">
-<li>
-<a class="sidebar-link" href="#screen-resolution">
-Screen Resolution
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#stats">
-Stats
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#editor-fps-stats">
-Editor FPS Stats
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#injecting-actors">
-Injecting Actors
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#with-1500-actors">
-With 1500 Actors
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#looking-at-the-stats">
-Looking at the Stats
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#using-unreal-insight">
-Using Unreal Insight
-</a>
-<ul class="sidebar-sub-headers">
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#collecting-traces-manually">
-Collecting traces manually
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#collecting-traces-automatically">
-Collecting traces automatically 
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#analysing-traces">
-Analysing traces
-</a>
-</li>
-</ul>
-</li>
-<li>
-<a class="sidebar-link" href="#reference">
-Reference
-</a>
-</li>
-</ul>
-</section>
-</li>
-</ul>
-</aside>
+<div class="main-container">
 <main class="page">
-<div class="theme-default-content content__default">
-<h1>Optimizing Unreal Engine : Part 2 - A Simple Test Project</h1>
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
+<h1 id="optimizing-unreal-engine-part-2-a-simple-test-project">Optimizing Unreal Engine : Part 2 <br/> A Simple Test Project </h1>
 <p>This page describes a simple test project which can be used to experiment with  optimization in Unreal Engine. The test project is created based on the Game | Third Person | C++ project including
 the starter content. </p>
 <p>The picture below shows the layout of the test map:</p>
-<p><img src="/images/optmap_001.png" alt="" /></p>
+<p><img src="/images/optmap_001.png" alt="width80" /></p>
 <p>The map has a simple floor created from the default cube object, 
 and a set of small walls. The walls are the static mesh Wall_400x200 (from the starter content) placed using this PCG graph:</p>
-<p><img src="/images/optmap_002.png" alt="" /></p>
+<p><img src="/images/optmap_002.png" alt="width80" /></p>
 <p>The player start point is in an elevated position at one end of the map.  This provides this
 view over some of the walls:</p>
-<p><img src="/images/optmap_003.png" alt="" /></p>
+<p><img src="/images/optmap_003.png" alt="width80" /></p>
 <h2 id="screen-resolution">Screen Resolution</h2>
 <p>We will be testing with different build configurations such as running in the editor and running standalone.  To ensure that the we have  consistent screen resolution across configurations we  add this code to the game mode to
 set the screen resolution to 1920x1080.  Without this the standalone windows opens at full screen with maximum resolution:</p>
@@ -242,7 +186,7 @@ of the spawned actors (such a enabling ticking) to see what effect this has.</p>
 				if (!Component) continue;
 
 				if(UHierarchicalInstancedStaticMeshComponent* InstancedComponent =   
-					Cast&lt;UHierarchicalInstancedStaticMeshComponent&gt;( Component ))
+							Cast&lt;UHierarchicalInstancedStaticMeshComponent&gt;( Component ))
 				{
 					constexpr bool bInWorldSpace{ true };
 					const int Count = InstancedComponent-&gt;GetInstanceCount();
@@ -255,15 +199,13 @@ of the spawned actors (such a enabling ticking) to see what effect this has.</p>
 					const FRotator Rotation{ FRotator::ZeroRotator };
 					FActorSpawnParameters SpawnParameters;
 					SpawnParameters.Name = &quot;Test&quot;;
-					SpawnParameters.NameMode 
-					    = FActorSpawnParameters::ESpawnActorNameMode::Requested;
+					SpawnParameters.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Requested;
 
 					// BoxExtent to distance from center to bounds so *2 to get dimensions
 					const FBoxSphereBounds Bounds = Mesh-&gt;GetBounds();
 
 					// where are we positioning the set of actors
-					FVector2 ActorDropZone{ double(NumX - 1) * Spacing , 
-											double(NumY - 1) * Spacing };
+					FVector2 ActorDropZone{ double(NumX - 1) * Spacing , double(NumY - 1) * Spacing };
 
 					// spawn actors 
 					for (int i = 0; i &lt; Count; ++i)
@@ -271,8 +213,7 @@ of the spawned actors (such a enabling ticking) to see what effect this has.</p>
 						FTransform InstanceTransform;
 						InstancedComponent-&gt;GetInstanceTransform(i, InstanceTransform, bInWorldSpace);
 
-						FVector Center = InstanceTransform.GetLocation() 
-										+ Bounds.BoxExtent + SpawnOffset;
+						FVector Center = InstanceTransform.GetLocation() + Bounds.BoxExtent + SpawnOffset;
 
 						// push center away from wall
 						Center.Y -= ActorDropZone.Y * 0.5f;
@@ -286,8 +227,7 @@ of the spawned actors (such a enabling ticking) to see what effect this has.</p>
 						{
 							for (int IY = 0; IY &lt; NumY; ++IY)
 							{
-								World-&gt;SpawnActor( PawnClass, &amp;SpawnLocation, &amp;Rotation, 
-													SpawnParameters );
+								World-&gt;SpawnActor( PawnClass, &amp;SpawnLocation, &amp;Rotation, SpawnParameters );
 								SpawnLocation.Y += Spacing;
 								CountSpawned++;
 							}
@@ -305,8 +245,8 @@ of the spawned actors (such a enabling ticking) to see what effect this has.</p>
 }
 </code></pre>
 <h2 id="with-1500-actors">With 1500 Actors</h2>
-<p>Timings vary depending on screen resolution, build confiruration and project settings.  </p>
-<p><img src="/images/optmap_005.png" alt="" /></p>
+<p>Timings vary depending on screen resolution, build configuration and project settings.  </p>
+<p><img src="/images/optmap_005.png" alt="width80" /></p>
 <p>Timings in different configurations show these figures:</p>
 <table>
 <thead>
@@ -413,53 +353,13 @@ that is run using editor code.</p>
 </tbody>
 </table>
 <p>Only the first 3 are important here.  At 60 frames per second that target time to generate a frame is 16.666ms - clearly our 60.59 is way over this.  We can see that the Draw time is under that but the Game time (48.73) is over.  From this we can infer that the problem is in the game performance rather than the rendering performance.</p>
-<h2 id="using-unreal-insight">Using Unreal Insight</h2>
-<p>Unreal Insights is a tool for measuring performance of Unreal Engine applications. Unreal Insights
-collects and stores data about the runtime state of the game which can then be viewed. The data about
-one session of the game is called a trace.  Traces are stored in a directory called the trace store. The Unreal Insights Session
-Browser is the tool which shows traces in the trace store and allows you to select open a trace in
-the Unreal Insights program.  To open the session browser use this option from the trace menu at the bottom 
-of the main editor window:</p>
-<p><img src="/images/optmap_007.png" alt="" /></p>
-<p>The session browser shows a window like this:</p>
-<p><img src="/images/optmap_008.png" alt="" /></p>
-<p>from here you can double-click on a session to open it in the Unreal Insights application.  If you 
-tick the &quot;Auto-start (LIVE)&quot; checkbox in the bottom left corner then the Unreal Insights
-application will load and start analysing the data as soon as tracing starts.</p>
-<h3 id="collecting-traces-manually">Collecting traces manually</h3>
-<p>To collect trace data press the Start Trace button at the bottom of the screen:</p>
-<p><img src="/images/optmap_009.png" alt="" /></p>
-<p>This will turn the button red for the duration of the trace.  Press the button again to turn off tracing.  </p>
-<p>While the trace is running a newly created session will appear in the session browser window (if it is open)
-with the word &quot;LIVE&quot; next to it. </p>
-<p><img src="/images/optmap_010.png" alt="" /></p>
-<p>As soon as you press the trace start button capturing of trace data begins.  If the game is not running, you are capturing 
-data about the editor itself.  If you then start the game as a separate processes, for example by using the &quot;Standalone Game&quot;
-option this will start another separate trace which will also appear in the session browser window
-with &quot;LIVE&quot; next to it.  If you start the game running in the same process as the editor, for example using the &quot;New Editor Window (PIE)&quot;
-option the trace data for the game and the editor will be in the same trace file.</p>
-<h3 id="collecting-traces-automatically">Collecting traces automatically </h3>
-<p>If the Unreal Insights session browser window is open some game configurations turn on tracing automatically, for example running the editor and launching the
-game in &quot;Standalone Game&quot; will start tracing whereas launching it in a &quot;New Editor Window (PIE)&quot; will not.</p>
-<h3 id="analysing-traces">Analysing traces</h3>
-<p>If we want to capture data for an entire game session from the start, we can use the following steps:</p>
-<ul>
-<li> setting the &quot;Auto-start (LIVE)&quot; checkbox in the Unreal Insights session browser window to checked</li>
-<li> setting the play mode to &quot;Standalone Game&quot;</li>
-<li> running the game</li>
-</ul>
-<p>This will open the Unreal Insights window and imediately being displaying data.</p>
-<p>Alternatively if we only want to look at what is happening in a small number of frames and
-ignore time spent initialising and loading assets, we can run the game, and once everything 
-is loaded press the Trace button, let it run for a few frames, then press it again to stop - this
-will create a small trace file openable from the trace browser.</p>
+<p>At this point we will to investigate the slowness in <a href="Optimization_Part3.html">Part 3: Using Unreal Insights</a>  </p>
 <h2 id="reference">Reference</h2>
 <p><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine">Advanced Debugging In Unreal Engine</a>  </p>
 <p><a href="https://www.youtube.com/watch?v=SxIXnEik2Xk">PCG New Features in 5.4</a>  </p>
 <p><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine">Advanced Debugging</a></p>
 <p><a href="https://docs.unrealengine.com/4.27/en-US/TestingAndOptimization/PerformanceAndProfiling/StatCommands/">Statistics</a>  </p>
 
-</div>
 <footer class="no-sidebar">
 <div>
 <p class="page-footer">
@@ -469,6 +369,8 @@ MIT Licensed | Copyright © 2020-2024 John Farrow
 </div>
 </footer>
 </main>
+</div>
+</div>
 </div>
 </body>
 </html>

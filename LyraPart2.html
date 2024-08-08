@@ -18,119 +18,48 @@ mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkM
 <meta name="description" content="Looking into Lyra - GAS 1 Inputs and the Gameplay Ability System">
 </head>
 <body>
-<div id="app" data-server-rendered="true">
+<div id="app">
 <div class="theme-container">
-</div>
-<header class="navbar">
-<div class="sidebar-button">
-</div>
-<a href="index.html" aria-current="page" class="home-link router-link-exact-active router-link-active">
-<span class="site-name">
-unrealcode.net
-</span>
-</a>
-<div class="links">
-<nav class="nav-links can-hide">
-<div class="nav-item">
-<a href="index.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
-Home
-</a>
-</div>
-</nav>
-</div>
-</header>
-<div class="sidebar-mask">
-</div>
-<aside class="sidebar">
-<ul class="sidebar-links">
-<li>
-<section class="sidebar-group depth-0">
-<p class="sidebar-heading open">
-<span>
-Looking into Lyra - GAS 1 Inputs and the Gameplay Ability System
-</span>
-</p>
-<ul class="sidebar-links sidebar-group-items">
-<li>
-<a class="sidebar-link" href="#introduction">
-Introduction
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#about-gameplay-tags">
-About Gameplay Tags
-</a>
-</li>
-<li>
-<a class="sidebar-link" href="#stages-in-how-lyra-uses-the-gameplay-ability-system">
-Stages in how Lyra uses the Gameplay Ability System
-</a>
-<ul class="sidebar-sub-headers">
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#step-1:-input">
-Step 1: Input 
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#step-2:-from-input-to-input-action-using-input-mapping-context">
-Step 2: From Input to Input Action using Input Mapping Context
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#step-3:-from-input-action-to-gameplay-tag">
-Step 3: From Input Action to Gameplay Tag
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#step-4:-from-gameplay-tag-to-gameplay-ability">
-Step 4: From Gameplay Tag to Gameplay Ability
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#step-5:-queueing-a-gameplay-ability-for-activation">
-Step 5: Queueing a Gameplay Ability for Activation
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#input-step-4:-activating-a-queued-gameplay-ability">
-Input Step 4: Activating a Queued Gameplay Ability
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#reference">
-Reference
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#move">
-MOVE
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#using-gameplay-tags-as-an-interface">
-Using Gameplay Tags as an interface
-</a>
-</li>
-<li class="sidebar-sub-header">
-<a class="sidebar-link" href="#"extension"">
-"Extension"
-</a>
-</li>
-</ul>
-</li>
-<li>
-<a class="sidebar-link" href="#references">
-References
-</a>
-</li>
-</ul>
-</section>
-</li>
-</ul>
-</aside>
+<div class="main-container">
 <main class="page">
-<div class="theme-default-content content__default">
-<h1>Looking into Lyra - GAS 1 Inputs and the Gameplay Ability System</h1>
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
+<h1>Looking into Lyra - GAS - Inputs and the Gameplay Ability System</h1>
 <h2 id="introduction">Introduction</h2>
 <p>The aim of this is to examine the source code from the Lyra example provided by Epic Games
 and to try and identify and document practices and approaches for using c++.</p>
@@ -294,7 +223,6 @@ to its pawn extension component:
 <a href="https://www.tomlooman.com/unreal-engine-asset-manager-async-loading/">Tom Looman: Async Asset Loading</a> (<a href="https://www.tomlooman.com">https://www.tomlooman.com</a>)  <br />
 <a href="https://github.com/tranek/GASDocumentation">tranek/GASDocumentation</a>  </p>
 
-</div>
 <footer class="no-sidebar">
 <div>
 <p class="page-footer">
@@ -304,6 +232,8 @@ MIT Licensed | Copyright © 2020-2024 John Farrow
 </div>
 </footer>
 </main>
+</div>
+</div>
 </div>
 </body>
 </html>

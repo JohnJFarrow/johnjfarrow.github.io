@@ -1,203 +1,298 @@
 <!DOCTYPE html>
 <html lang="en-US">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Experiments With Chaos Physics - Using C++ | unrealcode.net</title>
-    <meta name="generator" content="VuePress 1.9.8">
-    
-    <meta name="description" content="Notes on using Chaos Physics and C++ in Unreal Engine">
-    
-    <link rel="preload" href="/assets/css/0.styles.06a2c7d8.css" as="style"><link rel="preload" href="/assets/js/app.1a1bcabe.js" as="script"><link rel="preload" href="/assets/js/3.5e27fb36.js" as="script"><link rel="preload" href="/assets/js/2.32bfe7ad.js" as="script"><link rel="preload" href="/assets/js/28.c1e7ad63.js" as="script"><link rel="preload" href="/assets/js/12.0d1be04c.js" as="script"><link rel="prefetch" href="/assets/js/10.49e97280.js"><link rel="prefetch" href="/assets/js/11.6e4ef963.js"><link rel="prefetch" href="/assets/js/13.f0527924.js"><link rel="prefetch" href="/assets/js/14.511875d3.js"><link rel="prefetch" href="/assets/js/15.8fbca2bd.js"><link rel="prefetch" href="/assets/js/16.ccc64059.js"><link rel="prefetch" href="/assets/js/17.555bef63.js"><link rel="prefetch" href="/assets/js/18.954adcd7.js"><link rel="prefetch" href="/assets/js/19.c4ba1c17.js"><link rel="prefetch" href="/assets/js/20.86f91cee.js"><link rel="prefetch" href="/assets/js/21.d649793e.js"><link rel="prefetch" href="/assets/js/22.78da9d4f.js"><link rel="prefetch" href="/assets/js/23.69d54750.js"><link rel="prefetch" href="/assets/js/24.f5bbc596.js"><link rel="prefetch" href="/assets/js/25.7973a587.js"><link rel="prefetch" href="/assets/js/26.ae6327cd.js"><link rel="prefetch" href="/assets/js/27.e0d36fa0.js"><link rel="prefetch" href="/assets/js/29.4f4d6c3f.js"><link rel="prefetch" href="/assets/js/30.2578dbe5.js"><link rel="prefetch" href="/assets/js/31.cf2d3386.js"><link rel="prefetch" href="/assets/js/32.81861962.js"><link rel="prefetch" href="/assets/js/33.7fa418e0.js"><link rel="prefetch" href="/assets/js/34.b9c56611.js"><link rel="prefetch" href="/assets/js/35.290c21b9.js"><link rel="prefetch" href="/assets/js/36.3e48a375.js"><link rel="prefetch" href="/assets/js/37.4e5efe63.js"><link rel="prefetch" href="/assets/js/38.13b5b283.js"><link rel="prefetch" href="/assets/js/39.6d3c0f3d.js"><link rel="prefetch" href="/assets/js/4.b728e6f4.js"><link rel="prefetch" href="/assets/js/40.22519dd8.js"><link rel="prefetch" href="/assets/js/41.09218c23.js"><link rel="prefetch" href="/assets/js/5.fbe4e9e0.js"><link rel="prefetch" href="/assets/js/6.5aa171c8.js"><link rel="prefetch" href="/assets/js/7.592d144b.js"><link rel="prefetch" href="/assets/js/8.675e70c4.js"><link rel="prefetch" href="/assets/js/9.876839a1.js">
-    <link rel="stylesheet" href="/assets/css/0.styles.06a2c7d8.css">
-  </head>
-  <body>
-    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">unrealcode.net</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
-  Home
-</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
-  Home
-</a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Experiments With Chaos Physics - Using C++</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/content/PhysicsCpp.html#introduction" class="sidebar-link">Introduction</a><ul class="sidebar-sub-headers"></ul></li><li><a href="/content/PhysicsCpp.html#trebuchet-c-class" class="sidebar-link">Trebuchet C++ Class</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/content/PhysicsCpp.html#atrebuchet-header-file" class="sidebar-link">ATrebuchet Header File</a></li><li class="sidebar-sub-header"><a href="/content/PhysicsCpp.html#atrebuchet-cpp-file" class="sidebar-link">ATrebuchet CPP File</a></li><li class="sidebar-sub-header"><a href="/content/PhysicsCpp.html#properties-and-defaults" class="sidebar-link">Properties and Defaults</a></li><li class="sidebar-sub-header"><a href="/content/PhysicsCpp.html#cable-release-code" class="sidebar-link">Cable Release Code</a></li></ul></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1>Experiments With Chaos Physics - Using C++</h1> <h2 id="introduction"><a href="#introduction" class="header-anchor">#</a> Introduction</h2> <p>The page <a href="/PhysicsBlueprint.html">PhysicsUsingBlueprints</a> describes the creation of a simple
-physics example implementing a trebuchet using blueprints.</p> <p>This page describes implementing the same thing using c++.</p> <h2 id="trebuchet-c-class"><a href="#trebuchet-c-class" class="header-anchor">#</a> Trebuchet C++ Class</h2> <p>Create the class using the <code>Tools | New C++ Class</code> menu option. Derive the class from the Actor
-base class and call it &quot;Trebuchet&quot;.  The editor will automatically prefix the
-class name with &quot;A&quot; so the actual c++ class name will be &quot;ATrebuchet&quot;.</p> <p>Note that this will work even if the project was created as a blueprint project -
-adding a c++ class will convert the project to a c++ project.</p> <h3 id="atrebuchet-header-file"><a href="#atrebuchet-header-file" class="header-anchor">#</a> ATrebuchet Header File</h3> <p>This header file looks like this:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">pragma</span> <span class="token expression">once</span></span>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
+<title>Experiments With Chaos Physics - Using C++ | unrealcode.net</title>
+<meta name="description" content="Experiments With Chaos Physics - Using C++">
+</head>
+<body>
+<div id="app">
+<div class="theme-container">
+<div class="main-container">
+<main class="page">
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
+<h1>Experiments With Chaos Physics - Using C++</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The page <a href="../PhysicsBlueprint.html">PhysicsUsingBlueprints</a> describes the creation of a simple
+physics example implementing a trebuchet using blueprints.</p>
+<p>This page describes implementing the same thing using c++.</p>
+<h2 id="trebuchet-c-class">Trebuchet C++ Class</h2>
+<p>Create the class using the <code>Tools | New C++ Class</code> menu option. Derive the class from the Actor
+base class and call it &quot;Trebuchet&quot;.  The editor will automatically prefix the 
+class name with &quot;A&quot; so the actual c++ class name will be &quot;ATrebuchet&quot;.</p>
+<p>Note that this will work even if the project was created as a blueprint project - 
+adding a c++ class will convert the project to a c++ project.</p>
+<h3 id="atrebuchet-header-file">ATrebuchet Header File</h3>
+<p>This header file looks like this:</p>
+<pre><code class="language-cpp">#pragma once
 
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&quot;CoreMinimal.h&quot;</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&quot;GameFramework/Actor.h&quot;</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&quot;Trebuchet.generated.h&quot;</span></span>
+#include &quot;CoreMinimal.h&quot;
+#include &quot;GameFramework/Actor.h&quot;
+#include &quot;Trebuchet.generated.h&quot;
 
-<span class="token keyword">class</span> <span class="token class-name">USphereComponent</span><span class="token punctuation">;</span>
-<span class="token keyword">class</span> <span class="token class-name">UPhysicsConstraintComponent</span><span class="token punctuation">;</span>
+class USphereComponent;
+class UPhysicsConstraintComponent;
 
-<span class="token function">UCLASS</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">class</span> <span class="token class-name">PHYSICS_003_API</span> ATrebuchet <span class="token operator">:</span> <span class="token keyword">public</span> AActor
-<span class="token punctuation">{</span>
-	<span class="token function">GENERATED_BODY</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+UCLASS()
+class PHYSICS_003_API ATrebuchet : public AActor
+{
+	GENERATED_BODY()
 	
-<span class="token keyword">public</span><span class="token operator">:</span>	
-	<span class="token comment">// Sets default values for this actor's properties</span>
-	<span class="token function">ATrebuchet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+public:	
+	// Sets default values for this actor's properties
+	ATrebuchet();
 
-<span class="token keyword">protected</span><span class="token operator">:</span>
-	<span class="token comment">// Called when the game starts or when spawned</span>
-	<span class="token keyword">virtual</span> <span class="token keyword">void</span> <span class="token function">BeginPlay</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">override</span><span class="token punctuation">;</span>
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
-<span class="token keyword">public</span><span class="token operator">:</span>	
-	<span class="token comment">// Called every frame</span>
-	<span class="token keyword">virtual</span> <span class="token keyword">void</span> <span class="token function">Tick</span><span class="token punctuation">(</span><span class="token keyword">float</span> DeltaTime<span class="token punctuation">)</span> <span class="token keyword">override</span><span class="token punctuation">;</span>
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
-<span class="token keyword">public</span><span class="token operator">:</span>
-	<span class="token function">UPROPERTY</span><span class="token punctuation">(</span>VisibleAnywhere<span class="token punctuation">)</span> UStaticMeshComponent<span class="token operator">*</span> Arm<span class="token punctuation">;</span>
-	<span class="token function">UPROPERTY</span><span class="token punctuation">(</span>VisibleAnywhere<span class="token punctuation">)</span> UStaticMeshComponent<span class="token operator">*</span> Base<span class="token punctuation">;</span>
-	<span class="token function">UPROPERTY</span><span class="token punctuation">(</span>VisibleAnywhere<span class="token punctuation">)</span> UStaticMeshComponent<span class="token operator">*</span> Ramp<span class="token punctuation">;</span>
-	<span class="token function">UPROPERTY</span><span class="token punctuation">(</span>VisibleAnywhere<span class="token punctuation">)</span> UStaticMeshComponent<span class="token operator">*</span> Weight<span class="token punctuation">;</span>
-	<span class="token function">UPROPERTY</span><span class="token punctuation">(</span>VisibleAnywhere<span class="token punctuation">)</span> USphereComponent<span class="token operator">*</span> Ball<span class="token punctuation">;</span>
-	<span class="token function">UPROPERTY</span><span class="token punctuation">(</span>VisibleAnywhere<span class="token punctuation">)</span> UPhysicsConstraintComponent<span class="token operator">*</span> ArmBaseConstraint<span class="token punctuation">;</span>
-	<span class="token function">UPROPERTY</span><span class="token punctuation">(</span>VisibleAnywhere<span class="token punctuation">)</span> UPhysicsConstraintComponent<span class="token operator">*</span> ArmWeightConstraint<span class="token punctuation">;</span>
-	<span class="token function">UPROPERTY</span><span class="token punctuation">(</span>VisibleAnywhere<span class="token punctuation">)</span> UPhysicsConstraintComponent<span class="token operator">*</span> CableConstraint<span class="token punctuation">;</span>
+public:
+	UPROPERTY(VisibleAnywhere) UStaticMeshComponent* Arm;
+	UPROPERTY(VisibleAnywhere) UStaticMeshComponent* Base;
+	UPROPERTY(VisibleAnywhere) UStaticMeshComponent* Ramp;
+	UPROPERTY(VisibleAnywhere) UStaticMeshComponent* Weight;
+	UPROPERTY(VisibleAnywhere) USphereComponent* Ball;
+	UPROPERTY(VisibleAnywhere) UPhysicsConstraintComponent* ArmBaseConstraint;
+	UPROPERTY(VisibleAnywhere) UPhysicsConstraintComponent* ArmWeightConstraint;
+	UPROPERTY(VisibleAnywhere) UPhysicsConstraintComponent* CableConstraint;
 
-<span class="token keyword">private</span><span class="token operator">:</span>
-	<span class="token keyword">bool</span> bConstraintBroken <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span class="token punctuation">;</span>
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br></div></div><p>In addition to the generated code we have added:</p> <ul><li>forward declarations for USphereComponent and UPhysicsConstraintComponent classes</li> <li>member variables to hold the static mesh components which form the body of the trebuchet</li> <li>member variables for the physics constraints</li> <li>a member variable to track whether the cable constraint has been broken when the projectile is fired</li></ul> <h3 id="atrebuchet-cpp-file"><a href="#atrebuchet-cpp-file" class="header-anchor">#</a> ATrebuchet CPP File</h3> <p>The constructor for the ATrebuchet class is shown here:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token class-name">ATrebuchet</span><span class="token double-colon punctuation">::</span><span class="token function">ATrebuchet</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-  PrimaryActorTick<span class="token punctuation">.</span>bCanEverTick <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+private:
+	bool bConstraintBroken = false;
+};
+</code></pre>
+<p>In addition to the generated code we have added:</p>
+<ul>
+<li> forward declarations for USphereComponent and UPhysicsConstraintComponent classes</li>
+<li> member variables to hold the static mesh components which form the body of the trebuchet</li>
+<li> member variables for the physics constraints</li>
+<li> a member variable to track whether the cable constraint has been broken when the projectile is fired</li>
+</ul>
+<h3 id="atrebuchet-cpp-file">ATrebuchet CPP File</h3>
+<p>The constructor for the ATrebuchet class is shown here:</p>
+<pre><code class="language-cpp">ATrebuchet::ATrebuchet()
+{
+  PrimaryActorTick.bCanEverTick = true;
 
-  <span class="token keyword">static</span> ConstructorHelpers<span class="token double-colon punctuation">::</span>FObjectFinder<span class="token operator">&lt;</span>UStaticMesh<span class="token operator">&gt;</span> 
-      <span class="token function">ArmMeshAsset</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;StaticMesh'/Game/Meshes/SM_Arm.SM_Arm'&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">static</span> ConstructorHelpers<span class="token double-colon punctuation">::</span>FObjectFinder<span class="token operator">&lt;</span>UStaticMesh<span class="token operator">&gt;</span> 
-      <span class="token function">BaseMeshAsset</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;StaticMesh'/Game/Meshes/SM_Base.SM_Base'&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">static</span> ConstructorHelpers<span class="token double-colon punctuation">::</span>FObjectFinder<span class="token operator">&lt;</span>UStaticMesh<span class="token operator">&gt;</span> 
-      <span class="token function">RampMeshAsset</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;StaticMesh'/Game/Meshes/SM_Ramp.SM_Ramp'&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">static</span> ConstructorHelpers<span class="token double-colon punctuation">::</span>FObjectFinder<span class="token operator">&lt;</span>UStaticMesh<span class="token operator">&gt;</span> 
-      <span class="token function">WeightMeshAsset</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;StaticMesh'/Game/Meshes/SM_Weight.SM_Weight'&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  static ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; 
+      ArmMeshAsset(TEXT(&quot;StaticMesh'/Game/Meshes/SM_Arm.SM_Arm'&quot;));
+  static ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; 
+      BaseMeshAsset(TEXT(&quot;StaticMesh'/Game/Meshes/SM_Base.SM_Base'&quot;));
+  static ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; 
+      RampMeshAsset(TEXT(&quot;StaticMesh'/Game/Meshes/SM_Ramp.SM_Ramp'&quot;));
+  static ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; 
+      WeightMeshAsset(TEXT(&quot;StaticMesh'/Game/Meshes/SM_Weight.SM_Weight'&quot;));
 
-  Base <span class="token operator">=</span> <span class="token generic-function"><span class="token function">CreateDefaultSubobject</span><span class="token generic class-name"><span class="token operator">&lt;</span>UStaticMeshComponent<span class="token operator">&gt;</span></span></span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;Base&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Base<span class="token operator">-&gt;</span><span class="token function">SetStaticMesh</span><span class="token punctuation">(</span>BaseMeshAsset<span class="token punctuation">.</span>Object<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Base<span class="token operator">-&gt;</span><span class="token function">SetMobility</span><span class="token punctuation">(</span>EComponentMobility<span class="token double-colon punctuation">::</span>Static<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Base<span class="token operator">-&gt;</span><span class="token function">SetCollisionProfileName</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;BlockAll&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  RootComponent <span class="token operator">=</span> Base<span class="token punctuation">;</span>
+  Base = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(&quot;Base&quot;));
+  Base-&gt;SetStaticMesh(BaseMeshAsset.Object);
+  Base-&gt;SetMobility(EComponentMobility::Static);
+  Base-&gt;SetCollisionProfileName(TEXT(&quot;BlockAll&quot;));
+  RootComponent = Base;
 
-  Ramp <span class="token operator">=</span> <span class="token generic-function"><span class="token function">CreateDefaultSubobject</span><span class="token generic class-name"><span class="token operator">&lt;</span>UStaticMeshComponent<span class="token operator">&gt;</span></span></span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;Ramp&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ramp<span class="token operator">-&gt;</span><span class="token function">SetStaticMesh</span><span class="token punctuation">(</span>RampMeshAsset<span class="token punctuation">.</span>Object<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ramp<span class="token operator">-&gt;</span><span class="token function">SetMobility</span><span class="token punctuation">(</span>EComponentMobility<span class="token double-colon punctuation">::</span>Static<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ramp<span class="token operator">-&gt;</span><span class="token function">SetCollisionProfileName</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;BlockAll&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ramp<span class="token operator">-&gt;</span><span class="token function">SetRelativeLocation</span><span class="token punctuation">(</span><span class="token function">FVector</span><span class="token punctuation">(</span> <span class="token number">0.0</span><span class="token punctuation">,</span> <span class="token number">410.0</span><span class="token punctuation">,</span> <span class="token number">40.0</span> <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ramp<span class="token operator">-&gt;</span><span class="token function">AttachToComponent</span><span class="token punctuation">(</span>Base<span class="token punctuation">,</span> FAttachmentTransformRules<span class="token double-colon punctuation">::</span>KeepRelativeTransform <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  Ramp = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(&quot;Ramp&quot;));
+  Ramp-&gt;SetStaticMesh(RampMeshAsset.Object);
+  Ramp-&gt;SetMobility(EComponentMobility::Static);
+  Ramp-&gt;SetCollisionProfileName(TEXT(&quot;BlockAll&quot;));
+  Ramp-&gt;SetRelativeLocation(FVector( 0.0, 410.0, 40.0 ));
+  Ramp-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform );
 
-  Arm <span class="token operator">=</span> <span class="token generic-function"><span class="token function">CreateDefaultSubobject</span><span class="token generic class-name"><span class="token operator">&lt;</span>UStaticMeshComponent<span class="token operator">&gt;</span></span></span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;Arm&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Arm<span class="token operator">-&gt;</span><span class="token function">SetStaticMesh</span><span class="token punctuation">(</span>ArmMeshAsset<span class="token punctuation">.</span>Object<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Arm<span class="token operator">-&gt;</span><span class="token function">SetMobility</span><span class="token punctuation">(</span>EComponentMobility<span class="token double-colon punctuation">::</span>Movable<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Arm<span class="token operator">-&gt;</span><span class="token function">SetRelativeLocation</span><span class="token punctuation">(</span><span class="token function">FVector</span><span class="token punctuation">(</span> <span class="token number">20.000000</span><span class="token punctuation">,</span>  <span class="token number">57.132445</span><span class="token punctuation">,</span>  <span class="token number">694.646682</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Arm<span class="token operator">-&gt;</span><span class="token function">SetRelativeRotation</span><span class="token punctuation">(</span><span class="token function">FRotator</span><span class="token punctuation">(</span><span class="token number">0.000000</span><span class="token punctuation">,</span> <span class="token number">0.000000</span><span class="token punctuation">,</span> <span class="token number">40.000000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Arm<span class="token operator">-&gt;</span><span class="token function">SetMassOverrideInKg</span><span class="token punctuation">(</span>NAME_None<span class="token punctuation">,</span> <span class="token number">505</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Arm<span class="token operator">-&gt;</span><span class="token function">SetSimulatePhysics</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Arm<span class="token operator">-&gt;</span><span class="token function">SetEnableGravity</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Arm<span class="token operator">-&gt;</span><span class="token function">SetCollisionProfileName</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;PhysicsActor&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Arm<span class="token operator">-&gt;</span><span class="token function">AttachToComponent</span><span class="token punctuation">(</span>Base<span class="token punctuation">,</span> FAttachmentTransformRules<span class="token double-colon punctuation">::</span>KeepRelativeTransform<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  Arm = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(&quot;Arm&quot;));
+  Arm-&gt;SetStaticMesh(ArmMeshAsset.Object);
+  Arm-&gt;SetMobility(EComponentMobility::Movable);
+  Arm-&gt;SetRelativeLocation(FVector( 20.000000,  57.132445,  694.646682));
+  Arm-&gt;SetRelativeRotation(FRotator(0.000000, 0.000000, 40.000000));
+  Arm-&gt;SetMassOverrideInKg(NAME_None, 505);
+  Arm-&gt;SetSimulatePhysics(true);
+  Arm-&gt;SetEnableGravity(true);
+  Arm-&gt;SetCollisionProfileName(TEXT(&quot;PhysicsActor&quot;));
+  Arm-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
 
-  Weight <span class="token operator">=</span> <span class="token generic-function"><span class="token function">CreateDefaultSubobject</span><span class="token generic class-name"><span class="token operator">&lt;</span>UStaticMeshComponent<span class="token operator">&gt;</span></span></span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;Weight&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Weight<span class="token operator">-&gt;</span><span class="token function">SetStaticMesh</span><span class="token punctuation">(</span>WeightMeshAsset<span class="token punctuation">.</span>Object<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Weight<span class="token operator">-&gt;</span><span class="token function">SetMobility</span><span class="token punctuation">(</span>EComponentMobility<span class="token double-colon punctuation">::</span>Movable<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Weight<span class="token operator">-&gt;</span><span class="token function">SetRelativeLocation</span><span class="token punctuation">(</span><span class="token function">FVector</span><span class="token punctuation">(</span> <span class="token number">10.000000</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">165.000000</span><span class="token punctuation">,</span> <span class="token number">640.000000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Weight<span class="token operator">-&gt;</span><span class="token function">SetSimulatePhysics</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Weight<span class="token operator">-&gt;</span><span class="token function">SetMassOverrideInKg</span><span class="token punctuation">(</span>NAME_None<span class="token punctuation">,</span><span class="token number">4506</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Weight<span class="token operator">-&gt;</span><span class="token function">SetEnableGravity</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Weight<span class="token operator">-&gt;</span><span class="token function">SetCollisionProfileName</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;PhysicsActor&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Weight<span class="token operator">-&gt;</span><span class="token function">AttachToComponent</span><span class="token punctuation">(</span>Base<span class="token punctuation">,</span> FAttachmentTransformRules<span class="token double-colon punctuation">::</span>KeepRelativeTransform<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  Weight = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(&quot;Weight&quot;));
+  Weight-&gt;SetStaticMesh(WeightMeshAsset.Object);
+  Weight-&gt;SetMobility(EComponentMobility::Movable);
+  Weight-&gt;SetRelativeLocation(FVector( 10.000000, -165.000000, 640.000000));
+  Weight-&gt;SetSimulatePhysics(true);
+  Weight-&gt;SetMassOverrideInKg(NAME_None,4506);
+  Weight-&gt;SetEnableGravity(true);
+  Weight-&gt;SetCollisionProfileName(TEXT(&quot;PhysicsActor&quot;));
+  Weight-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
 
-  Ball <span class="token operator">=</span> <span class="token generic-function"><span class="token function">CreateDefaultSubobject</span><span class="token generic class-name"><span class="token operator">&lt;</span>USphereComponent<span class="token operator">&gt;</span></span></span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;Ball&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ball<span class="token operator">-&gt;</span><span class="token function">SetMobility</span><span class="token punctuation">(</span>EComponentMobility<span class="token double-colon punctuation">::</span>Movable<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ball<span class="token operator">-&gt;</span><span class="token function">SetRelativeLocation</span><span class="token punctuation">(</span><span class="token function">FVector</span><span class="token punctuation">(</span><span class="token number">0.000000</span><span class="token punctuation">,</span> <span class="token number">190.000000</span><span class="token punctuation">,</span> <span class="token number">140.000000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ball<span class="token operator">-&gt;</span><span class="token function">SetSimulatePhysics</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ball<span class="token operator">-&gt;</span><span class="token function">SetMassOverrideInKg</span><span class="token punctuation">(</span>NAME_None<span class="token punctuation">,</span><span class="token number">15</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ball<span class="token operator">-&gt;</span><span class="token function">SetEnableGravity</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ball<span class="token operator">-&gt;</span><span class="token function">SetCollisionProfileName</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;PhysicsActor&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ball<span class="token operator">-&gt;</span><span class="token function">SetHiddenInGame</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  Ball<span class="token operator">-&gt;</span><span class="token function">AttachToComponent</span><span class="token punctuation">(</span>Base<span class="token punctuation">,</span> FAttachmentTransformRules<span class="token double-colon punctuation">::</span>KeepRelativeTransform<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  Ball = CreateDefaultSubobject&lt;USphereComponent&gt;(TEXT(&quot;Ball&quot;));
+  Ball-&gt;SetMobility(EComponentMobility::Movable);
+  Ball-&gt;SetRelativeLocation(FVector(0.000000, 190.000000, 140.000000));
+  Ball-&gt;SetSimulatePhysics(true);
+  Ball-&gt;SetMassOverrideInKg(NAME_None,15);
+  Ball-&gt;SetEnableGravity(true);
+  Ball-&gt;SetCollisionProfileName(TEXT(&quot;PhysicsActor&quot;));
+  Ball-&gt;SetHiddenInGame(false);
+  Ball-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
 
-  ArmBaseConstraint <span class="token operator">=</span> <span class="token generic-function"><span class="token function">CreateDefaultSubobject</span><span class="token generic class-name"><span class="token operator">&lt;</span> UPhysicsConstraintComponent <span class="token operator">&gt;</span></span></span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;ArmBaseConstraint&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmBaseConstraint<span class="token operator">-&gt;</span><span class="token function">SetRelativeLocation</span><span class="token punctuation">(</span><span class="token function">FVector</span><span class="token punctuation">(</span><span class="token number">10.000000</span><span class="token punctuation">,</span> <span class="token number">0.000000</span><span class="token punctuation">,</span> <span class="token number">740.000000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmBaseConstraint<span class="token operator">-&gt;</span><span class="token function">SetConstrainedComponents</span><span class="token punctuation">(</span> Base<span class="token punctuation">,</span> <span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Arm<span class="token punctuation">,</span> <span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;&quot;</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmBaseConstraint<span class="token operator">-&gt;</span><span class="token function">SetLinearXLimit</span><span class="token punctuation">(</span>ELinearConstraintMotion<span class="token double-colon punctuation">::</span>LCM_Locked<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmBaseConstraint<span class="token operator">-&gt;</span><span class="token function">SetLinearYLimit</span><span class="token punctuation">(</span>ELinearConstraintMotion<span class="token double-colon punctuation">::</span>LCM_Locked<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmBaseConstraint<span class="token operator">-&gt;</span><span class="token function">SetLinearZLimit</span><span class="token punctuation">(</span>ELinearConstraintMotion<span class="token double-colon punctuation">::</span>LCM_Locked<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmBaseConstraint<span class="token operator">-&gt;</span><span class="token function">SetAngularSwing1Limit</span><span class="token punctuation">(</span>EAngularConstraintMotion<span class="token double-colon punctuation">::</span>ACM_Locked<span class="token punctuation">,</span> <span class="token number">0</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmBaseConstraint<span class="token operator">-&gt;</span><span class="token function">SetAngularSwing2Limit</span><span class="token punctuation">(</span>EAngularConstraintMotion<span class="token double-colon punctuation">::</span>ACM_Locked<span class="token punctuation">,</span> <span class="token number">0</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmBaseConstraint<span class="token operator">-&gt;</span><span class="token function">SetAngularTwistLimit</span><span class="token punctuation">(</span>EAngularConstraintMotion<span class="token double-colon punctuation">::</span>ACM_Free<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmBaseConstraint<span class="token operator">-&gt;</span><span class="token function">SetDisableCollision</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmBaseConstraint<span class="token operator">-&gt;</span><span class="token function">AttachToComponent</span><span class="token punctuation">(</span>Base<span class="token punctuation">,</span> FAttachmentTransformRules<span class="token double-colon punctuation">::</span>KeepRelativeTransform<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  ArmBaseConstraint = CreateDefaultSubobject&lt; UPhysicsConstraintComponent &gt;(TEXT(&quot;ArmBaseConstraint&quot;));
+  ArmBaseConstraint-&gt;SetRelativeLocation(FVector(10.000000, 0.000000, 740.000000));
+  ArmBaseConstraint-&gt;SetConstrainedComponents( Base, TEXT(&quot;&quot;), Arm, TEXT(&quot;&quot;) );
+  ArmBaseConstraint-&gt;SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmBaseConstraint-&gt;SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmBaseConstraint-&gt;SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmBaseConstraint-&gt;SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0 );
+  ArmBaseConstraint-&gt;SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0 );
+  ArmBaseConstraint-&gt;SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free, 0);
+  ArmBaseConstraint-&gt;SetDisableCollision(true);
+  ArmBaseConstraint-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
 
-  ArmWeightConstraint <span class="token operator">=</span> <span class="token generic-function"><span class="token function">CreateDefaultSubobject</span><span class="token generic class-name"><span class="token operator">&lt;</span> UPhysicsConstraintComponent <span class="token operator">&gt;</span></span></span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;ArmWeightConstraint&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
-  ArmWeightConstraint<span class="token operator">-&gt;</span><span class="token function">SetRelativeLocation</span><span class="token punctuation">(</span><span class="token function">FVector</span><span class="token punctuation">(</span> <span class="token number">15.000000</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">168.000000</span><span class="token punctuation">,</span> <span class="token number">883.000000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmWeightConstraint<span class="token operator">-&gt;</span><span class="token function">SetConstrainedComponents</span><span class="token punctuation">(</span>Arm<span class="token punctuation">,</span> <span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Weight<span class="token punctuation">,</span> <span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmWeightConstraint<span class="token operator">-&gt;</span><span class="token function">SetLinearXLimit</span><span class="token punctuation">(</span>ELinearConstraintMotion<span class="token double-colon punctuation">::</span>LCM_Locked<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmWeightConstraint<span class="token operator">-&gt;</span><span class="token function">SetLinearYLimit</span><span class="token punctuation">(</span>ELinearConstraintMotion<span class="token double-colon punctuation">::</span>LCM_Locked<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmWeightConstraint<span class="token operator">-&gt;</span><span class="token function">SetLinearZLimit</span><span class="token punctuation">(</span>ELinearConstraintMotion<span class="token double-colon punctuation">::</span>LCM_Locked<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmWeightConstraint<span class="token operator">-&gt;</span><span class="token function">SetAngularSwing1Limit</span><span class="token punctuation">(</span>EAngularConstraintMotion<span class="token double-colon punctuation">::</span>ACM_Locked<span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmWeightConstraint<span class="token operator">-&gt;</span><span class="token function">SetAngularSwing2Limit</span><span class="token punctuation">(</span>EAngularConstraintMotion<span class="token double-colon punctuation">::</span>ACM_Locked<span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmWeightConstraint<span class="token operator">-&gt;</span><span class="token function">SetAngularTwistLimit</span><span class="token punctuation">(</span>EAngularConstraintMotion<span class="token double-colon punctuation">::</span>ACM_Free<span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmWeightConstraint<span class="token operator">-&gt;</span><span class="token function">SetDisableCollision</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  ArmWeightConstraint<span class="token operator">-&gt;</span><span class="token function">AttachToComponent</span><span class="token punctuation">(</span>Base<span class="token punctuation">,</span> FAttachmentTransformRules<span class="token double-colon punctuation">::</span>KeepRelativeTransform<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  ArmWeightConstraint = CreateDefaultSubobject&lt; UPhysicsConstraintComponent &gt;(TEXT(&quot;ArmWeightConstraint&quot;));;
+  ArmWeightConstraint-&gt;SetRelativeLocation(FVector( 15.000000, -168.000000, 883.000000));
+  ArmWeightConstraint-&gt;SetConstrainedComponents(Arm, TEXT(&quot;&quot;), Weight, TEXT(&quot;&quot;));
+  ArmWeightConstraint-&gt;SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmWeightConstraint-&gt;SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmWeightConstraint-&gt;SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  ArmWeightConstraint-&gt;SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked,0);
+  ArmWeightConstraint-&gt;SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked,0);
+  ArmWeightConstraint-&gt;SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free,0);
+  ArmWeightConstraint-&gt;SetDisableCollision(true);
+  ArmWeightConstraint-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
 
-  CableConstraint <span class="token operator">=</span> <span class="token generic-function"><span class="token function">CreateDefaultSubobject</span><span class="token generic class-name"><span class="token operator">&lt;</span> UPhysicsConstraintComponent <span class="token operator">&gt;</span></span></span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;CableConstraint&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token punctuation">;</span>
-  CableConstraint<span class="token operator">-&gt;</span><span class="token function">SetRelativeLocation</span><span class="token punctuation">(</span><span class="token function">FVector</span><span class="token punctuation">(</span> <span class="token number">14.000000</span><span class="token punctuation">,</span> <span class="token number">634.000000</span><span class="token punctuation">,</span> <span class="token number">210.000000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  CableConstraint<span class="token operator">-&gt;</span><span class="token function">SetConstrainedComponents</span><span class="token punctuation">(</span>Arm<span class="token punctuation">,</span> <span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Ball<span class="token punctuation">,</span> <span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  CableConstraint<span class="token operator">-&gt;</span><span class="token function">SetLinearXLimit</span><span class="token punctuation">(</span>ELinearConstraintMotion<span class="token double-colon punctuation">::</span>LCM_Locked<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  CableConstraint<span class="token operator">-&gt;</span><span class="token function">SetLinearYLimit</span><span class="token punctuation">(</span>ELinearConstraintMotion<span class="token double-colon punctuation">::</span>LCM_Locked<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  CableConstraint<span class="token operator">-&gt;</span><span class="token function">SetLinearZLimit</span><span class="token punctuation">(</span>ELinearConstraintMotion<span class="token double-colon punctuation">::</span>LCM_Locked<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  CableConstraint<span class="token operator">-&gt;</span><span class="token function">SetAngularSwing1Limit</span><span class="token punctuation">(</span>EAngularConstraintMotion<span class="token double-colon punctuation">::</span>ACM_Free<span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  CableConstraint<span class="token operator">-&gt;</span><span class="token function">SetAngularSwing2Limit</span><span class="token punctuation">(</span>EAngularConstraintMotion<span class="token double-colon punctuation">::</span>ACM_Free<span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  CableConstraint<span class="token operator">-&gt;</span><span class="token function">SetAngularTwistLimit</span><span class="token punctuation">(</span>EAngularConstraintMotion<span class="token double-colon punctuation">::</span>ACM_Free<span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  CableConstraint<span class="token operator">-&gt;</span><span class="token function">SetDisableCollision</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  CableConstraint<span class="token operator">-&gt;</span><span class="token function">AttachToComponent</span><span class="token punctuation">(</span>Base<span class="token punctuation">,</span> FAttachmentTransformRules<span class="token double-colon punctuation">::</span>KeepRelativeTransform<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br></div></div><h4 id="static-mesh-loading"><a href="#static-mesh-loading" class="header-anchor">#</a> Static Mesh Loading</h4> <p>For each static mesh we have an object to locate and load it:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token keyword">static</span> ConstructorHelpers<span class="token double-colon punctuation">::</span>FObjectFinder<span class="token operator">&lt;</span>UStaticMesh<span class="token operator">&gt;</span> 
-    <span class="token function">ArmMeshAsset</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;StaticMesh'/Game/Meshes/SM_Arm.SM_Arm'&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>This works for a simple example, in a larger project you would not do this because:</p> <ul><li>it forces the mesh assets to be loaded even if they are not in use</li> <li>hard coding the asset path is brittle and hard to maintain</li></ul> <p>For most of the static mesh components we set properties like this:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code>Weight <span class="token operator">=</span> <span class="token generic-function"><span class="token function">CreateDefaultSubobject</span><span class="token generic class-name"><span class="token operator">&lt;</span>UStaticMeshComponent<span class="token operator">&gt;</span></span></span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;Weight&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-Weight<span class="token operator">-&gt;</span><span class="token function">SetStaticMesh</span><span class="token punctuation">(</span>WeightMeshAsset<span class="token punctuation">.</span>Object<span class="token punctuation">)</span><span class="token punctuation">;</span>
-Weight<span class="token operator">-&gt;</span><span class="token function">SetMobility</span><span class="token punctuation">(</span>EComponentMobility<span class="token double-colon punctuation">::</span>Movable<span class="token punctuation">)</span><span class="token punctuation">;</span>
-Weight<span class="token operator">-&gt;</span><span class="token function">SetRelativeLocation</span><span class="token punctuation">(</span><span class="token function">FVector</span><span class="token punctuation">(</span> <span class="token number">10.000000</span><span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">165.000000</span><span class="token punctuation">,</span> <span class="token number">640.000000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-Weight<span class="token operator">-&gt;</span><span class="token function">SetSimulatePhysics</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-Weight<span class="token operator">-&gt;</span><span class="token function">SetMassOverrideInKg</span><span class="token punctuation">(</span>NAME_None<span class="token punctuation">,</span><span class="token number">4506</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-Weight<span class="token operator">-&gt;</span><span class="token function">SetEnableGravity</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-Weight<span class="token operator">-&gt;</span><span class="token function">SetCollisionProfileName</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;PhysicsActor&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-Weight<span class="token operator">-&gt;</span><span class="token function">AttachToComponent</span><span class="token punctuation">(</span>Base<span class="token punctuation">,</span> FAttachmentTransformRules<span class="token double-colon punctuation">::</span>KeepRelativeTransform<span class="token punctuation">)</span><span class="token punctuation">;</span>
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br></div></div><p>The location and rotation values are simply copied from the blueprint project.  This is enough to
-show physics working from c++.</p> <h3 id="properties-and-defaults"><a href="#properties-and-defaults" class="header-anchor">#</a> Properties and Defaults</h3> <p>Note that more properties required setting from c++ than when using the editor.  When
-using the editor, changing the Mobility property to &quot;Movable&quot; also changes the
-Collision Preset value to &quot;PhysicsActor&quot;.  In c++ we need to manually set both
-properties like this:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code>Weight<span class="token operator">-&gt;</span><span class="token function">SetMobility</span><span class="token punctuation">(</span>EComponentMobility<span class="token double-colon punctuation">::</span>Movable<span class="token punctuation">)</span><span class="token punctuation">;</span>
-Weight<span class="token operator">-&gt;</span><span class="token function">SetCollisionProfileName</span><span class="token punctuation">(</span><span class="token function">TEXT</span><span class="token punctuation">(</span><span class="token string">&quot;PhysicsActor&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>Also note the defaults for components are different depending on how they are created. A USphere
+  CableConstraint = CreateDefaultSubobject&lt; UPhysicsConstraintComponent &gt;(TEXT(&quot;CableConstraint&quot;));;
+  CableConstraint-&gt;SetRelativeLocation(FVector( 14.000000, 634.000000, 210.000000));
+  CableConstraint-&gt;SetConstrainedComponents(Arm, TEXT(&quot;&quot;), Ball, TEXT(&quot;&quot;));
+  CableConstraint-&gt;SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  CableConstraint-&gt;SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  CableConstraint-&gt;SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
+  CableConstraint-&gt;SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Free,0);
+  CableConstraint-&gt;SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Free,0);
+  CableConstraint-&gt;SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free,0);
+  CableConstraint-&gt;SetDisableCollision(true);
+  CableConstraint-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
+}
+</code></pre>
+<h4 id="static-mesh-loading">Static Mesh Loading</h4>
+<p>For each static mesh we have an object to locate and load it:</p>
+<pre><code class="language-cpp">static ConstructorHelpers::FObjectFinder&lt;UStaticMesh&gt; 
+    ArmMeshAsset(TEXT(&quot;StaticMesh'/Game/Meshes/SM_Arm.SM_Arm'&quot;));
+</code></pre>
+<p>This works for a simple example, in a larger project you would not do this because:</p>
+<ul>
+<li> it forces the mesh assets to be loaded even if they are not in use</li>
+<li> hard coding the asset path is brittle and hard to maintain</li>
+</ul>
+<p>For most of the static mesh components we set properties like this:</p>
+<pre><code class="language-cpp">Weight = CreateDefaultSubobject&lt;UStaticMeshComponent&gt;(TEXT(&quot;Weight&quot;));
+Weight-&gt;SetStaticMesh(WeightMeshAsset.Object);
+Weight-&gt;SetMobility(EComponentMobility::Movable);
+Weight-&gt;SetRelativeLocation(FVector( 10.000000, -165.000000, 640.000000));
+Weight-&gt;SetSimulatePhysics(true);
+Weight-&gt;SetMassOverrideInKg(NAME_None,4506);
+Weight-&gt;SetEnableGravity(true);
+Weight-&gt;SetCollisionProfileName(TEXT(&quot;PhysicsActor&quot;));
+Weight-&gt;AttachToComponent(Base, FAttachmentTransformRules::KeepRelativeTransform);
+</code></pre>
+<p>The location and rotation values are simply copied from the blueprint project.  This is enough to
+show physics working from c++.</p>
+<h3 id="properties-and-defaults">Properties and Defaults </h3>
+<p>Note that more properties required setting from c++ than when using the editor.  When
+using the editor, changing the Mobility property to &quot;Movable&quot; also changes the 
+Collision Preset value to &quot;PhysicsActor&quot;.  In c++ we need to manually set both 
+properties like this:</p>
+<pre><code class="language-cpp">Weight-&gt;SetMobility(EComponentMobility::Movable);
+Weight-&gt;SetCollisionProfileName(TEXT(&quot;PhysicsActor&quot;));
+</code></pre>
+<p>Also note the defaults for components are different depending on how they are created. A USphere
 component has the Hidden In Game property set to false when created in the blueprint editor and
-true when created from c++, so we need to explcitly set it in c++:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code>Ball<span class="token operator">-&gt;</span><span class="token function">SetHiddenInGame</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><h3 id="cable-release-code"><a href="#cable-release-code" class="header-anchor">#</a> Cable Release Code</h3> <p>This image shows the blueprint which breaks the Physics Constraint once the projectile
-is travelling in the right direction and at an angle of &lt;= 45 degrees:</p> <img src="/images/chaos_029.png" id="BP2"> <p>This is converted into the c++ code shown here:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token keyword">void</span> <span class="token class-name">ATrebuchet</span><span class="token double-colon punctuation">::</span><span class="token function">Tick</span><span class="token punctuation">(</span><span class="token keyword">float</span> DeltaTime<span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-  <span class="token function">check</span><span class="token punctuation">(</span>Ball<span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token function">check</span><span class="token punctuation">(</span>CableConstraint<span class="token punctuation">)</span><span class="token punctuation">;</span>
+true when created from c++, so we need to explcitly set it in c++:</p>
+<pre><code class="language-cpp">Ball-&gt;SetHiddenInGame(false);
+</code></pre>
+<h3 id="cable-release-code">Cable Release Code</h3>
+<p>This image shows the blueprint which breaks the Physics Constraint once the projectile
+is travelling in the right direction and at an angle of &lt;= 45 degrees:</p>
+<ImageExpando :imagePath="$withBase('/images/chaos_029.png')" imageId="BP2"/>
+<p>This is converted into the c++ code shown here:</p>
+<pre><code class="language-cpp">void ATrebuchet::Tick(float DeltaTime)
+{
+  check(Ball);
+  check(CableConstraint);
 
-  <span class="token class-name">Super</span><span class="token double-colon punctuation">::</span><span class="token function">Tick</span><span class="token punctuation">(</span>DeltaTime<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  Super::Tick(DeltaTime);
 
-  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bConstraintBroken <span class="token punctuation">)</span>
-  <span class="token punctuation">{</span>
-    <span class="token keyword">const</span> FVector Velocity <span class="token operator">=</span> Ball<span class="token operator">-&gt;</span><span class="token function">GetComponentVelocity</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  if (!bConstraintBroken )
+  {
+    const FVector Velocity = Ball-&gt;GetComponentVelocity();
 
-    <span class="token comment">// assume we firing down X axis, </span>
-    <span class="token keyword">if</span> <span class="token punctuation">(</span>Velocity<span class="token punctuation">.</span>X <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
-    <span class="token punctuation">{</span>
-      <span class="token keyword">const</span> <span class="token keyword">float</span> TrajectoryDegress <span class="token operator">=</span> 
-         <span class="token class-name">FMath</span><span class="token double-colon punctuation">::</span><span class="token function">RadiansToDegrees</span><span class="token punctuation">(</span> <span class="token class-name">FMath</span><span class="token double-colon punctuation">::</span><span class="token function">Atan</span><span class="token punctuation">(</span>Velocity<span class="token punctuation">.</span>Z <span class="token operator">/</span> Velocity<span class="token punctuation">.</span>X<span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-      <span class="token keyword">if</span> <span class="token punctuation">(</span>TrajectoryDegress <span class="token operator">&lt;</span> <span class="token number">45</span><span class="token punctuation">)</span>
-      <span class="token punctuation">{</span>
-        CableConstraint<span class="token operator">-&gt;</span><span class="token function">BreakConstraint</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        bConstraintBroken <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
-      <span class="token punctuation">}</span>
-    <span class="token punctuation">}</span>
-  <span class="token punctuation">}</span>
-<span class="token punctuation">}</span>
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br></div></div></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main> <footer class="f"><div><p>MIT Licensed | Copyright © 2020-2023 John Farrow</p></div></footer></div><div class="global-ui"></div></div>
-    <script src="/assets/js/app.1a1bcabe.js" defer></script><script src="/assets/js/3.5e27fb36.js" defer></script><script src="/assets/js/2.32bfe7ad.js" defer></script><script src="/assets/js/28.c1e7ad63.js" defer></script><script src="/assets/js/12.0d1be04c.js" defer></script>
-  </body>
+    // assume we firing down X axis, 
+    if (Velocity.X &gt; 0)
+    {
+      const float TrajectoryDegress = 
+         FMath::RadiansToDegrees( FMath::Atan(Velocity.Z / Velocity.X) );
+      if (TrajectoryDegress &lt; 45)
+      {
+        CableConstraint-&gt;BreakConstraint();
+        bConstraintBroken = true;
+      }
+    }
+  }
+}
+</code></pre>
+
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</div>
+</body>
 </html>

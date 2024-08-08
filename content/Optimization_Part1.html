@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
+<title>Optimization Part 1 Build Configurations | unrealcode.net</title>
+<meta name="description" content="Optimization Part 1 Build Configurations">
+</head>
+<body>
+<div id="app">
+<div class="theme-container">
+<div class="main-container">
+<main class="page">
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
+<h1 id="optimizing-unreal-engine-part-1-build-configurations">Optimizing Unreal Engine : Part 1 <br/>Build Configurations</h1>
+<h3 id="available-solution-configurations">Available Solution Configurations</h3>
+<p>Unreal Engine projects can be built with different configurations which serve different purposes.  The solution configurations available depend on the whether you are building with the Unreal Engine source code.  </p>
+<p>If you create a project by launching Unreal Editor from the Epic Launcher, then you are using the engine compiled by Epic
+ and you will see these configuration options in Visual Studio:</p>
+<p><img src="/images/devops_020.png" alt="offset" /></p>
+<p>If you are compiling the engine from source code, you will see these  configuration options in Visual Studio:</p>
+<p><img src="/images/devops_021.png" alt="offset" /></p>
+<p>In Rider with a non-source build the options are the same:</p>
+<p><img src="/images/devops_025.png" alt="offset" /></p>
+<p>In Rider with an engine source build is it more obvious you are selecting one configuration and one target:</p>
+<p><img src="/images/devops_024.png" alt="offset" /></p>
+<p>These configurations reflect:</p>
+<ul>
+<li> if you are compiling the engine source code or not.  Engine source code builds offer more configurations but take a long time to compile the engine initially</li>
+<li> if  you are  working on a standalone game or a multiplayer game (which is split into client and server components)</li>
+<li> if  you are  building a debug version or a non-debug version (which is referred to as &quot;development&quot;)</li>
+<li> when you compile the program and run it, it will launch one of:
+<ul>
+<li> a standalone game</li>
+<li> the server part of a multiplayer game</li>
+<li> the client part of a multiplayer game</li>
+<li> the Unreal Editor  </li>
+</ul>
+</li>
+</ul>
+<p>The following table lists the Debug configuration options.  These are for when you are compiling the engine source yourself and want to debug your code and the engine code.</p>
+<table>
+<thead>
+<tr>
+<th><div style="width:136px">Configuration</div></th>
+<th><div style="width:50px">Needs Engine Source</div></th>
+<th><div style="width:50px">Engine Code</div></th>
+<th><div style="width:50px">Your Code</div></th>
+<th><div style="width:62px">Runs</div></th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Debug</td>
+<td>Yes</td>
+<td>Debug</td>
+<td>Debug</td>
+<td>Single player game</td>
+<td>Debugging a single player game</td>
+</tr>
+<tr>
+<td>Debug Client</td>
+<td>Yes</td>
+<td>Debug</td>
+<td>Debug</td>
+<td>Game client</td>
+<td>Debugging the client part of a multiplayer game</td>
+</tr>
+<tr>
+<td>Debug Server</td>
+<td>Yes</td>
+<td>Debug</td>
+<td>Debug</td>
+<td>Game server</td>
+<td>Debugging the server part of a multiplayer game</td>
+</tr>
+<tr>
+<td>Debug Editor</td>
+<td>Yes</td>
+<td>Debug</td>
+<td>Debug</td>
+<td>Editor</td>
+<td>Debugging your game and the editor</td>
+</tr>
+</tbody>
+</table>
+<p>The following table lists the DebugGame configuration options.  These are for when you want to debug your own code but use an optimized version of the engine code.</p>
+<table>
+<thead>
+<tr>
+<th><div style="width:136px">Configuration</div></th>
+<th><div style="width:50px">Needs Engine Source</div></th>
+<th><div style="width:50px">Engine Code</div></th>
+<th><div style="width:50px">Your Code</div></th>
+<th><div style="width:62px">Runs</div></th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DebugGame</td>
+<td>No</td>
+<td>Release</br>Optimized</td>
+<td>Debug</td>
+<td>Single player game</td>
+<td>Debugging your own code in a single player game, builds your game code with debug, non-optimized, but the engine code is not debug and is optimized</td>
+</tr>
+<tr>
+<td>DebugGame Client</td>
+<td>Yes</td>
+<td>Release</br>Optimized</td>
+<td>Debug</td>
+<td>Game client</td>
+<td>Debugging your own code in the client part of a multiplayer game, builds your game code with debug, non-optimized, but the engine code is not debug and is optimized</td>
+</tr>
+<tr>
+<td>DebugGame Server</td>
+<td>Yes</td>
+<td>Release</br>Optimized</td>
+<td>Debug</td>
+<td>Game server</td>
+<td>Debugging your own code in the server part of a multiplayer game, builds your game code with debug, non-optimized, but the engine code is not debug and is optimized</td>
+</tr>
+<tr>
+<td>DebugGame Editor</td>
+<td>No</td>
+<td>Release</br>Optimized</td>
+<td>Debug</td>
+<td>Editor</td>
+<td>Builds engine, editor in release mode and your code in debug,  and runs the Unreal Editor</td>
+</tr>
+</tbody>
+</table>
+<p>The following table lists the Development configuration options.  This is for non-debugging activities.</p>
+<table>
+<thead>
+<tr>
+<th><div style="width:136px">Configuration</div></th>
+<th><div style="width:50px">Needs Engine Source</div></th>
+<th><div style="width:50px">Engine Code</div></th>
+<th><div style="width:50px">Your Code</div></th>
+<th><div style="width:62px">Runs</div></th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Development</td>
+<td>No</td>
+<td>Release</br>Optimized</td>
+<td>Release</br>Optimized</td>
+<td>Single player game</td>
+<td>Running your game without debug information</td>
+</tr>
+<tr>
+<td>Development Client</td>
+<td>Yes</td>
+<td>Release</br>Optimized</td>
+<td>Release</br>Optimized</td>
+<td>Game client</td>
+<td>Running the client part of your multiplayer game without debug information</td>
+</tr>
+<tr>
+<td>Development Server</td>
+<td>Yes</td>
+<td>Release</br>Optimized</td>
+<td>Release</br>Optimized</td>
+<td>Game server</td>
+<td>Running the server part of your multiplayer game without debug information</td>
+</tr>
+<tr>
+<td>Development Editor</td>
+<td>No</td>
+<td>Release</br>Optimized</td>
+<td>Release</br>Optimized</td>
+<td>Editor</td>
+<td>Same as above but for loading in the editor, so when you run it the executable it will run the editor not the game</td>
+</tr>
+</tbody>
+</table>
+<p>The following table lists the Shipping configuration options:</p>
+<table>
+<thead>
+<tr>
+<th><div style="width:136px">Configuration</div></th>
+<th><div style="width:50px">Needs Engine Source</div></th>
+<th><div style="width:50px">Engine Code</div></th>
+<th><div style="width:50px">Your Code</div></th>
+<th><div style="width:62px">Runs</div></th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shipping</td>
+<td>No</td>
+<td>Release</br>Optimized</td>
+<td>Release</br>Optimized</td>
+<td>Game</td>
+<td></td>
+</tr>
+<tr>
+<td>Shipping Client</td>
+<td>Yes</td>
+<td>Release</br>Optimized</td>
+<td>Release</br>Optimized</td>
+<td>Game client</td>
+<td></td>
+</tr>
+<tr>
+<td>Shipping Server</td>
+<td>Yes</td>
+<td>Release</br>Optimized</td>
+<td>Release</br>Optimized</td>
+<td>Game server</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The following table lists the Test configuration options:</p>
+<table>
+<thead>
+<tr>
+<th><div style="width:136px">Configuration</div></th>
+<th><div style="width:50px">Needs Engine Source</div></th>
+<th><div style="width:50px">Engine Code</div></th>
+<th><div style="width:50px">Your Code</div></th>
+<th><div style="width:62px">Runs</div></th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Test</td>
+<td>Yes</td>
+<td>Release</br>Optimized</td>
+<td>Release</br>Optimized</td>
+<td>Game</td>
+<td>Shipping configuration, but with some console commands, stats, and profiling tools enabled</td>
+</tr>
+<tr>
+<td>Test Client</td>
+<td>Yes</td>
+<td>Release</br>Optimized</td>
+<td>Release</br>Optimized</td>
+<td>Game client</td>
+<td>Shipping configuration, but with some console commands, stats, and profiling tools enabled</td>
+</tr>
+<tr>
+<td>Test Server</td>
+<td>Yes</td>
+<td>Release</br>Optimized</td>
+<td>Release</br>Optimized</td>
+<td>Game server</td>
+<td>Shipping configuration, but with some console commands, stats, and profiling tools enabled</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-need-for-packaging">The need for packaging</h2>
+<p>Some configurations (such as &quot;Debug&quot;) run using files which are 
+created by cooking or packaging the project. If you have never cooked or packaged the project you get 
+this error message:</p>
+<p><img src="/images/devops_022.png" alt="offset" /></p>
+<p>And in the log you will see  something like this:</p>
+<blockquote>
+<p>LogShaderLibrary: Display: Logical shader library 'Global' component count 0, new components: 0  <br />
+LogShaderLibrary: Display: Running without a pakfile and did not find a monolithic library 'Global' - attempting disk search for its chunks  <br />
+LogShaderLibrary: Display:    ....  not found  <br />
+LogShaderLibrary: Error: Failed to initialize ShaderCodeLibrary required by the project because part of the Global shader library is missing from ../../../../../EpicSource/UnrealEngineSource521/../../work/LyraCombined/work/Content/.</p>
+</blockquote>
+<p>Use Platforms | Windows | Package Project to make the required files.  This requires you to use another configuration such as Debug Editor in order to actually run the editor to do the packaging.  The image below shows the cooking options for the &quot;Debug&quot; configuration of the Lyra sample game:</p>
+<p><img src="/images/devops_023.png" alt="" /></p>
+<p>Different configurations use different cooked or packaged files.  For example if cooking the Lyra example project you need to package with different settings for the Debug and Debug Client configurations, changing the &quot;Build Target&quot; property from &quot;LyraGame&quot; to &quot;LyraClient&quot;.  </p>
+<p>The cooking process creates files (based on the above example) in Saved/Cooked/Windows/Lyra.</p>
+<h2 id="target.cs-files">Target.cs files</h2>
+<p>Different configurations use different Target.cs files to change build settings.  </p>
+<p>These are named &lt;GAME_NAME&gt;&lt;BUILD_CONFIG&gt;.Target.cs file, for example the Lyra project has these files:</p>
+<ul>
+<li> LyraClient.Target.cs for client builds</li>
+<li> LyraGame.Target.cs for standalone game builds</li>
+<li> LyraServer.Target.cs for server game builds</li>
+<li> LyraEditor.Target.cs for editor builds</li>
+</ul>
+<h2 id="all-builds-can-have-debug-symbols">All builds can have debug symbols</h2>
+<p>All configuration, including shipping builds, can have symbols files for debugging if:</p>
+<ul>
+<li> they are built with Visual Studio or</li>
+<li> Project Settings | Project | Packaging | Include Debug Files is turned on </li>
+</ul>
+<p>This means you can debug shipping builds.</p>
+<h2 id="attaching-the-debugger">Attaching the debugger</h2>
+<p>A debug version can be made to wait until the debugger is attached using the -WaitForAttach parameter like this:</p>
+<blockquote>
+<p>Binaries\Win64\LyraClient-Win64-Debug.exe -WaitForAttach</p>
+</blockquote>
+<p>Run this command, and then in Visual Studio use the Debug | Attach to Process command.</p>
+<h2 id="reference">Reference</h2>
+<p><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine">Advanced Debugging In Unreal Engine</a>  </p>
+<p><a href="https://forums.unrealengine.com/t/project-crashing-due-to-missing-game-files/467207">Missing Game Files</a>  </p>
+<p><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine">Advanced Debugging</a></p>
+
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</div>
+</body>
+</html>

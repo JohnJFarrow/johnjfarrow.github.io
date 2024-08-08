@@ -1,0 +1,8 @@
+@startuml lyra_02_020
+LyraAbilitySystemComponent o-- LyraGameplayAbility: owns 
+LyraGameplayAbilitySet --> "*" LyraGameplayAbility: refers to
+LyraPawnExtensionComponent o--> LyraAbilitySystemComponent: owns
+PlayerController o--> LyraPlayerState : owns 
+LyraPlayerState o--> LyraPawnExtensionComponent : owns 
+
+@enduml

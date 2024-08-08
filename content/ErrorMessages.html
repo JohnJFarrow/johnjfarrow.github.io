@@ -1,38 +1,92 @@
 <!DOCTYPE html>
 <html lang="en-US">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Clang has better error messages | unrealcode.net</title>
-    <meta name="generator" content="VuePress 1.9.8">
-    
-    <meta name="description" content="Compared to clang the error messages produced by MSVC are really unhelpful">
-    
-    <link rel="preload" href="/assets/css/0.styles.06a2c7d8.css" as="style"><link rel="preload" href="/assets/js/app.1a1bcabe.js" as="script"><link rel="preload" href="/assets/js/3.5e27fb36.js" as="script"><link rel="preload" href="/assets/js/2.32bfe7ad.js" as="script"><link rel="preload" href="/assets/js/20.86f91cee.js" as="script"><link rel="prefetch" href="/assets/js/10.49e97280.js"><link rel="prefetch" href="/assets/js/11.6e4ef963.js"><link rel="prefetch" href="/assets/js/12.0d1be04c.js"><link rel="prefetch" href="/assets/js/13.f0527924.js"><link rel="prefetch" href="/assets/js/14.511875d3.js"><link rel="prefetch" href="/assets/js/15.8fbca2bd.js"><link rel="prefetch" href="/assets/js/16.ccc64059.js"><link rel="prefetch" href="/assets/js/17.555bef63.js"><link rel="prefetch" href="/assets/js/18.954adcd7.js"><link rel="prefetch" href="/assets/js/19.c4ba1c17.js"><link rel="prefetch" href="/assets/js/21.d649793e.js"><link rel="prefetch" href="/assets/js/22.78da9d4f.js"><link rel="prefetch" href="/assets/js/23.69d54750.js"><link rel="prefetch" href="/assets/js/24.f5bbc596.js"><link rel="prefetch" href="/assets/js/25.7973a587.js"><link rel="prefetch" href="/assets/js/26.ae6327cd.js"><link rel="prefetch" href="/assets/js/27.e0d36fa0.js"><link rel="prefetch" href="/assets/js/28.c1e7ad63.js"><link rel="prefetch" href="/assets/js/29.4f4d6c3f.js"><link rel="prefetch" href="/assets/js/30.2578dbe5.js"><link rel="prefetch" href="/assets/js/31.cf2d3386.js"><link rel="prefetch" href="/assets/js/32.81861962.js"><link rel="prefetch" href="/assets/js/33.7fa418e0.js"><link rel="prefetch" href="/assets/js/34.b9c56611.js"><link rel="prefetch" href="/assets/js/35.290c21b9.js"><link rel="prefetch" href="/assets/js/36.3e48a375.js"><link rel="prefetch" href="/assets/js/37.4e5efe63.js"><link rel="prefetch" href="/assets/js/38.13b5b283.js"><link rel="prefetch" href="/assets/js/39.6d3c0f3d.js"><link rel="prefetch" href="/assets/js/4.b728e6f4.js"><link rel="prefetch" href="/assets/js/40.22519dd8.js"><link rel="prefetch" href="/assets/js/41.09218c23.js"><link rel="prefetch" href="/assets/js/5.fbe4e9e0.js"><link rel="prefetch" href="/assets/js/6.5aa171c8.js"><link rel="prefetch" href="/assets/js/7.592d144b.js"><link rel="prefetch" href="/assets/js/8.675e70c4.js"><link rel="prefetch" href="/assets/js/9.876839a1.js">
-    <link rel="stylesheet" href="/assets/css/0.styles.06a2c7d8.css">
-  </head>
-  <body>
-    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">unrealcode.net</span></a> <div class="links"><!----> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
-  Home
-</a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
-  Home
-</a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>Clang has better error messages</span> <!----></p> <!----></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1>Clang has better error messages</h1> <p>Comparing the error messages created by Clang and by MSVC.
-</p> <p>Consider this code:</p> <div class="language-cpp line-numbers-mode"><pre class="language-cpp"><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;memory&gt;</span></span>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
+<title>Clang has better error messages | unrealcode.net</title>
+<meta name="description" content="Clang has better error messages">
+</head>
+<body>
+<div id="app">
+<div class="theme-container">
+<div class="main-container">
+<main class="page">
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
+<h1>Clang has better error messages</h1>
+<p>Comparing the error messages created by Clang and by MSVC.</p>
+<!-- more -->
+<p>Consider this code:</p>
+<pre><code class="language-cpp">#include &lt;memory&gt;
 
-<span class="token keyword">struct</span> <span class="token class-name">SPDeleter</span>
-<span class="token punctuation">{</span>
-    <span class="token keyword">void</span> <span class="token keyword">operator</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">)</span> <span class="token keyword">const</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span class="token punctuation">;</span>
+struct SPDeleter
+{
+    void operator()(int) const {}
+};
 
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-    <span class="token keyword">using</span> T <span class="token operator">=</span> <span class="token keyword">int</span><span class="token punctuation">;</span>
-    std<span class="token double-colon punctuation">::</span>shared_ptr<span class="token operator">&lt;</span>T<span class="token operator">&gt;</span> <span class="token function">X</span><span class="token punctuation">(</span> <span class="token keyword">new</span> <span class="token function">T</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">SPDeleter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br></div></div><p>The problem here is that that <code>operator()()</code> on the <code>SPDeleter</code> should take an <code>int*</code> not just an <code>int</code>.</p> <p>MSVC gives this error message:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>error C2661: 'std::shared_ptr&lt;T&gt;::shared_ptr': no overloaded function takes 2 arguments
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><p>which is misleading at best.  The constructor of <code>std::shared_ptr</code> does have functions which take two arguments.</p> <p>Compiling with clang gives a much better error message:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>error: no matching constructor for initialization of 'std::shared_ptr&lt;T&gt;' (aka 'shared_ptr&lt;int&gt;')
+int main()
+{
+    using T = int;
     std::shared_ptr&lt;T&gt; X( new T(), SPDeleter() );
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br></div></div><p>plus clang lists all the possible matches and explains why they were not chosen:</p> <div class="language- line-numbers-mode"><pre class="language-text"><code>C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1526:5: note:
+}
+</code></pre>
+<p>The problem here is that that <code>operator()()</code> on the <code>SPDeleter</code> should take an <code>int*</code> not just an <code>int</code>.</p>
+<p>MSVC gives this error message:</p>
+<pre><code>error C2661: 'std::shared_ptr&lt;T&gt;::shared_ptr': no overloaded function takes 2 arguments
+</code></pre>
+<p>which is misleading at best.  The constructor of <code>std::shared_ptr</code> does have functions which take two arguments.</p>
+<p>Compiling with clang gives a much better error message:</p>
+<pre><code>error: no matching constructor for initialization of 'std::shared_ptr&lt;T&gt;' (aka 'shared_ptr&lt;int&gt;')
+    std::shared_ptr&lt;T&gt; X( new T(), SPDeleter() );
+</code></pre>
+<p>plus clang lists all the possible matches and explains why they were not chosen:</p>
+<pre><code>C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1526:5: note:
       candidate template ignored: requirement 'conjunction_v&lt;std::is_move_constructible&lt;SPDeleter&gt;,
       std::_Can_call_function_object&lt;SPDeleter &amp;, int *&amp;, void&gt;, std::_SP_convertible&lt;int, int&gt;&gt;' was not satisfied
       [with _Ux = int, _Dx = SPDeleter]
@@ -98,7 +152,19 @@ C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.3
 C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.32.31326\include\memory:1504:15: note:
       candidate constructor not viable: requires 0 arguments, but 2 were provided
     constexpr shared_ptr() noexcept = default;
-</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br></div></div></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main> <footer class="f"><div><p>MIT Licensed | Copyright © 2020-2023 John Farrow</p></div></footer></div><div class="global-ui"></div></div>
-    <script src="/assets/js/app.1a1bcabe.js" defer></script><script src="/assets/js/3.5e27fb36.js" defer></script><script src="/assets/js/2.32bfe7ad.js" defer></script><script src="/assets/js/20.86f91cee.js" defer></script>
-  </body>
+</code></pre>
+
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</div>
+</body>
 </html>

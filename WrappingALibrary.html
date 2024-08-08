@@ -62,7 +62,7 @@ optimization
 <h1>Wrapping a third party library using an Unreal Engine Plugin</h1>
 <h2 id="introduction">Introduction</h2>
 <p>Unreal Engine supports plugins, which contain code and game content. They can also
-wrap a third party library (a .dll file) and allow the functionality of
+wrap a third party library (on Windows, one or more .dll files) and allow the functionality of
 that library to be called  directly from C++
 and indirectly using Blueprint objects which are part of the plugin.</p>
 <p>In a previous article <a href="BuildingFFMPEG.html">here</a> we compiled the open source ffmpeg 
@@ -74,10 +74,6 @@ explain how to deal with some of the problems which might arise.</p>
 <h2 id="understanding-import-libraries">Understanding Import Libraries</h2>
 <p>When a DLL is compiled from C or C++ source code two files are created, one with the extension &quot;.dll&quot; and
 one with the extension &quot;.lib&quot;.  The one with the .lib extension is the import library.</p>
-<p>Typically a DLL contains a large number of symbols for all the functions and variables used in the code.  Only some
-of these symbols are intended to be used by programs which load the DLL. These symbols
-are <em>exported</em> from the DLL either by making them with  <code>__declspec(dllexport)</code> in the source
-code or naming them in a separate .DEF file which is used as part of the compilation process.</p>
 <p>The import library contains information about all of the exported symbols
 from the DLL and is used in two ways:</p>
 <ul>
@@ -85,20 +81,24 @@ from the DLL and is used in two ways:</p>
 <li> at runtime to tell the linker which DLL supplies the exported symbol</li>
 </ul>
 <p>The .dll and .lib files are a pair and are distributed together in a plugin.</p>
-<h4 id="minor-details">Minor Details</h4>
+<p>Typically a DLL contains a large number of symbols for all the functions and variables used in the code.  Only some
+of these symbols are intended to be used by programs which load the DLL. These symbols
+are <em>exported</em> from the DLL either by marking them with  <code>__declspec(dllexport)</code> in the source
+code or naming them in a separate .DEF file which is used as part of the compilation process.</p>
+<h4 id="minor-details-symbol-resolution">Minor Details - Symbol Resolution</h4>
 <p>Windows static libraries also have a .lib extension.  When using a DLL, symbols are resolved 
 when the program is loaded.  When using a static library, symbols are resolved at compile time - the
 needed parts of the static library are included in the executable file.  This has consequences including 
 larger executable files and not being able to share code which resides in a DLL.</p>
-<p>Linux does not use import libraries.  By default it exports all symbols in a .dll (usually a shared object .so file).  This
-is a simpler approach but introduces its own complexities as thousands more symbols must be resolved at link time, and
-sometimes they resolve in undesirable ways.</p>
+<p>Linux does not use import libraries.  By default it exports all symbols in a library (usually a shared object .so file).  This
+is a simpler approach but introduces its own complexities as thousands more symbols must be resolved at link time
+or runtime, and sometimes they resolve in undesirable ways.</p>
 <h2 id="plugin-directory-structures">Plugin Directory Structures</h2>
 <p>Epic has this to say about directory structures:</p>
 <blockquote>
 <p>&quot;The Unreal Engine (UE) source code includes several third-party libraries, which are stored under UnrealEngine/Engine/Source/ThirdParty/.. This is a convention for engine modules, and not required. When developing plugins that use third-party libraries, it is more convenient to include the third-party software within the plugin directory.</p>
 </blockquote>
-<p>If you create a plugin from the UI, using Edit | Plugins | +Add | Third Party Library you end up with a plugin directory
+<p>If you create a plugin from the Unreal Editor, using Edit | Plugins | +Add | Third Party Library you end up with a plugin directory
 structure which looks like this (for clarity I have removed the non-Windows directories):</p>
 <p><img src="/images/plugin_001.png" alt="" /></p>
 <h2 id="plugin-build-files">Plugin Build Files</h2>
@@ -158,7 +158,7 @@ put there by the build process.  Although it is a copy of the file in ThirdParty
 does not have a  mechanism to automatically copy it.  If we delete Binaries/ThirdParty/GeneratedExampleLibrary/Win64/ExampleLibrary.dll
 and rebuild the project, it does not get regenerated or copied.</p>
 <p>These lines in the .Build.cs files suggest the ExampleLibrary.dll will be copied to the Binaries directory - but this is
-not the case; a runtime dependency added in this way is only added if the file already exists under the Binaries directory:</p>
+not the case; a runtime dependency coded in this way is only added if the file already exists under the Binaries directory:</p>
 <pre><code class="language-cs">// Ensure that the DLL is staged along with the executable
 RuntimeDependencies.Add(
 	 &quot;$(PluginDir)/Binaries/ThirdParty/GeneratedExampleLibrary/Win64/ExampleLibrary.dll&quot;);
@@ -173,9 +173,9 @@ put the DLL in the Binaries directory when you package the plugin.</p>
 <p>If the DLLs you want to distribute in the plugin are installed elsewhere on your system you can reference them
 in a similar way.  These lines show how to add runtime dependencies for all the .dll files in the
 directory d:\tools\ffmpeg6\installed\bin:</p>
-<pre><code class="language-cs">DirectoryInfo d = new DirectoryInfo(@&quot;d:\tools\ffmpeg6\installed\bin&quot;); 
+<pre><code class="language-cs">DirectoryInfo DI = new DirectoryInfo(@&quot;d:\tools\ffmpeg6\installed\bin&quot;); 
 
-FileInfo[] Files = d.GetFiles(&quot;*.dll&quot;);
+FileInfo[] Files = DI.GetFiles(&quot;*.dll&quot;);
 foreach (FileInfo file in Files)
 {
 	string FileName = Path.GetFileName(file.FullName);  
@@ -190,9 +190,9 @@ will be copied to the /Binaries/ThirdParty/GeneratedExampleLibrary/Win64/ direct
 <p>To add an .lib file to the project it needs to be added to the additional libraries collection
 which Unreal uses to generate its compile commands.  This is done by 
 adding it to the PublicAdditionalLibraries collection in the GeneratedExampleLibrary.Build.cs like this:</p>
-<pre><code class="language-cs">DirectoryInfo d = new DirectoryInfo(@&quot;d:\tools\ffmpeg6\installed\bin&quot;); 
+<pre><code class="language-cs">DirectoryInfo DI = new DirectoryInfo(@&quot;d:\tools\ffmpeg6\installed\bin&quot;); 
 
-FileInfo[] Libs = d.GetFiles(&quot;*.lib&quot;);
+FileInfo[] Libs = DI.GetFiles(&quot;*.lib&quot;);
 foreach (FileInfo file in Libs)
 {
 	PublicAdditionalLibraries.Add( file.FullName );
@@ -223,19 +223,19 @@ and another ~150 similar lines
 </code></pre>
 <p>Unreal by default looks in the Binaries\Win64 directory of every plugin, including:</p>
 <ul>
-<li> D:\work\learn\PluginsGenerated\Binaries\Win64</li>
-<li> D:\work\learn\PluginsGenerated\Plugins\GeneratedExample\Binaries\Win64</li>
+<li> PluginsGenerated\Binaries\Win64</li>
+<li> PluginsGenerated\Plugins\GeneratedExample\Binaries\Win64</li>
 </ul>
 <p>but not the Binaries directory of the ThirdParty module of our project</p>
 <ul>
-<li> D:\work\learn\PluginsGenerated\Plugins\GeneratedExample\Binaries\ThirdParty\GeneratedExampleLibrary\Win64</li>
+<li> PluginsGenerated\Plugins\GeneratedExample\Binaries\ThirdParty\GeneratedExampleLibrary\Win64</li>
 </ul>
 <p>So we can either:</p>
 <ul>
-<li> move the files to D:\work\learn\PluginsGenerated\Plugins\GeneratedExample\Binaries\Win64 by changing the
+<li> move the files to PluginsGenerated\Plugins\GeneratedExample\Binaries\Win64 by changing the
 .Build.cs to:</li>
 </ul>
-<pre><code class="language-cs">FileInfo[] Files = d.GetFiles(&quot;*.dll&quot;);
+<pre><code class="language-cs">FileInfo[] Files = DI.GetFiles(&quot;*.dll&quot;);
 foreach (FileInfo file in Files)
 {
 	string FileName = Path.GetFileName(file.FullName);
@@ -244,7 +244,7 @@ foreach (FileInfo file in Files)
 		file.FullName);
 }
 
-FileInfo[] Libs = d.GetFiles(&quot;*.lib&quot;);
+FileInfo[] Libs = DI.GetFiles(&quot;*.lib&quot;);
 foreach (FileInfo file in Libs)
 {
 	PublicAdditionalLibraries.Add( file.FullName);
@@ -269,7 +269,7 @@ foreach (FileInfo file in Files)
 </code></pre>
 <p>Note that the <code>PublicDelayLoadDLLs()</code> call takes just the file name not the path.</p>
 <p>Delayed loading means before Unreal attempts to call a method in a DLL it gives
-us a change to load the library ourselves using a call to 
+us a chance to load the library ourselves using a call to 
 <code>FPlatformProcess::GetDllHandle()</code>. </p>
 <p>If our code calls <code>FPlatformProcess::GetDllHandle()</code> to load a DLL
 <em>before any method from it is used</em>, we can load the DLL from any location and it will be used.</p>
@@ -334,7 +334,8 @@ you get an exception like this:</p>
 <p>To see which DLL is causing the problem look at the local variables:</p>
 <p><img src="/images/plugin_005.png" alt="" /></p>
 <p>From this we can see the dli-&gt;szDLL variable has the value &quot;avformat-60.dll&quot; so this is 
-the DLL which has not been loaded yet.</p>
+the DLL which has not been loaded yet.  To fix this problem change the order of the DLLs
+so that &quot;avformat-60.dll&quot; appears earlier in the list. </p>
 <h2 id="other-plugin-features">Other plugin features</h2>
 <h4 id="include-paths">Include Paths</h4>
 <p>If your plugin has include files you can add the directory which contains them to

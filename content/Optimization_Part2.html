@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
+<title>Optimization Part 2 A Simple Test Program | unrealcode.net</title>
+<meta name="description" content="Optimization Part 2 A Simple Test Program">
+</head>
+<body>
+<div id="app">
+<div class="theme-container">
+<div class="main-container">
+<main class="page">
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
+<h1 id="optimizing-unreal-engine-part-2-a-simple-test-project">Optimizing Unreal Engine : Part 2 <br/> A Simple Test Project </h1>
+<p>This page describes a simple test project which can be used to experiment with  optimization in Unreal Engine. The test project is created based on the Game | Third Person | C++ project including
+the starter content. </p>
+<p>The picture below shows the layout of the test map:</p>
+<p><img src="/images/optmap_001.png" alt="width80" /></p>
+<p>The map has a simple floor created from the default cube object, 
+and a set of small walls. The walls are the static mesh Wall_400x200 (from the starter content) placed using this PCG graph:</p>
+<p><img src="/images/optmap_002.png" alt="width80" /></p>
+<p>The player start point is in an elevated position at one end of the map.  This provides this
+view over some of the walls:</p>
+<p><img src="/images/optmap_003.png" alt="width80" /></p>
+<h2 id="screen-resolution">Screen Resolution</h2>
+<p>We will be testing with different build configurations such as running in the editor and running standalone.  To ensure that the we have  consistent screen resolution across configurations we  add this code to the game mode to
+set the screen resolution to 1920x1080.  Without this the standalone windows opens at full screen with maximum resolution:</p>
+<pre><code class="language-cpp">void ASpawnGameMode::StartPlay()
+{
+	Super::StartPlay();
+	FSystemResolution::RequestResolutionChange(1920, 1080, EW indowMode::Windowed);
+	...
+}
+</code></pre>
+<p>Setting the screen resolution in this way effects both the &quot;Standalone&quot; and &quot;New Editor Window (PIE)&quot;
+options  from
+this menu:</p>
+<p><img src="/images/devops_026.png" alt="offset" /></p>
+<p>It does not effect the &quot;Selected Viewport&quot; option, in which the window remains at the size it appears in the editor.	</p>
+<h2 id="stats">Stats</h2>
+<p>The console commands &quot;stat unit&quot; and &quot;stat fps&quot; will display these stats:</p>
+<p><img src="/images/optmap_004.png" alt="offset" /></p>
+<p>The project has this code in the game mode to enable these stats:</p>
+<pre><code class="language-cpp">void ASpawnGameMode::StartPlay()
+{
+	...
+
+	if (UWorld* World = GetWorld(); World &amp;&amp; GEngine )
+	{
+		const TArray&lt;FString&gt; StatNames = { TEXT(&quot;fps&quot;), TEXT(&quot;unit&quot;) };
+
+		for( const FString&amp; StatName: StatNames )
+		{
+			if( !GEngine-&gt;GameViewport || !GEngine-&gt;GameViewport-&gt;IsStatEnabled(StatName) )
+			{
+				const FString Command ( &quot;stat &quot; + StatName );
+				check( GEngine-&gt;Exec( World, *Command ) );
+			}
+		}
+	}
+}
+</code></pre>
+<p>This code checks if the stat is enabled before setting it is because the
+command &quot;stat fps&quot; is a toggle.  Executing the command when the stat is already enabled 
+disables it.  If the game is run twice with the &quot;New Editor Window (PIE)&quot; option, the first
+run will enable the option and, because the game is run in the same process as the editor, when
+the game is run the second time the stat will already be enabled.  In this case we don't want run the
+command again which would result in the stat being disabled.</p>
+<h2 id="editor-fps-stats">Editor FPS Stats</h2>
+<p>To remove the default limit of 120 fps in the editor use this command:</p>
+<blockquote>
+<p>t.MaxFPS 400</p>
+</blockquote>
+<p>The scalability settings ( Setting | Engine Scalablity Settings) in the editor effect the fps.  Without any spawned actors except the player in the map, just with the
+walls, the scalability settings effect fps like this:</p>
+<table>
+<thead>
+<tr>
+<th>Scalability</th>
+<th>FPS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low</td>
+<td>180</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>135</td>
+</tr>
+<tr>
+<td>High</td>
+<td>130</td>
+</tr>
+<tr>
+<td>Epic</td>
+<td>120</td>
+</tr>
+<tr>
+<td>Cinematic</td>
+<td>102</td>
+</tr>
+</tbody>
+</table>
+<p>This is mainly irrelevant because it depends on so many other settings:</p>
+<ul>
+<li> nanite</li>
+<li> lumen</li>
+<li> Settings | Preview Platform - SM5, SM6 etc.</li>
+</ul>
+<h2 id="injecting-actors">Injecting Actors</h2>
+<p>The code in this actor will find walls on the map and create a number of actors behind each wall.  This should generate enough actors to 
+slow the game down and for a basis for exploring optimization.  This is not done with PCG because I want to be able to change the behaviour
+of the spawned actors (such a enabling ticking) to see what effect this has.</p>
+<pre><code class="language-cpp">void ASpawnMother::BeginPlay()
+{
+	using FVector2 = UE::Math::TVector2&lt;FVector::FReal&gt;;
+
+	Super::BeginPlay();
+
+	int32 CountSpawned{ 0 };
+
+	// spawn some more players
+	if (UWorld* World = GetWorld(); PawnClass &amp;&amp; TargetStaticMesh &amp;&amp; World )
+	{
+		// find all actors of the target object class (which is a wall) and spawn adjacent to them
+		TArray&lt;AActor*&gt; PCGVolumes;
+		UGameplayStatics::GetAllActorsOfClass(World, APCGVolume::StaticClass(), PCGVolumes);
+
+		for (const AActor* PCGVolume : PCGVolumes)
+		{
+			const TArray&lt;UActorComponent*&gt;&amp; PCGVolumeInstanceComponents 
+				= PCGVolume-&gt;GetInstanceComponents();
+
+			for (UActorComponent* Component : PCGVolumeInstanceComponents )
+			{
+				if (!Component) continue;
+
+				if(UHierarchicalInstancedStaticMeshComponent* InstancedComponent =   
+							Cast&lt;UHierarchicalInstancedStaticMeshComponent&gt;( Component ))
+				{
+					constexpr bool bInWorldSpace{ true };
+					const int Count = InstancedComponent-&gt;GetInstanceCount();
+
+					// get the dimensions of the static mesh
+					TObjectPtr&lt;UStaticMesh&gt; Mesh = InstancedComponent-&gt;GetStaticMesh();
+					if (!Mesh) continue;
+
+					// configure spawning
+					const FRotator Rotation{ FRotator::ZeroRotator };
+					FActorSpawnParameters SpawnParameters;
+					SpawnParameters.Name = &quot;Test&quot;;
+					SpawnParameters.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Requested;
+
+					// BoxExtent to distance from center to bounds so *2 to get dimensions
+					const FBoxSphereBounds Bounds = Mesh-&gt;GetBounds();
+
+					// where are we positioning the set of actors
+					FVector2 ActorDropZone{ double(NumX - 1) * Spacing , double(NumY - 1) * Spacing };
+
+					// spawn actors 
+					for (int i = 0; i &lt; Count; ++i)
+					{
+						FTransform InstanceTransform;
+						InstancedComponent-&gt;GetInstanceTransform(i, InstanceTransform, bInWorldSpace);
+
+						FVector Center = InstanceTransform.GetLocation() + Bounds.BoxExtent + SpawnOffset;
+
+						// push center away from wall
+						Center.Y -= ActorDropZone.Y * 0.5f;
+
+						const FVector2 StartOffset{ -ActorDropZone * 0.5f };
+
+						FVector SpawnLocation( Center.X + StartOffset.X, 
+							Center.Y + StartOffset.Y, 0 );
+
+						for (int IX = 0; IX &lt; NumX; ++IX )
+						{
+							for (int IY = 0; IY &lt; NumY; ++IY)
+							{
+								World-&gt;SpawnActor( PawnClass, &amp;SpawnLocation, &amp;Rotation, SpawnParameters );
+								SpawnLocation.Y += Spacing;
+								CountSpawned++;
+							}
+							SpawnLocation.X += Spacing;
+							SpawnLocation.Y = Center.Y + StartOffset.Y;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	
+	UE_LOG(LogTemp, Warning, TEXT(&quot;Spawned %d new actors&quot;), CountSpawned);
+}
+</code></pre>
+<h2 id="with-1500-actors">With 1500 Actors</h2>
+<p>Timings vary depending on screen resolution, build configuration and project settings.  </p>
+<p><img src="/images/optmap_005.png" alt="width80" /></p>
+<p>Timings in different configurations show these figures:</p>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Description</th>
+<th>Running</th>
+<th style="text-align: right;">FPS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Debug Editor</td>
+<td>Everything build in debug mode</td>
+<td>editor standalone</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td>Debug Editor</td>
+<td>Everything build in debug mode</td>
+<td>editor new window(pie)</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td>DebugGame Editor</td>
+<td>Editor in release mode, our code in debug mode</td>
+<td>editor standalone</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr>
+<td>DebugGame Editor</td>
+<td>Editor in release mode, our code in debug mode</td>
+<td>editor new window(pie)</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td>Development Editor</td>
+<td>Everything built in release mode</td>
+<td>editor standalone</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr>
+<td>Development Editor</td>
+<td>Editor and our code in release mode</td>
+<td>editor new window(pie)</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td>Development Game</td>
+<td>Everything built in release mode</td>
+<td>game</td>
+<td style="text-align: right;">13</td>
+</tr>
+<tr>
+<td>Shipping</td>
+<td>Everything built in release mode</td>
+<td>game</td>
+<td style="text-align: right;">17</td>
+</tr>
+</tbody>
+</table>
+<p>This doesn't tell us a great deal, just that different configurations run at different
+speeds.  Given that there is little difference between the Debug Game Editor (where
+our code is in debug mode) and the Development Editor (where our code is in release mode)
+we can infer our code does not make much difference - which makes sense because
+our code is only run to configure the project and create the actors, everything after
+that is run using editor code.</p>
+<h2 id="looking-at-the-stats">Looking at the Stats</h2>
+<p>We can look at the stats here:</p>
+<p><img src="/images/optmap_006.png" alt="offset" /></p>
+<p>The explanation for these values is:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frame</td>
+<td style="text-align: left;">Frame time is the total amount of time spent generating one frame of the game. Since both the Game and Draw threads sync up   before finishing a frame, Frame time is often close to the time being shown in one of these threads.</td>
+</tr>
+<tr>
+<td>Game</td>
+<td style="text-align: left;">If Frame time is close to Game time, the game's performance is likely being bottlenecked (negatively impacted) by the game thread.</td>
+</tr>
+<tr>
+<td>Draw</td>
+<td style="text-align: left;">If Frame time is close to Draw time, the game's performance is likely being bottlenecked by the rendering thread</td>
+</tr>
+<tr>
+<td>GPU</td>
+<td style="text-align: left;">GPU time measures how long the video card takes to render the scene. Since GPU time is synced to the frame, it will likely be similar to Frame time.</td>
+</tr>
+<tr>
+<td>RHIT</td>
+<td style="text-align: left;">Typically, RHI Thread time is synced to the frame, and it will likely be similar to Frame time.</td>
+</tr>
+<tr>
+<td>DynRes</td>
+<td style="text-align: left;">If supported (and enabled), DynRes shows Primary Screen Percentage by Secondary Screen Percentage.</td>
+</tr>
+</tbody>
+</table>
+<p>Only the first 3 are important here.  At 60 frames per second that target time to generate a frame is 16.666ms - clearly our 60.59 is way over this.  We can see that the Draw time is under that but the Game time (48.73) is over.  From this we can infer that the problem is in the game performance rather than the rendering performance.</p>
+<p>At this point we will to investigate the slowness in <a href="Optimization_Part3.html">Part 3: Using Unreal Insights</a>  </p>
+<h2 id="reference">Reference</h2>
+<p><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine">Advanced Debugging In Unreal Engine</a>  </p>
+<p><a href="https://www.youtube.com/watch?v=SxIXnEik2Xk">PCG New Features in 5.4</a>  </p>
+<p><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine">Advanced Debugging</a></p>
+<p><a href="https://docs.unrealengine.com/4.27/en-US/TestingAndOptimization/PerformanceAndProfiling/StatCommands/">Statistics</a>  </p>
+
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</div>
+</body>
+</html>

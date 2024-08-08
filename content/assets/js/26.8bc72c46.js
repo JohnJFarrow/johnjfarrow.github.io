@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[26],{309:function(n,e,s){"use strict";s.r(e);var t={computed:{emails:()=>"john.farrow@unrealcode.net"}},i=s(14),l=Object(i.a)(t,(function(){return(0,this._self._c)("p",[this._v(this._s(this.emails))])}),[],!1,null,null,null);e.default=l.exports}}]);

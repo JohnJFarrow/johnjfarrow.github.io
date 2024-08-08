@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
+<title>EQS Error Messages | unrealcode.net</title>
+<meta name="description" content="EQS Error Messages">
+</head>
+<body>
+<div id="app">
+<div class="theme-container">
+<div class="main-container">
+<main class="page">
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
+<h1 id="what-does-listener-must-have-a-valid-id-to-update-its-sense-config-mean">What does &quot;Listener must have a valid id to update its sense config&quot; mean?</h1>
+<p>The message comes from <code>UAIPerceptionSystem::OnListenerConfigUpdated()</code> when you call
+<code>UAIPerceptionComponent::ConfigureSense()</code> can pass in a sense object such as
+an instance of <code>UAISenseConfig_Sight</code>.</p>
+<p>The problem here is that the <code>UAIPerceptionComponent</code> member variable
+<code>PerceptionListenerId</code> is invalid, its never been changed from the -1
+set in the constructor.</p>
+<p>When things go well, the  <code>PerceptionListenerId</code> is set in <code>UAIPerceptionComponent::OnRegister()</code>
+in the line </p>
+<pre><code class="language-cpp">AIPerceptionSys-&gt;UpdateListener(*this);
+</code></pre>
+<p>However in 5.4.2 this line is only called if there is at least one Sense associated with the
+<code>UAIPerceptionComponent</code>, like this:</p>
+<pre><code class="language-cpp">if (SensesConfig.Num() &gt; 0)
+{
+	// set up perception listener based on SensesConfig
+	for (auto SenseConfig : SensesConfig)
+	{
+		if (SenseConfig)
+		{
+			RegisterSenseConfig(*SenseConfig, *AIPerceptionSys);
+		}
+	}
+
+	AIPerceptionSys-&gt;UpdateListener(*this);
+}
+</code></pre>
+<p><code>UAIPerceptionComponent::OnRegister()</code> is called after the containing actors constructor is called
+but before any implementation of <code>OnPossess()</code> is called.  So
+if the setup for the AI sense is done like this:</p>
+<pre><code class="language-cpp">void ASpawnEnemyAIController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	AISenseConfig_Sight-&gt;SightRadius = SightRange;
+	AISenseConfig_Sight-&gt;LoseSightRadius = (SightRange + 20.0f);
+	AISenseConfig_Sight-&gt;PeripheralVisionAngleDegrees = 120.f;
+	AISenseConfig_Sight-&gt;DetectionByAffiliation.bDetectEnemies = true;
+	AISenseConfig_Sight-&gt;DetectionByAffiliation.bDetectNeutrals = true;
+	AISenseConfig_Sight-&gt;DetectionByAffiliation.bDetectFriendlies = true;
+
+	AIPerceptionComponent-&gt;ConfigureSense( *AISenseConfig_Sight );
+	AIPerceptionComponent-&gt;SetDominantSense(AISenseConfig_Sight-&gt;GetSenseImplementation());
+    ...
+}
+</code></pre>
+<p>it will not work.  The senses must have been configured (by a call to <code>ConfigureSense()</code>)
+in the actor's constructor, so to make this work move this line:</p>
+<pre><code class="language-cpp">AIPerceptionComponent-&gt;ConfigureSense( *AISenseConfig_Sight );
+</code></pre>
+<p>to the constructor.  The rest of the lines can remain in <code>OnPossess()</code>.</p>
+
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</div>
+</body>
+</html>

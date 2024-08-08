@@ -1,0 +1,26 @@
+
+@startuml
+interface IMediaPlayer
+interface IMediaCache
+interface IMediaControls
+interface IMediaSamples
+interface IMediaTracks
+interface IMediaView
+
+class FKLVImgMediaPlayer extends IMediaPlayer
+class FKLVImgMediaPlayer extends IMediaCache
+class FKLVImgMediaPlayer extends IMediaControls
+class FKLVImgMediaPlayer extends IMediaSamples
+class FKLVImgMediaPlayer extends IMediaTracks
+class FKLVImgMediaPlayer extends IMediaView
+
+FKLVImgMediaPlayer : FString CurrentUrl
+FKLVImgMediaPlayer : FTimespan CurrentTime
+
+FKLVImgMediaPlayer --> FKLVImgMediaLoader : loader 
+FKLVImgMediaPlayer --> FKLVImgMediaScheduler : scheduler 
+FKLVImgMediaPlayer --> FKLVImgMediaGlobalCache : global cache  
+
+UMediaPlayer --> FMediaPlayerFacade : owns 
+FMediaPlayerFacade --> FKLVImgMediaPlayer : owns as "low level" media player 
+@enduml

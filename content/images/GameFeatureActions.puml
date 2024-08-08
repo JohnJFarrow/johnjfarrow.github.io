@@ -1,0 +1,22 @@
+@startuml
+UObject <|-- UGameFeatureAction
+UGameFeatureAction <|-- UGameFeatureAction_WorldActionBase
+UGameFeatureAction_WorldActionBase <|-- UGameFeatureAction_AddAbilities
+UGameFeatureAction_WorldActionBase <|-- UGameFeatureAction_AddInputContextMapping
+UGameFeatureAction_WorldActionBase <|-- UGameFeatureAction_AddLevelInstances
+UGameFeatureAction_WorldActionBase <|-- UGameFeatureAction_AddWorldSystem
+UGameFeatureAction_WorldActionBase <|-- UGameFeatureAction_AddSpawnedActors
+
+UGameFeatureAction_AddAbilities --> FGameFeatureAbilitiesEntry
+FGameFeatureAbilitiesEntry --> FAncientGameAttributesMapping
+
+UGameFeatureAction_AddLevelInstances --> FGameFeatureLevelInstanceEntry
+
+UGameFeatureAction_AddSpawnedActors --> FSpawningWorldActorsEntry
+FSpawningWorldActorsEntry --> FSpawningActorEntry
+
+UGameFeatureAction_AddWorldSystem --> FGameFeatureWorldSystemEntry
+FGameFeatureWorldSystemEntry --> UGameFeatureWorldSystem 
+
+@enduml
+

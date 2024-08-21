@@ -83,13 +83,13 @@ animation textures are used to animate the crowd members:</p>
 <p>This article describes materials which work with animation textures.  It is part of
 a set of articles about animation textures which describe how animation textures
 are created and how they can be used by MASS, PCG and Niagara.</p>
-<h2 id="its-all-about-materials">Its all about materials</h2>
+<h2 id="its-all-about-materials">It;s all about materials</h2>
 <p>Unreal Engine implements vertex animation by using materials, material instances
-and material layers.  Its helpful to understand the relationship between these parts:</p>
+and material layers.  It's helpful to understand the relationship between these parts:</p>
 <p><img src="images/vam_017.png" alt="width80" /></p>
 <p>This picture shows:</p>
 <ul>
-<li> a skeletal mesh has material instances which are specified in it's material slots.  When a static
+<li> a skeletal mesh has material instances which are specified in its material slots.  When a static
 mesh is created from that skeletal mesh these material instances are copied to the material slots of
  the static mesh;</li>
 <li> a static mesh can have one or more material instances;</li>
@@ -111,7 +111,7 @@ in animating the elements of the mesh</li>
 It's important to realise that when the animation textures are generated
 by the AnimToTexture process the associated material instance(s) are updated with
 values specific to the animations (such as the first and last frame numbers)
-so every static mesh which is animated this way needs it's own 
+so every static mesh which is animated this way needs its own 
 material instance(s).
 </div>
 <h2 id="creating-the-example-project">Creating the example project</h2>
@@ -121,8 +121,8 @@ material instance(s).
 are both enabled.</p>
 <h2 id="updating-an-existing-material">Updating an existing material</h2>
 <p>To demonstrate how materials support animation textures we will update the materials 
-and material instances associated with the the skeletal mesh
-SKM_Manny_Simple found in the directory /Content/Characters/Mannequins/Meshes.</p>
+and material instances associated with  the skeletal mesh
+SKM_Manny_Simple which is found in the folder /Content/Characters/Mannequins/Meshes.</p>
 <p>This skeletal mesh uses these materials and material instances:</p>
 <table>
 <thead>
@@ -159,9 +159,9 @@ MI_ATManny_01 and MI_ATManny_02, just to make it easier to check
 we are altering our own files.</p>
 <p>Find the material  M_Mannequin  in the 
 folder /Content/Characters/Mannequins/Materials
-and copy them it the /Content/ATMaterials folder.  Rename it 
+and copy it to the /Content/ATMaterials folder.  Rename it 
 M_ATMannequin.</p>
-<p>Now:</p>
+<p>Now, in the ATMaterials folder:</p>
 <ul>
 <li> open MI_ATManny_01 and change the parent to M_ATMannequin</li>
 <li> open MI_ATManny_02 and change the parent to MI_ATManny_01</li>
@@ -185,7 +185,7 @@ with animation textures.</p>
 will be deleted from the material graph. Don't do this yet.</p>
 <p>First we want to add a MakeMaterialAttributes node and connect all the nodes
 which are inputs into the M_ATMannequin into the MakeMaterialAttributes that way
-we don't have to remember where they went.</p>
+we don't have to remember where they where connected.</p>
 <p>Add a MakeMaterialAttributes node and connect it like this:</p>
 <p><img src="images/vam_021.png" alt="width80" /></p>
 <p>Then check the &quot;Use Material Attributes&quot; property.  This will delete the 
@@ -197,21 +197,25 @@ do the actual bone or vertex animation. Here we will do bone animation, the
 vertex animation process is similar.</p>
 <p>Add the nodes and connections shown in the  this picture:</p>
 <p><img src="images/vam_023.png" alt="width80" /></p>
-<p>When you add the GetMaterialAttributes nodes, in order to get pins
+<p>When you add the GetMaterialAttributes nodes in order to get pins
 on the node you will need to edit its 
 details and add elements to the &quot;Attribute Get Types&quot; property.</p>
 <p>The top GetMaterialAttributes has this 1 entry:</p>
 <p><img src="images/vam_025.png" alt="width50" /></p>
 <p>The bottom GetMaterialAttributes has these 2 entries:</p>
 <p><img src="images/vam_024.png" alt="width50" /></p>
+<p>When you add the SetMaterialAttributes node in order to get pins
+on the node you will need to edit its 
+details and add elements to the &quot;Attribute Get Types&quot; property:</p>
+<p><img src="images/vam_024.png" alt="width50" /></p>
 <p>Note that we added the crucial MaterialAttributeLayers node.  Set the properties
 of this node like so:</p>
 <p><img src="images/vam_026.png" alt="width50" /></p>
 <p>This node is what make animation textures work. </p>
 <p>Save the M_ATMannequin material node.</p>
-<p>We can't set any more properties of the ML_BoneAnnimation
+<p>We can't set the  properties of the ML_BoneAnimation
 here in the material, but if you open a material instance 
-derived from this material such as MI_ATManny_01
+derived from this material (such as MI_ATManny_01),
 in the Layer Parameters tab you will see parameters from the
 ML_BoneAnimation. These parameters will be assigned values when the
  AnimToTexture process is run:</p>
@@ -220,14 +224,14 @@ ML_BoneAnimation. These parameters will be assigned values when the
 menu option.</p>
 <h2 id="other-approaches-to-materials-layer-blend-nodes">Other approaches to materials - layer blend nodes</h2>
 <p>We modified the material above by adding a MakeMaterialAttributes node, but 
-is only one way of modifying a material.  We took that approach because it suited the material we were modifying, enabling us to simply replace the M_ATMannequin node with a MakeMaterialAttributes and use
+is only one way of modifying a material.  We took this approach because it suited the material we were modifying, enabling us to simply replace the M_ATMannequin node with a MakeMaterialAttributes and use
 all of the same connections.</p>
 <p>The AnimToTexture plugin in Unreal Engine 5.4 has materials constructed
 using layer blend nodes like this:</p>
-<p><img src="images/vam_027.png" alt="width50" /></p>
-<p>and these materials are extended to support animation textures by adding the same set of
+<p><img src="images/vam_030.png" alt="width80" /></p>
+<p>To extended this material to support animation textures we would add the same set of
 modes we added to the M_ATMannequin material but without having to use a MakeMaterialAttributes node: </p>
-<p><img src="images/vam_029.png" alt="width50" /></p>
+<p><img src="images/vam_029.png" alt="width80" /></p>
 <!--
 ## Creating Animation Textures
 

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="./css/styles.css">
+<link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
+<link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkMode': true,'primaryTextColor':'#000','primaryColor': '#fff','primaryBorderColor': '#000','lineColor': 'yellow','secondaryColor': '#006100','tertiaryColor': '#fff' } });
+</script>
+<link rel = "stylesheet" href="./css/highlight/styles/unrealcode.css">
+<link rel = "stylesheet" href="./css/hljs_overrides.css">
+<script src = "./css/highlight/highlight.min.js" ></script>
+<script> hljs.highlightAll();</script>
+<title>Animation Textures and using the AnimToTexture plugin | unrealcode.net</title>
+<meta name="description" content="Animation Textures and using the AnimToTexture plugin">
+</head>
+<body>
+<div id="app">
+<div class="theme-container">
+<div class="main-container">
+<main class="page">
+<header class="navbar">
+<a class="header-link" href="index.html">
+<span class="site-name">
+UNREALCODE.net
+</span>
+</a>
+<a class="header-link" href="index.html">
+<span>
+Articles
+</span>
+</a>
+<a class="header-link" href="index_cpp.html">
+<span>
+c++
+</span>
+</a>
+<a class="header-link" href="index_python.html">
+<span>
+python
+</span>
+</a>
+<a class="header-link" href="index_physics.html">
+<span>
+physics
+</span>
+</a>
+<a class="header-link" href="index_tools.html">
+<span>
+tools
+</span>
+</a>
+<a class="header-link" href="index_optimization.html">
+<span>
+optimization
+</span>
+</a>
+</header>
+<h1 id="understanding-animation-textures">Understanding Animation Textures </h1>
+<p>Animation Textures is a technique for storing animation data in a texture
+and then having a material apply that texture to a static
+mesh and by doing so animate the mesh. </p>
+<p>This technique is typically used for animating large numbers of background 
+characters with minimal overhead.  It's used in the Epic Games
+<a href="https://www.unrealengine.com/marketplace/en-US/product/city-sample">City Sample</a>
+to animate the crowds walking around the city.  If you open the
+City Sample and play the MassCrowd map you will see a scene like this in which
+animation textures are used to animate the crowd members:</p>
+<p><img src="images/vam_001.png" alt="width80" /></p>
+<p>Unreal 5.4 ships with a plugin called AnimToTexture, this is not enabled
+by default so you will need to enable it for anything described 
+here to work.  There is lots of content on the web about version 5.1 and 5.2
+of this AnimToTexture plugin but it changed for version 5.4 and 
+not much has been written about the latest version.</p>
+<h2 id="its-all-about-materials">Its all about materials</h2>
+<p>Unreal Engine implements vertex animation by using materials, material instances
+and material layers.  Its helpful to understand the relationship between these parts:</p>
+<p><img src="images/vam_006.png" alt="width50" /></p>
+<p>A skeletal mesh has materials which are specified in its material slots.  When a static
+mesh is created these materials are copied to the material slots of the static mesh, after
+that the materials on the skeletal mesh are not used.  We will be changing the
+materials associated with a static mesh to ones which support  animation textures, i.e.
+ones which have a material layer which uses the ML_BoneAnimation or ML_VertexAnimation
+material layers.</p>
+<div class="warning">
+It's important to realise that the material instance gets updated with
+data specific to the animations (such as the first and last frame numbers)
+so every static mesh which is animated this way needs it's own 
+material instance.  A material instance cannot be shared by multiple
+static meshes.
+</div>
+<h2 id="the-approach">The Approach</h2>
+<p>Vertex animation can be used animate a static mesh either by
+animating the vertices or by animating the bones.  The AnimToTexture
+plugin supports both.  In this article to keep it simple I will
+only refer to bone animation.</p>
+<p>This is a simplified overview of what happens when we create animation textures:</p>
+<p><img src="images/vam_002.png" alt="width50" /></p>
+<p>We start with:</p>
+<ul>
+<li> a skeletal mesh</li>
+<li> one or more animations</li>
+<li> a material </li>
+<li> a material instance </li>
+</ul>
+<p>The process is controlled by a data asset.  We fill in properties
+of the data asset with the details of the skeletal mesh, the
+animations and the material files, then we execute the AnimToTexture
+process to create:</p>
+<ul>
+<li> a static mesh derived from the skeletal mesh</li>
+<li> multiple textures containing animation for bone positions and rotations</li>
+<li> an updated material instance </li>
+</ul>
+<h2 id="what-is-in-the-animtotexture-plugin">What is in the AnimToTexture plugin</h2>
+<p>In addition to the code used to create the animation textures, the
+plugin contains other useful files.  These can be located
+under the /Engine/Plugins/AnimToTexture directory.  This is split into
+two parts &quot;AnimToTexture Content&quot; and &quot;AnimToTexture C++ Classes&quot;, we only
+ever use the &quot;AnimToTexture Content&quot; part and just refer to it as &quot;AnimToTexture&quot;
+which is the actual directory name.</p>
+<p>If you can't see the /Engine/Plugins/AnimToTexture directory make sure you have the AnimToTexture plugin enabled and 
+in the settings for the content browser (accessed with the
+button in the top right corner of the content browser window)
+make sure you have &quot;Show Engine Content&quot; and &quot;Show Plugin Content&quot; enabled.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Files</th>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Characters/Mannequin/BP_AnimToTexture</td>
+<td style="text-align: left;">the editor utility blueprint which creates the textures</td>
+</tr>
+<tr>
+<td style="text-align: left;">Characters/Mannequin/Data/DA_BoneAnimation</td>
+<td style="text-align: left;">example data asset which we will copy and change</td>
+</tr>
+<tr>
+<td style="text-align: left;">Characters/Mannequin/Materials/BoneAnimation/M_Body_BoneAnimation</td>
+<td style="text-align: left;">material we will copy</td>
+</tr>
+<tr>
+<td style="text-align: left;">Characters/Mannequin/Materials/BoneAnimation/MI_Body_BoneAnimation</td>
+<td style="text-align: left;">material instance we will copy</td>
+</tr>
+<tr>
+<td style="text-align: left;">Characters/Mannequin/Textures/BoneAnimation/TX_*</td>
+<td style="text-align: left;">textures we will copy</td>
+</tr>
+<tr>
+<td style="text-align: left;">Materials/ML_BoneAnimation</td>
+<td style="text-align: left;">material layer we will copy</td>
+</tr>
+</tbody>
+</table>
+<p>Some of these files have shipped in prior versions of Unreal,
+and some  up to date Unreal example projects contain old versions of these files. 
+For example if you download the City Sample
+for Unreal 5.4 you will find a version of ML_BoneAnimation in the 
+AnimToTexture plugin (in your engine) and another version in /Content/Crowd/VAT/Materials/ (in the project).  These two files are very different - it looks as if the one in 
+the City Sample project is from Unreal Engine 5.2. </p>
+<h2 id="steps">Steps</h2>
+<p>This section outlines the steps to take to (1) create animation textures
+for a specific static mesh, then (2) create a Niagara system to
+spawn a lot of animated static meshes, then (3) create a PCG system
+to spawn a lot of animated static meshes.</p>
+<h4 id="creating-the-example-project">Creating the example project</h4>
+<p>For this example from the launcher (I am using 5.4.3) create a new Game, Third Person, Blueprint, Desktop project with starter content.  Call it &quot;VertexAnimation&quot;.</p>
+<p>Go into Edit | Plugins and enabled the AnimToTexture plugin an restart.</p>
+<p>Under the Content directory create a new directory called &quot;Example&quot;.</p>
+<p>In the content browser settings make sure &quot;Show Plugin Content&quot; and &quot;Show Engine Content&quot;
+are both enabled.</p>
+<h4 id="creating-the-data-asset">Creating the data asset</h4>
+<p>The data asset /Content/Example/DA_ExampleBoneAnimation controls the whole animation texture creation process.  The easiest way to
+make one of the correct structure is to copy the one which ships with the plugin, so:</p>
+<p>Copy &quot;Engine/Plugins/AnimToTexture/Characters/Mannequin/Data/DA_BoneAnimation&quot;
+to our new Example directory.  Rename it &quot;DA_ExampleBoneAnimation&quot; and save it.</p>
+<h4 id="creating-a-static-mesh-from-a-skeletal-mesh">Creating a static mesh from a skeletal mesh</h4>
+<p>For the character we will be using Content/Characters/SKM_Manny.  Open this asset
+and click the &quot;Make Static Mesh&quot; button on the top toolbar.  Save the
+static mesh in the Content/Example directory and call it &quot;SM_ExampleManny&quot;.</p>
+<h4 id="creating-the-material-instances">Creating the material instances</h4>
+<p>Copy /Engine/Plugins/AnimToTexture/Characters/Mannequin/Materials/BoneAnimation/MI_Body_BoneAnimation 
+to the /Content/Example directory and rename it &quot;MI_ExampleBody_BoneAnimation&quot;.</p>
+<p>Copy /Engine/Plugins/AnimToTexture/Characters/Mannequin/Materials/BoneAnimation/MI_ChestLog_BoneAnimation 
+to the /Content/Example directory and rename it &quot;MI_ExampleChestLog_BoneAnimation&quot;.</p>
+<p>Open SM_ExampleManny and change the materials to the ones we just created like this:</p>
+<p><img src="images/vam_007.png" alt="width80" /></p>
+<h4 id="creating-texture-files">Creating texture files</h4>
+<p>The animation texture process populates pre-existing texture files.  To get these 
+go to the /Engine/Plugins/AnimToTexture/Characters/Mannequin/Textures/BoneAnimation
+copy the 3 texture files into /Content/Example and rename them:</p>
+<ul>
+<li> TX_BonePosition to TX_ExampleBonePosition</li>
+<li> TX_BoneRotation to TX_ExampleBoneRotation</li>
+<li> TX_BoneWeight to TX_ExampleBoneWeight</li>
+</ul>
+<p>We are renaming all these files to make it clear when we are looking at the data object which
+file it is referencing and to reduce the risk of overwriting the files which are included
+in the AnimToTexture plugin.</p>
+<h4 id="populating-the-data-asset">Populating the data asset</h4>
+<p>Open the data asset DA_ExampleBoneAnimation.  It will be populated with the values from the
+AnimToTexture plugin like so:</p>
+<p><img src="images/vam_004.png" alt="width80" /></p>
+<p>We will be changing all the items in the green boxes.</p>
+<p>Change:</p>
+<ul>
+<li> The static mesh to SM_ExampleManny</li>
+<li> The Bone Position Texture to SM_ExampleBonePosition</li>
+<li> The Bone Rotation Texture to SM_ExampleBoneRotation</li>
+<li> The Bone Weight Texture to SM_ExampleBoneWeight</li>
+</ul>
+<p>For the purposes of this example we will be usin 3 animations which go in the AnimSequences array.  </p>
+<p>Replace the 3 existing animations with ones from the /Content/Characters/Mannequins/Animations/Manny
+directory.  Change</p>
+<ul>
+<li> Anim Sequence Index[0] to MM_Run_Fwd</li>
+<li> Anim Sequence Index[1] to MM_Walk_Fwd</li>
+<li> Anim Sequence Index[2] to MM_Idle</li>
+</ul>
+<p>The data asset should now look like this:</p>
+<p><img src="images/vam_005.png" alt="width80" /></p>
+<h4 id="configuring-the-animtotexture-blueprint">Configuring the AnimToTexture blueprint</h4>
+<p>The AnimToTexture blueprint contains the code which creates the animation textures
+and updates the material instance(s) to use those textures.</p>
+<p>We will be editing the AnimToTexture blueprint which comes with the AnimToTextire plugin 
+so we need to make a copy of it.</p>
+<p>Copy /Engine/Plugins/AnimToTexture/Characters/Mannequin/BP_AnimToTexture to
+the /Content/Example directory and rename it &quot;BP_ExampleAnimToTexture&quot;.</p>
+<p>Open BP_ExampleAnimToTexture and make the following changes:</p>
+<ul>
+<li> delete everything in the &quot;VertexAnimation&quot; box, we only want to do bone animation, so
+it should look like this:</li>
+</ul>
+<p><img src="images/vam_008.png" alt="width80" /></p>
+<ul>
+<li> delete the VertexDataAsset variable shown:</li>
+</ul>
+<p><img src="images/vam_009.png" alt="width50" /></p>
+<ul>
+<li> click on the BoneDataAsset variable and change the default value to DA_ExampleBoneAnimation:</li>
+</ul>
+<p><img src="images/vam_010.png" alt="width50" />
+<img src="images/vam_011.png" alt="width50" /></p>
+<ul>
+<li> click on the first &quot;Update Material Instance from Data Asset&quot; and change the material instance to MI_ExampleBody_BoneAnimation</li>
+</ul>
+<p><img src="images/vam_014.png" alt="width50" /></p>
+<ul>
+<li> click on the second &quot;Update Material Instance from Data Asset&quot; and change the material instance to MI_ExampleChestLog_BoneAnimation</li>
+</ul>
+<p><img src="images/vam_015.png" alt="width50" /></p>
+<p>Compile and save BP_ExampleAnimToTexture.</p>
+<h4 id="generating-the-animation-textures">Generating the animation textures</h4>
+<p>Save everything before doing this step.</p>
+<p>Right-click the BP_ExampleAnimToTexture and click &quot;Run Editor Utility Blueprint&quot; as shown here:</p>
+<p><img src="images/vam_012.png" alt="offset" /></p>
+<p>This will take a minute or two.</p>
+<p>Once it has finished you should see the data asset, materials, and the vertex textures have been updated and need saving.</p>
+<h4 id="checking-results">Checking results</h4>
+<p>If you open the data asset and expand the Info &gt; Animations section at the bottom you will see something
+like this:</p>
+<p><img src="images/vam_013.png" alt="width80" /></p>
+<p>This shows the animations have been processed and data such as the number of frames, the animation bounding box
+and the individual animation lengths have been added to the data asset.</p>
+<p>If you open the material instance MI_ExampleBody_BoneAnimation and look at the Layer Parameters tab you 
+will see the parameter values have been updated:</p>
+<p><img src="images/vam_016.png" alt="width50" /></p>
+<h2 id="reference">Reference</h2>
+<p><a href="https://www.youtube.com/watch?v=vrlFozqB0jA">Unreal Engine 5 AnimToTexture Plugin, How to Use it to make Vertex Animation Textures for crowds</a>  This is a great video by Kevin Romond based on Unreal 5.2.</p>
+<p><a href="https://docs.google.com/document/d/1P2r3YzPOMZU59o2DaEBim0nmPSTdVg3MmFA3rORg6f0/edit#heading=h.mfv57e40k4rc">UE5 AnimToTexture plug-in</a>  This
+is a translation of an article originally in Japanese</p>
+<p><a href="https://dev.epicgames.com/community/learning/tutorials/daE9/unreal-engine-baking-out-vertex-animation-in-editor-with-animtotexture">Baking Out Vertex Animation Tutorial</a>  </p>
+<p><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/using-material-layers-in-unreal-engine?application_version=5.4">Material Layers</a></p>
+
+<footer class="no-sidebar">
+<div>
+<p class="page-footer">
+MIT Licensed | Copyright © 2020-2024 John Farrow
+: john.farrow@unrealcode.net
+</p>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</div>
+</body>
+</html>

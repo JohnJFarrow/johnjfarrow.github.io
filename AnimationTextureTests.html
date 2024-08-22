@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="keywords" content="unreal engine development c++ cpp python">
+<meta name="keywords" content="unreal engine development c++ cpp python AnimToTexture animation textures animation materials">
 <link rel="stylesheet" type="text/css" href="./css/styles.css">
 <link rel="stylesheet" type="text/css" href="./css/syntaxhighlightingstyles.css">
 <link rel="stylesheet" type="text/css" href="./css/print.css" media="print">
@@ -15,12 +15,14 @@ mermaid.initialize({ startOnLoad: true, theme: 'base', 'themeVariables': {'darkM
 <link rel = "stylesheet" href="./css/hljs_overrides.css">
 <script src = "./css/highlight/highlight.min.js" ></script>
 <script> hljs.highlightAll();</script>
-<title>unrealcode.net</title>
-<meta name="description" content="">
+<title>Using Animation Textures from Blueprint | unrealcode.net</title>
+<meta name="description" content="Using Animation Textures from Blueprint">
 </head>
 <body>
-<div id="app" data-server-rendered="true">
-<div class="theme-container no-sidebar">
+<div id="app">
+<div class="theme-container">
+<div class="main-container">
+<main class="page">
 <header class="navbar">
 <a class="header-link" href="index.html">
 <span class="site-name">
@@ -68,36 +70,32 @@ animation
 </span>
 </a>
 </header>
-<main class="home">
-<header class="hero">
-<h1 class="main-header-part1">
-Articles About Unreal Engine [materials]
-</h1>
-</header>
-<div class="theme-default-content custom content__default">
-<div>
-<table class="index-table">
-<tr class="index-row">
-<td class="index-cell">
-<section class="article">
-<h2>
-<a href="AnimationTextureMaterials.html">
-Materials for Animation Textures
-</a>
+<h1 id="using-animation-textures-characters-from-blueprint">Using Animation Textures Characters from Blueprint</h1>
+<p>This article is part of a series detailing how to use the AnimToTexture plugin to 
+animate static meshes.  </p>
+<p>Previous parts are:</p>
+<ul>
+<li> <a href="AnimationTextureMaterials.html">Materials for Animation Textures</a></li>
+<li> <a href="AnimationTextures.html">Animation Textures and using the AnimToTexture plugin</a></li>
+</ul>
+<h2 id="reference">Reference</h2>
+<p><a href="https://www.youtube.com/watch?v=vrlFozqB0jA">Unreal Engine 5 AnimToTexture Plugin, How to Use it to make Vertex Animation Textures for crowds</a>  This is a great video by Kevin Romond based on Unreal 5.2.</p>
+<p><a href="https://docs.google.com/document/d/1P2r3YzPOMZU59o2DaEBim0nmPSTdVg3MmFA3rORg6f0/edit#heading=h.mfv57e40k4rc">UE5 AnimToTexture plug-in</a>  This
+is a translation of an article originally in Japanese</p>
+<p><a href="https://dev.epicgames.com/community/learning/tutorials/daE9/unreal-engine-baking-out-vertex-animation-in-editor-with-animtotexture">Baking Out Vertex Animation Tutorial</a>  </p>
+<p><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/using-material-layers-in-unreal-engine?application_version=5.4">Material Layers</a></p>
+
+<div class="issue">
+<h2 id="feedback">
+Feedback
 </h2>
 <p>
-Creating materials for use with animation textures and the AnimToTexture plugin in Unreal 5.4
-</p>
-<a href="AnimationTextureMaterials.html">
-Read more
+Please leave any feedback about this article
+<a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/34">
+here
 </a>
-</section>
-</td>
-</tr>
-</table>
+</p>
 </div>
-</div>
-</main>
 <footer class="no-sidebar">
 <div>
 <p class="page-footer">
@@ -106,6 +104,8 @@ MIT Licensed | Copyright © 2020-2024 John Farrow
 </p>
 </div>
 </footer>
+</main>
+</div>
 </div>
 </div>
 </body>

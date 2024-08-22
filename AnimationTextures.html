@@ -91,9 +91,9 @@ by default so you will need to enable it for anything described
 here to work.  There is lots of content on the web about version 5.1 and 5.2
 of this AnimToTexture plugin but it changed for version 5.4 and 
 not much has been written about the latest version.</p>
-<h2 id="its-all-about-materials">Its all about materials</h2>
+<h2 id="its-all-about-materials">It's all about materials</h2>
 <p>Unreal Engine implements vertex animation by using materials, material instances
-and material layers.  Its helpful to understand the relationship between these parts:</p>
+and material layers.  It's helpful to understand the relationship between these parts:</p>
 <p><img src="images/vam_006.png" alt="width50" /></p>
 <p>A skeletal mesh has materials and/or material instances which are specified in its material slots.  When a static
 mesh is created these materials or material instances  are copied to the material slots of the static mesh, after
@@ -221,6 +221,17 @@ to create the static mesh and its  materials  and material instances.</p>
 <p>Once you have completed this you should have an ATMaterials folder
 with the static mesh, a material, and two material instances:</p>
 <p><img src="images/vam_034.png" alt="width80" /></p>
+<h4 id="setting-the-lod-level">Setting the LOD level</h4>
+<p>The AnimToTexture plugin only generates animation textures for one level
+of detail.  If the static mesh can be rendered with more than one level
+of detail you will see artifacts.</p>
+<p>This image shows what happens when  the two front characters are
+rendered with LOD 0, which has animation textures, and the two rear characters
+are rendered with LOD 1 which has no animation textures.</p>
+<p><img src="images/vam_040.png" alt="width80" /></p>
+<p>To prevent this problem  open the static mesh SM_ATMannySimple
+and set the property &quot;Number of LODs&quot; to 1 and then press the &quot;Apply Changes&quot; button:</p>
+<p><img src="images/vam_041.png" alt="width50" /></p>
 <h4 id="creating-the-data-asset">Creating the data asset</h4>
 <p>The animation texture creation process is controlled by a data asset.  The easiest way to
 make one with the correct structure is to copy the one which ships with the plugin, so 
@@ -262,7 +273,7 @@ AnimToTexture plugin like so:</p>
 <h4 id="configuring-the-animtotexture-blueprint">Configuring the AnimToTexture blueprint</h4>
 <p>The AnimToTexture blueprint contains the code which creates the animation textures
 and updates the material instance(s) to use those textures.</p>
-<p>We will be editing the AnimToTexture blueprint which comes with the AnimToTextire plugin 
+<p>We will be editing the AnimToTexture blueprint which comes with the AnimToTexture plugin 
 so we need to make a copy of it.</p>
 <p>Copy /Engine/Plugins/AnimToTexture/Characters/Mannequin/BP_AnimToTexture to
 the /Content/ATMaterials folder and rename it &quot;BP_ATAnimToTexture&quot;.</p>

@@ -84,7 +84,7 @@ animation textures are used to animate the crowd members:</p>
 <p>This article describes materials which work with animation textures.  It is part of
 a set of articles about animation textures which describe how animation textures
 are created and how they can be used by MASS, PCG and Niagara.</p>
-<h2 id="its-all-about-materials">It;s all about materials</h2>
+<h2 id="its-all-about-materials">It's all about materials</h2>
 <p>Unreal Engine implements vertex animation by using materials, material instances
 and material layers.  It's helpful to understand the relationship between these parts:</p>
 <p><img src="images/vam_017.png" alt="width80" /></p>
@@ -180,39 +180,62 @@ with animation textures.</p>
 <p>Open the material M_ATMannequin.</p>
 <p>The part we want to change is on the right side:</p>
 <p><img src="images/vam_019.png" alt="width80" /></p>
-<p>There is a property called &quot;Use Material Attributes&quot;:</p>
-<p><img src="images/vam_020.png" alt="width30" /></p>
-<p>We want to change this property but not yet.  If you just tick it the M_ATMannequin node 
-will be deleted from the material graph. Don't do this yet.</p>
-<p>First we want to add a MakeMaterialAttributes node and connect all the nodes
+<!--
+There is a property called "Use Material Attributes":
+
+![width30](images/vam_020.png)
+
+We want to change this property but not yet.  If you just tick it the M_ATMannequin node 
+will be deleted from the material graph. Don't do this yet.
+-->
+<p>We want to change the material to use material attributes.  First we need to add a MakeMaterialAttributes node and connect all the nodes
 which are inputs into the M_ATMannequin into the MakeMaterialAttributes that way
 we don't have to remember where they where connected.</p>
 <p>Add a MakeMaterialAttributes node and connect it like this:</p>
 <p><img src="images/vam_021.png" alt="width80" /></p>
-<p>Then check the &quot;Use Material Attributes&quot; property.  This will delete the 
+<p>There is a property called &quot;Use Material Attributes&quot; on the material itself:</p>
+<p><img src="images/vam_020.png" alt="width30" /></p>
+<p>Check the &quot;Use Material Attributes&quot; property.  This will delete the 
 big M_ATMannequin and replace it with a small one. This should leave
 you with this:</p>
 <p><img src="images/vam_022.png" alt="width80" /></p>
 <p>The above nodes create the visual appearance, now we have to add the nodes which 
 do the actual bone or vertex animation. Here we will do bone animation, the
 vertex animation process is similar.</p>
-<p>Add the nodes and connections shown in the  this picture:</p>
+<p>We want to end up with these nodes and connections:</p>
 <p><img src="images/vam_023.png" alt="width80" /></p>
-<p>When you add the GetMaterialAttributes nodes in order to get pins
-on the node you will need to edit its 
-details and add elements to the &quot;Attribute Get Types&quot; property.</p>
-<p>The top GetMaterialAttributes has this 1 entry:</p>
-<p><img src="images/vam_025.png" alt="width50" /></p>
-<p>The bottom GetMaterialAttributes has these 2 entries:</p>
-<p><img src="images/vam_024.png" alt="width50" /></p>
-<p>When you add the SetMaterialAttributes node in order to get pins
-on the node you will need to edit its 
-details and add elements to the &quot;Attribute Get Types&quot; property:</p>
-<p><img src="images/vam_024.png" alt="width50" /></p>
-<p>Note that we added the crucial MaterialAttributeLayers node.  Set the properties
-of this node like so:</p>
-<p><img src="images/vam_026.png" alt="width50" /></p>
-<p>This node is what make animation textures work. </p>
+<p>To do this add these nodes:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Node</th>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">GetMaterialAttributes<br/>(the top one)</td>
+<td style="text-align: left;">In order to get the pins shown on the picture above edit the node details and add these elements to the &quot;Attribute Get Types&quot; property <img src="images/vam_025.png" alt="width50" /></td>
+</tr>
+<tr>
+<td style="text-align: left;">MaterialAttributeLayers</td>
+<td style="text-align: left;">Edit the node details and set these properties:<img src="images/vam_026.png" alt="width50" /></td>
+</tr>
+<tr>
+<td style="text-align: left;">GetMaterialAttributes<br/>(the bottom one)</td>
+<td style="text-align: left;">In order to get the pins shown on the picture above edit the node details and add these elements to the &quot;Attribute Get Types&quot; property <img src="images/vam_024.png" alt="width50" /></td>
+</tr>
+<tr>
+<td style="text-align: left;">BlendAngleCorrectedNormals</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">SetMaterialAttributes</td>
+<td style="text-align: left;">In order to get the pins shown on the picture above edit the node details and add these elements to the &quot;Attribute Get Types&quot; property <img src="images/vam_042.png" alt="width50" /></td>
+</tr>
+</tbody>
+</table>
+<p>Then make connections shown in the diagram above.</p>
 <p>Save the M_ATMannequin material node.</p>
 <p>We can't set the  properties of the ML_BoneAnimation
 here in the material, but if you open a material instance 

@@ -198,13 +198,13 @@ the City Sample project is from Unreal Engine 5.2. </p>
 for a specific static mesh, then (2) create a Niagara system to
 spawn a lot of animated static meshes, then (3) create a PCG system
 to spawn a lot of animated static meshes.</p>
-<h4 id="creating-the-example-project">Creating the example project</h4>
+<h4 id="step-1-creating-the-project">Step 1: Creating the  project</h4>
 <p>For this example from the launcher (I am using 5.4.3) create a new Game, Third Person, Blueprint, Desktop project with starter content.  Call it &quot;VertexAnimation&quot;.</p>
 <p>Go into Edit | Plugins and enabled the AnimToTexture plugin an restart.</p>
 <p>Under the Content folder create a new folder called &quot;ATMaterials&quot;.</p>
 <p>In the content browser settings make sure &quot;Show Plugin Content&quot; and &quot;Show Engine Content&quot;
 are both enabled.</p>
-<h4 id="protecting-the-engine-files-optional">Protecting the engine files [Optional]</h4>
+<h4 id="step-2-protecting-the-engine-files-optional">Step 2: Protecting the engine files [Optional]</h4>
 <p>The AnimToTexture plugin contains static mesh files which reference material instance files which reference material files which reference material layer files which reference texture files.  This makes it easy to 
 accidentally update  files contained in the plugin when  generating new textures.  To
 prevent this it is advisable to open the directory
@@ -213,7 +213,7 @@ Windows Explorer and change all the files under this directory to read only.  If
 accidently change any of these files you can recover then by running the Verify process
 from the launcher:</p>
 <p><img src="images/vam_031.png" alt="width30" /></p>
-<h4 id="setting-up-favorites-optional">Setting up favorites [Optional]</h4>
+<h4 id="step-3-setting-up-favorites-optional">Step 3: Setting up favorites [Optional]</h4>
 <p>We will be copying a number of assets from the AnimToTexture plugin folders to the /Content/ATMaterials 
 folder and moving between these two folders frequently.</p>
 <p>If you right click on the AnimToTexture folder and choose &quot;Add To Favorites&quot; and do the same thing for the ATMaterials folder you end up with both folders listed in your favorites list:</p>
@@ -221,13 +221,13 @@ folder and moving between these two folders frequently.</p>
 <p>This means you can quickly move from one folder to the other and you can select assets
 in the plugin folder and just drop them on the ATMaterials folder in the favorites list.</p>
 <p><img src="images/vam_033.png" alt="width80" /></p>
-<h4 id="creating-a-static-mesh-and-materials">Creating a static mesh and materials</h4>
+<h4 id="step-4-creating-a-static-mesh-and-materials">Step 4: Creating a static mesh and materials</h4>
 <p>Follow the steps detailed in <a href="AnimationTextureMaterials.html">Materials for Animation Textures </a>
 to create the static mesh and its  materials  and material instances.</p>
 <p>Once you have completed this you should have an ATMaterials folder
 with the static mesh, a material, and two material instances:</p>
-<p><img src="images/vam_034.png" alt="width80" /></p>
-<h4 id="setting-the-lod-level">Setting the LOD level</h4>
+<p><img src="images/vam_034.png" alt="width60" /></p>
+<h4 id="step-5-setting-the-lod-level">Step 5: Setting the LOD level</h4>
 <p>The AnimToTexture plugin only generates animation textures for one level
 of detail.  If the static mesh can be rendered with more than one level
 of detail you will see artifacts.</p>
@@ -238,11 +238,11 @@ are rendered with LOD 1 which has no animation textures.</p>
 <p>To prevent this problem  open the static mesh SM_ATMannySimple
 and set the property &quot;Number of LODs&quot; to 1 and then press the &quot;Apply Changes&quot; button:</p>
 <p><img src="images/vam_041.png" alt="width50" /></p>
-<h4 id="creating-the-data-asset">Creating the data asset</h4>
+<h4 id="step-6-creating-the-data-asset">Step 6: Creating the data asset</h4>
 <p>The animation texture creation process is controlled by a data asset.  The easiest way to
 make one with the correct structure is to copy the one which ships with the plugin, so 
 copy Engine/Plugins/AnimToTexture/Characters/Mannequin/Data/DA_BoneAnimation to the ATMaterials folder.  Rename it &quot;DA_ATBoneAnimation&quot; and save it.</p>
-<h4 id="creating-texture-files">Creating texture files</h4>
+<h4 id="step-7-creating-texture-files">Step 7: Creating texture files</h4>
 <p>The animation texture process populates pre-existing texture files.  To get these 
 go to the /Engine/Plugins/AnimToTexture/Characters/Mannequin/Textures/BoneAnimation
 and copy the 3 texture files into /Content/ATMaterials and rename them:</p>
@@ -254,7 +254,7 @@ and copy the 3 texture files into /Content/ATMaterials and rename them:</p>
 <p>We are renaming all these assets to make it clear when we are looking at the data object which
 asset it is referencing and to reduce the risk of overwriting the materials and textures which are included
 in the AnimToTexture plugin.</p>
-<h4 id="populating-the-data-asset">Populating the data asset</h4>
+<h4 id="step-8-populating-the-data-asset">Step 8: Populating the data asset</h4>
 <p>Open the data asset DA_ATBoneAnimation.  It will be populated with the values from the
 AnimToTexture plugin like so:</p>
 <p><img src="images/vam_004.png" alt="width80" /></p>
@@ -276,7 +276,7 @@ AnimToTexture plugin like so:</p>
 </ul>
 <p>The data asset should now look like this:</p>
 <p><img src="images/vam_005.png" alt="width80" /></p>
-<h4 id="configuring-the-animtotexture-blueprint">Configuring the AnimToTexture blueprint</h4>
+<h4 id="step-9-configuring-the-animtotexture-blueprint">Step 9: Configuring the AnimToTexture blueprint</h4>
 <p>The AnimToTexture blueprint contains the code which creates the animation textures
 and updates the material instance(s) to use those textures.</p>
 <p>We will be editing the AnimToTexture blueprint which comes with the AnimToTexture plugin 
@@ -307,9 +307,9 @@ it should look like this:</li>
 </ul>
 <p><img src="images/vam_015.png" alt="width50" /></p>
 <p>Compile and save BP_ATAnimToTexture.</p>
-<h4 id="save-everything">Save Everything</h4>
+<h4 id="step-10-save-everything">Step 10: Save Everything</h4>
 <p>Save everything before doing the next step.</p>
-<h4 id="generating-the-animation-textures">Generating the animation textures</h4>
+<h4 id="step-11-generating-the-animation-textures">Step 11: Generating the animation textures</h4>
 <p>Right-click the BP_ATAnimToTexture and click &quot;Run Editor Utility Blueprint&quot; as shown here:</p>
 <p><img src="images/vam_012.png" alt="offset" /></p>
 <p>This will take a minute or two.</p>
@@ -320,7 +320,10 @@ static mesh you will see a warning like this:</p>
 <pre><code>LogAnimToTextureEditor: Warning: Invalid AnimSequence: run_fwd for given SkeletalMesh: SKM_Manny_Simple
 </code></pre>
 <p>Once it has finished you should see the data asset, material instances, static mesh and the animation textures have all been updated and need saving.  Save everything.</p>
-<h4 id="checking-results">Checking results</h4>
+<p>At this point you should have a static mesh with working bone animations.</p>
+<p>If you open the static mesh you should see it executing the first animation:</p>
+<p><img src="images/vam_043.gif" alt="width80" /></p>
+<h4 id="troubleshooting">Troubleshooting</h4>
 <p>If you open the data asset and expand the Info &gt; Animations section at the bottom you will see something
 like this:</p>
 <p><img src="images/vam_013.png" alt="width80" /></p>
@@ -329,15 +332,16 @@ and the individual animation lengths have been added to the data asset.</p>
 <p>If you open the material instance MI_ATManny_01 and look at the Layer Parameters tab you 
 will see the parameter values have been updated:</p>
 <p><img src="images/vam_016.png" alt="width80" /></p>
-<p>If you open the static mesh you should see it executing the first
-animation:</p>
-<p><img src="images/vam_035.png" alt="width50" /></p>
 <p>If you see something like this:</p>
-<p><img src="images/vam_036.png" alt="width50" /></p>
+<p><img src="images/vam_047.gif" alt="width50" /></p>
 <p>This happens when the static mesh does not have its &quot;Number of LODs&quot; property set to 1.  Open the static mesh SM_ATMannySimple, change &quot;Number of LODs&quot; 
-to 1, click &quot;Apply Changes&quot;, save the static mesh and rerun the BP_ATAnimToTexture blueprint.  </p>
+to 1, click &quot;Apply Changes&quot;, save the static mesh.  </p>
 <p>At this point you should have a static mesh with working bone animations.  The next
 parts in this series will detail how to use that mesh in Niagara, blueprints and MASS.</p>
+<p>Currently available parts are:</p>
+<ul>
+<li> <a href="AnimationTextureTests.html">Using Animation Textures Characters from Blueprint</a></li>
+</ul>
 <h2 id="reference">Reference</h2>
 <p><a href="https://www.youtube.com/watch?v=vrlFozqB0jA">Unreal Engine 5 AnimToTexture Plugin, How to Use it to make Vertex Animation Textures for crowds</a>  This is a great video by Kevin Romond based on Unreal 5.2.</p>
 <p><a href="https://docs.google.com/document/d/1P2r3YzPOMZU59o2DaEBim0nmPSTdVg3MmFA3rORg6f0/edit#heading=h.mfv57e40k4rc">UE5 AnimToTexture plug-in</a>  This

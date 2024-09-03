@@ -141,10 +141,16 @@ body {
 }
 
 div.main-container {
-    margin-left: 10%;
-    margin-right: 10%;
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
+div.index-navbar-container {
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+}
 
 
 .sidebar-mask {
@@ -474,8 +480,8 @@ th {
 
 
 .home {
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: auto;
+    margin-right: auto;
     display: block
 }
 
@@ -838,86 +844,7 @@ th {
 }
 
 
-@media (max-width:719px) {
-    .navbar {
-        padding-left: 4rem
-    }
 
-    .navbar .can-hide {
-        display: none
-    }
-
-    .navbar .links {
-        padding-left: 1.5rem
-    }
-
-    .navbar .site-name {
-        width: calc(100vw - 9.4rem);
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis
-    }
-}
-
-.page-edit {
-    max-width: 740px;
-    margin: 0 auto;
-    padding: 2rem 2.5rem
-}
-
-@media (max-width:959px) {
-    .page-edit {
-        padding: 2rem
-    }
-}
-
-@media (max-width:419px) {
-    .page-edit {
-        padding: 1.5rem
-    }
-}
-
-.page-edit {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    overflow: auto
-}
-
-.page-edit .edit-link {
-    display: inline-block
-}
-
-.page-edit .edit-link a {
-    color: #4e6e8e;
-    margin-right: .25rem
-}
-
-.page-edit .last-updated {
-    float: right;
-    font-size: .9em
-}
-
-.page-edit .last-updated .prefix {
-    font-weight: 500;
-    color: #4e6e8e
-}
-
-.page-edit .last-updated .time {
-    font-weight: 400;
-    color: #767676
-}
-
-@media (max-width:719px) {
-    .page-edit .edit-link {
-        margin-bottom: .5rem
-    }
-
-    .page-edit .last-updated {
-        font-size: .8em;
-        float: none;
-        text-align: left
-    }
-}
 
 .page-nav {
     max-width: 740px;
@@ -1173,8 +1100,6 @@ section.article > p:first-of-type {
 header.navbar {
     box-sizing: border-box;
     line-height: 2.2rem;
-    margin-left: 10%;
-    margin-right: 10%;
     padding-top: 66px;
     a {
         color:#999;
@@ -1270,6 +1195,14 @@ img[alt=width80] {
     margin-right: auto;
     display:block;
     width:80%;
+}
+
+img[alt=width60] {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 60%;
+    margin-top:2rem;
 }
 
 img[alt=width50] {

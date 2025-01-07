@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="blog-wrapper blog-post-page plugin-blog plugin-id-default" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.7.0">
+<title data-rh="true">Animation Textures Part 2 - Using the AnimToTexture plugin | Unrealcode.net</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://www.unrealcode.net/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://www.unrealcode.net/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://www.unrealcode.net/AnimationTextures"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docusaurus_tag" content="default"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docsearch:docusaurus_tag" content="default"><meta data-rh="true" property="og:title" content="Animation Textures Part 2 - Using the AnimToTexture plugin | Unrealcode.net"><meta data-rh="true" name="description" content="Understanding how the AnimToTexture works in Unreal 5.4"><meta data-rh="true" property="og:description" content="Understanding how the AnimToTexture works in Unreal 5.4"><meta data-rh="true" name="keywords" content="unreal,unreal engine,c++,AnimToTexture,animation,textures"><meta data-rh="true" property="og:type" content="article"><meta data-rh="true" property="article:published_time" content="2024-12-03T00:00:00.000Z"><meta data-rh="true" property="article:tag" content="Animation,Materials"><link data-rh="true" rel="icon" href="/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://www.unrealcode.net/AnimationTextures"><link data-rh="true" rel="alternate" href="https://www.unrealcode.net/AnimationTextures" hreflang="en"><link data-rh="true" rel="alternate" href="https://www.unrealcode.net/AnimationTextures" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","@id":"https://www.unrealcode.net/AnimationTextures","mainEntityOfPage":"https://www.unrealcode.net/AnimationTextures","url":"https://www.unrealcode.net/AnimationTextures","headline":"Animation Textures Part 2 - Using the AnimToTexture plugin","name":"Animation Textures Part 2 - Using the AnimToTexture plugin","description":"Understanding how the AnimToTexture works in Unreal 5.4","datePublished":"2024-12-03T00:00:00.000Z","author":[],"keywords":["unreal","unreal engine","c++","AnimToTexture","animation","textures"],"isPartOf":{"@type":"Blog","@id":"https://www.unrealcode.net/","name":"Blog"}}</script><link rel="alternate" type="application/rss+xml" href="/rss.xml" title="Unrealcode.net RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Unrealcode.net Atom Feed"><link rel="stylesheet" href="/assets/css/styles.2beda875.css">
+<script src="/assets/js/runtime~main.7f379c22.js" defer="defer"></script>
+<script src="/assets/js/main.1574e752.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();t(null!==e?e:"dark")}(),function(){try{const n=new URLSearchParams(window.location.search).entries();for(var[t,e]of n)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/"><b class="navbar__title text--truncate">unrealcode.net</b></a></div><div class="navbar__items navbar__items--right"><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/">Articles</a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="Switch between dark and light mode (currently dark mode)" aria-label="Switch between dark and light mode (currently dark mode)" aria-live="polite" aria-pressed="true"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_z2l0"><div class="container margin-vert--lg"><div class="row"><main class="col col--9 col--offset-1"><article class=""><header><h1 class="title_f1Hy">Animation Textures Part 2 - Using the AnimToTexture plugin</h1><div class="container_mt6G margin-vert--md"><time datetime="2024-12-03T00:00:00.000Z">December 3, 2024</time></div></header><div id="__blog-post-container" class="markdown"><p>Animation Textures is a technique for storing animation data in a texture
+and animating the mesh by using a special material to read and
+replay the animation data.</p>
+<p>This technique is typically used for animating large numbers of background
+characters with minimal overhead.  It&#x27;s used in the Epic Games
+<a href="https://www.unrealengine.com/marketplace/en-US/product/city-sample" target="_blank" rel="noopener noreferrer">City Sample</a>
+to animate the crowds walking around the city.  If you open the
+City Sample and play the MassCrowd map you will see a scene like this in which
+animation textures are used to animate the crowd members:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="/assets/images/vam_001-b2d15a0e36f3805c20ce5fd92623ba24.png" width="1756" height="750" class="img_ev3q"></p>
+<p>This article is part of a series detailing how to use the AnimToTexture plugin to
+animate static meshes.</p>
+<p>Previous parts are:</p>
+<ul>
+<li><a href="/AnimationTextureMaterials.html">Materials for Animation Textures</a></li>
+</ul>
+<p>This article describes how animation textures are created.  It is part of
+a set of articles about animation textures which describe how animation textures
+are created, <a href="/AnimationTextureMaterials.html">How Animation Texture Materials are created</a>
+and how they can be used by MASS, PCG and Niagara.</p>
+<p>Unreal 5.4 ships with a plugin called AnimToTexture, this is not enabled
+by default so you will need to enable it for anything described
+here to work.  There is lots of content on the web about version 5.1 and 5.2
+of this AnimToTexture plugin but it changed for version 5.4 and
+not much has been written about the latest version.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="its-all-about-materials">It&#x27;s all about materials<a href="#its-all-about-materials" class="hash-link" aria-label="Direct link to It&#x27;s all about materials" title="Direct link to It&#x27;s all about materials">​</a></h2>
+<p>Unreal Engine implements vertex animation by using materials, material instances
+and material layers.  It&#x27;s helpful to understand the relationship between these parts:</p>
+<p><img decoding="async" loading="lazy" alt="width50" src="/assets/images/vam_006-c2b9463618fad493a17966a562085a9c.png" width="1346" height="682" class="img_ev3q"></p>
+<p>A skeletal mesh has materials and/or material instances which are specified in its material slots.  When a static
+mesh is created these materials or material instances  are copied to the material slots of the static mesh, after
+that the materials on the skeletal mesh are not used.</p>
+<p>The process for creating materials and material instances which
+can be used with animation textures is described in <a href="/AnimationTextureMaterials.html">Animation Texture Materials</a>.  We will be used materials created using the process described on that page.</p>
+<div class="warning"><p>It&#x27;s important to realise that when the animation textures are generated by the AnimToTexture process the associated material instance(s) are updated with values specific to the animations (such as the first and last frame numbers) so every static mesh which is animated this way needs its own material instance(s).</p></div>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-approach">The Approach<a href="#the-approach" class="hash-link" aria-label="Direct link to The Approach" title="Direct link to The Approach">​</a></h2>
+<p>Animation textures are used to animate a static mesh either by
+animating the vertices or by animating the bones.  The AnimToTexture
+plugin supports both.  In this article to keep it simple I will
+only refer to bone animation.</p>
+<p>This is a simplified overview of what happens when we create animation textures:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="/assets/images/vam_002-8b0e4926d22a25698a8055fd77f25803.png" width="1161" height="1161" class="img_ev3q"></p>
+<p>We start with:</p>
+<ul>
+<li>a skeletal mesh</li>
+<li>a static mesh created from the skeletal mesh</li>
+<li>materials</li>
+<li>material instances</li>
+<li>animations</li>
+</ul>
+<p>The process is controlled by a data asset. The data asset
+stores information such as the paths to the  meshes, the textures,
+the materials, and other parameters such as texture size.</p>
+<p>Once we have populated the data asset we execute the AnimToTexture
+process to:</p>
+<ul>
+<li>create multiple textures containing animations for bone positions and rotations</li>
+<li>update material instances</li>
+<li>update the data asset</li>
+</ul>
+<p>After the process has been run the data asset contains information about the
+animations we processed so that we can, for example, use a blueprint to
+read which frames a set of animation uses and replay those animations.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="what-is-in-the-animtotexture-plugin">What is in the AnimToTexture plugin<a href="#what-is-in-the-animtotexture-plugin" class="hash-link" aria-label="Direct link to What is in the AnimToTexture plugin" title="Direct link to What is in the AnimToTexture plugin">​</a></h2>
+<p>The AnimToTexture plugin ships with Unreal 5.4, on a typical installation
+its files can be found in the directory &quot;c:\Program Files\Epic Games\UE_5.4\Engine\Plugins\Experimental\AnimToTexture&quot;.</p>
+<p>Everything described here requires this plugin be enabled.</p>
+<p>In addition to the code used to create the animation textures, the
+plugin contains other useful files.  These can be located
+under the /Engine/Plugins/AnimToTexture folder.  This is split into
+two parts &quot;AnimToTexture Content&quot; and &quot;AnimToTexture C++ Classes&quot;, we only
+ever use the &quot;AnimToTexture Content&quot; part and just refer to it as &quot;AnimToTexture&quot;
+which is the actual folder name.</p>
+<p>If you can&#x27;t see the /Engine/Plugins/AnimToTexture folder:</p>
+<ul>
+<li>make sure you have the AnimToTexture plugin enabled</li>
+<li>in the settings for the content browser (accessed with the
+button in the top right corner of the content browser window) make sure you have &quot;Show Engine Content&quot; and &quot;Show Plugin Content&quot; enabled.</li>
+</ul>
+<table><thead><tr><th style="text-align:left">Files</th><th style="text-align:left">Notes</th></tr></thead><tbody><tr><td style="text-align:left">Characters/Mannequin/BP_AnimToTexture</td><td style="text-align:left">the editor utility blueprint which runs the AnimToTexture process</td></tr><tr><td style="text-align:left">Characters/Mannequin/Data/DA_BoneAnimation</td><td style="text-align:left">example data asset</td></tr><tr><td style="text-align:left">Characters/Mannequin/Materials/BoneAnimation/M_Body_BoneAnimation</td><td style="text-align:left">material</td></tr><tr><td style="text-align:left">Characters/Mannequin/Materials/BoneAnimation/MI_Body_BoneAnimation</td><td style="text-align:left">material instance</td></tr><tr><td style="text-align:left">Characters/Mannequin/Textures/BoneAnimation/TX_*</td><td style="text-align:left">animation textures</td></tr><tr><td style="text-align:left">Materials/ML_BoneAnimation</td><td style="text-align:left">material layer</td></tr></tbody></table>
+<p>Some of these files have shipped in prior versions of Unreal,
+and some  up to date Unreal example projects contain old versions of these files.
+For example if you download the City Sample
+for Unreal 5.4 you will find one version of ML_BoneAnimation in the
+AnimToTexture plugin (in your engine) and another version in /Content/Crowd/VAT/Materials/ (from the project).  These two files are very different - it looks as if the one in
+the City Sample project is from Unreal Engine 5.2.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="steps">Steps<a href="#steps" class="hash-link" aria-label="Direct link to Steps" title="Direct link to Steps">​</a></h2>
+<p>This section outlines the steps to take to (1) create animation textures
+for a specific static mesh, then (2) create a Niagara system to
+spawn a lot of animated static meshes, then (3) create a PCG system
+to spawn a lot of animated static meshes.</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-1-creating-the--project">Step 1: Creating the  project<a href="#step-1-creating-the--project" class="hash-link" aria-label="Direct link to Step 1: Creating the  project" title="Direct link to Step 1: Creating the  project">​</a></h4>
+<p>For this example from the launcher (I am using 5.4.3) create a new Game, Third Person, Blueprint, Desktop project with starter content.  Call it &quot;VertexAnimation&quot;.</p>
+<p>Go into Edit | Plugins and enabled the AnimToTexture plugin an restart.</p>
+<p>Under the Content folder create a new folder called &quot;ATMaterials&quot;.</p>
+<p>In the content browser settings make sure &quot;Show Plugin Content&quot; and &quot;Show Engine Content&quot;
+are both enabled.</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-2-protecting-the-engine-files-optional">Step 2: Protecting the engine files [Optional]<a href="#step-2-protecting-the-engine-files-optional" class="hash-link" aria-label="Direct link to Step 2: Protecting the engine files [Optional]" title="Direct link to Step 2: Protecting the engine files [Optional]">​</a></h4>
+<p>The AnimToTexture plugin contains static mesh files which reference material instance files which reference material files which reference material layer files which reference texture files.  This makes it easy to
+accidentally update  files contained in the plugin when  generating new textures.  To
+prevent this it is advisable to open the directory
+&quot;c:\Program Files\Epic Games\UE_5.4\Engine\Plugins\Experimental\AnimToTexture\Content&quot; in
+Windows Explorer and change all the files under this directory to read only.  If you do
+accidently change any of these files you can recover then by running the Verify process
+from the launcher:</p>
+<p><img decoding="async" loading="lazy" alt="width30" src="/assets/images/vam_031-1eb5130312fbc2dd57c4f730b9dd1a88.png" width="266" height="277" class="img_ev3q"></p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-3-setting-up-favorites-optional">Step 3: Setting up favorites [Optional]<a href="#step-3-setting-up-favorites-optional" class="hash-link" aria-label="Direct link to Step 3: Setting up favorites [Optional]" title="Direct link to Step 3: Setting up favorites [Optional]">​</a></h4>
+<p>We will be copying a number of assets from the AnimToTexture plugin folders to the /Content/ATMaterials
+folder and moving between these two folders frequently.</p>
+<p>If you right click on the AnimToTexture folder and choose &quot;Add To Favorites&quot; and do the same thing for the ATMaterials folder you end up with both folders listed in your favorites list:</p>
+<p><img decoding="async" loading="lazy" alt="width30" src="/assets/images/vam_032-045430456276e29b21b18831d07069a0.png" width="573" height="570" class="img_ev3q"></p>
+<p>This means you can quickly move from one folder to the other and you can select assets
+in the plugin folder and just drop them on the ATMaterials folder in the favorites list.</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="/assets/images/vam_033-eb32969b0d1d6dedab5dd3dacd6939b8.png" width="1489" height="582" class="img_ev3q"></p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-4-creating-a-static-mesh-and-materials">Step 4: Creating a static mesh and materials<a href="#step-4-creating-a-static-mesh-and-materials" class="hash-link" aria-label="Direct link to Step 4: Creating a static mesh and materials" title="Direct link to Step 4: Creating a static mesh and materials">​</a></h4>
+<p>Follow the steps detailed in <a href="/AnimationTextureMaterials.html">Materials for Animation Textures </a>
+to create the static mesh and its  materials  and material instances.</p>
+<p>Once you have completed this you should have an ATMaterials folder
+with the static mesh, a material, and two material instances:</p>
+<p><img decoding="async" loading="lazy" alt="width60" src="/assets/images/vam_034-44b3d27bf48588fe39f2102d15ba9ae2.png" width="566" height="280" class="img_ev3q"></p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-5-setting-the-lod-level">Step 5: Setting the LOD level<a href="#step-5-setting-the-lod-level" class="hash-link" aria-label="Direct link to Step 5: Setting the LOD level" title="Direct link to Step 5: Setting the LOD level">​</a></h4>
+<p>The AnimToTexture plugin only generates animation textures for one level
+of detail.  If the static mesh can be rendered with more than one level
+of detail you will see artifacts.</p>
+<p>This image shows what happens when  the two front characters are
+rendered with LOD 0, which has animation textures, and the two rear characters
+are rendered with LOD 1 which has no animation textures.</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="/assets/images/vam_040-96a5c75769cf7359836745fc1eead7f1.png" width="2159" height="713" class="img_ev3q"></p>
+<p>To prevent this problem  open the static mesh SM_ATMannySimple
+and set the property &quot;Number of LODs&quot; to 1 and then press the &quot;Apply Changes&quot; button:</p>
+<p><img decoding="async" loading="lazy" alt="width50" src="/assets/images/vam_041-d1244b12c14e841812c36f847a4b5b2e.png" width="540" height="261" class="img_ev3q"></p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-6-creating-the-data-asset">Step 6: Creating the data asset<a href="#step-6-creating-the-data-asset" class="hash-link" aria-label="Direct link to Step 6: Creating the data asset" title="Direct link to Step 6: Creating the data asset">​</a></h4>
+<p>The animation texture creation process is controlled by a data asset.  The easiest way to
+make one with the correct structure is to copy the one which ships with the plugin, so
+copy Engine/Plugins/AnimToTexture/Characters/Mannequin/Data/DA_BoneAnimation to the ATMaterials folder.  Rename it &quot;DA_ATBoneAnimation&quot; and save it.</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-7-creating-texture-files">Step 7: Creating texture files<a href="#step-7-creating-texture-files" class="hash-link" aria-label="Direct link to Step 7: Creating texture files" title="Direct link to Step 7: Creating texture files">​</a></h4>
+<p>The animation texture process populates pre-existing texture files.  To get these
+go to the /Engine/Plugins/AnimToTexture/Characters/Mannequin/Textures/BoneAnimation
+and copy the 3 texture files into /Content/ATMaterials and rename them:</p>
+<ul>
+<li>TX_BonePosition to TX_ATBonePosition</li>
+<li>TX_BoneRotation to TX_ATBoneRotation</li>
+<li>TX_BoneWeight to TX_ATBoneWeight</li>
+</ul>
+<p>We are renaming all these assets to make it clear when we are looking at the data object which
+asset it is referencing and to reduce the risk of overwriting the materials and textures which are included
+in the AnimToTexture plugin.</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-8-populating-the-data-asset">Step 8: Populating the data asset<a href="#step-8-populating-the-data-asset" class="hash-link" aria-label="Direct link to Step 8: Populating the data asset" title="Direct link to Step 8: Populating the data asset">​</a></h4>
+<p>Open the data asset DA_ATBoneAnimation.  It will be populated with the values from the
+AnimToTexture plugin like so:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="/assets/images/vam_004-060626ca5accb808ec612cdf132137b7.png" width="1456" height="1161" class="img_ev3q"></p>
+<p>We will be changing all the items in the green boxes.</p>
+<p>Make these changes:</p>
+<ul>
+<li>change the Skeletal Mesh to SKM_MannySimple</li>
+<li>the static mesh to SM_ATMannySimple</li>
+<li>the Bone Position Texture to TX_ATBonePosition</li>
+<li>the Bone Rotation Texture to TX_ATBoneRotation</li>
+<li>the Bone Weight Texture to TX_ATBoneWeight</li>
+</ul>
+<p>For the purposes of this example we will be using 3 animations which go in the &quot;AnimSequences&quot; array property.</p>
+<p>Replace the 3 existing animations with ones from the /Content/Characters/Mannequins/Animations/Manny folder.  Change</p>
+<ul>
+<li>Anim Sequence Index[0] to MM_Run_Fwd</li>
+<li>Anim Sequence Index[1] to MM_Walk_Fwd</li>
+<li>Anim Sequence Index[2] to MM_Idle</li>
+</ul>
+<p>The data asset should now look like this:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="/assets/images/vam_005-a1d0af4fbe6fb654eb2bae83f8fc31d2.png" width="1720" height="1400" class="img_ev3q"></p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-9-configuring-the-animtotexture-blueprint">Step 9: Configuring the AnimToTexture blueprint<a href="#step-9-configuring-the-animtotexture-blueprint" class="hash-link" aria-label="Direct link to Step 9: Configuring the AnimToTexture blueprint" title="Direct link to Step 9: Configuring the AnimToTexture blueprint">​</a></h4>
+<p>The AnimToTexture blueprint contains the code which creates the animation textures
+and updates the material instance(s) to use those textures.</p>
+<p>We will be editing the AnimToTexture blueprint which comes with the AnimToTexture plugin
+so we need to make a copy of it.</p>
+<p>Copy /Engine/Plugins/AnimToTexture/Characters/Mannequin/BP_AnimToTexture to
+the /Content/ATMaterials folder and rename it &quot;BP_ATAnimToTexture&quot;.</p>
+<p>Open BP_ATAnimToTexture and make the following changes:</p>
+<ul>
+<li>delete everything in the &quot;VertexAnimation&quot; box, we only want to do bone animation, so
+it should look like this:</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="width80" src="/assets/images/vam_008-288824cb1544005ec3b186b166e91966.png" width="950" height="210" class="img_ev3q"></p>
+<ul>
+<li>delete the VertexDataAsset variable shown:</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="width50" src="/assets/images/vam_009-2f827a7b100efbf953218d42debc0047.png" width="633" height="332" class="img_ev3q"></p>
+<ul>
+<li>click on the BoneDataAsset variable and change the default value to DA_ATBoneAnimation:</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="width50" src="/assets/images/vam_010-3379c4b0ad89eabf168d47a98e20ffd8.png" width="367" height="299" class="img_ev3q">
+<img decoding="async" loading="lazy" alt="width50" src="/assets/images/vam_011-e93072ce0fdf1a3877605371fa3a6930.png" width="425" height="504" class="img_ev3q"></p>
+<ul>
+<li>click on the first &quot;Update Material Instance from Data Asset&quot; and change the material instance to MI_ATManny_01</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="width50" src="/assets/images/vam_014-f7d7cfb0190656dae635b517aca53a43.png" width="508" height="256" class="img_ev3q"></p>
+<ul>
+<li>click on the second &quot;Update Material Instance from Data Asset&quot; and change the material instance to MI_ATManny_02</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="width50" src="/assets/images/vam_015-4dc64374780610e2742e03772ee99891.png" width="440" height="243" class="img_ev3q"></p>
+<p>Compile and save BP_ATAnimToTexture.</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-10-save-everything">Step 10: Save Everything<a href="#step-10-save-everything" class="hash-link" aria-label="Direct link to Step 10: Save Everything" title="Direct link to Step 10: Save Everything">​</a></h4>
+<p>Save everything before doing the next step.</p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="step-11-generating-the-animation-textures">Step 11: Generating the animation textures<a href="#step-11-generating-the-animation-textures" class="hash-link" aria-label="Direct link to Step 11: Generating the animation textures" title="Direct link to Step 11: Generating the animation textures">​</a></h4>
+<p>Right-click the BP_ATAnimToTexture and click &quot;Run Editor Utility Blueprint&quot; as shown here:</p>
+<p><img decoding="async" loading="lazy" alt="offset" src="/assets/images/vam_012-fe54827b38cb7d690c9132aae810e566.png" width="286" height="513" class="img_ev3q"></p>
+<p>This will take a minute or two.</p>
+<p>Check the Output Log window.  If an error occurs this will be logged, there will
+not be any sort of popup alert.  For example of one of the animations specified
+in the data asset does not have the same skeletal mesh as the specified
+static mesh you will see a warning like this:</p>
+<div class="codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">LogAnimToTextureEditor: Warning: Invalid AnimSequence: run_fwd for given SkeletalMesh: SKM_Manny_Simple</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>Once it has finished you should see the data asset, material instances, static mesh and the animation textures have all been updated and need saving.  Save everything.</p>
+<p>At this point you should have a static mesh with working bone animations.</p>
+<p>If you open the static mesh you should see it executing the first animation:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="/assets/images/vam_043-ed86f27aba5dedb0956bf9ac1f547fb2.gif" width="1280" height="720" class="img_ev3q"></p>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="hash-link" aria-label="Direct link to Troubleshooting" title="Direct link to Troubleshooting">​</a></h4>
+<p>If you open the data asset and expand the Info &gt; Animations section at the bottom you will see something
+like this:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="/assets/images/vam_013-e6b06ee537fd6bfce87dddfbfd48acb5.png" width="1343" height="476" class="img_ev3q"></p>
+<p>This shows the animations have been processed and data such as the number of frames, the animation bounding box
+and the individual animation lengths have been added to the data asset.</p>
+<p>If you open the material instance MI_ATManny_01 and look at the Layer Parameters tab you
+will see the parameter values have been updated:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="/assets/images/vam_016-48ce6da03b9ab386c71ff5d201381e91.png" width="1073" height="866" class="img_ev3q"></p>
+<p>If you see something like this:</p>
+<p><img decoding="async" loading="lazy" alt="width50" src="/assets/images/vam_047-2fa40f3be757993c7f53953939faa5aa.gif" width="1280" height="1039" class="img_ev3q"></p>
+<p>This happens when the static mesh does not have its &quot;Number of LODs&quot; property set to 1.  Open the static mesh SM_ATMannySimple, change &quot;Number of LODs&quot;
+to 1, click &quot;Apply Changes&quot;, save the static mesh.</p>
+<p>At this point you should have a static mesh with working bone animations.  The next
+parts in this series will detail how to use that mesh in Niagara, blueprints and MASS.</p>
+<p>Currently available parts are:</p>
+<ul>
+<li><a href="/AnimationTextureTests.html">Using Animation Textures Characters from Blueprint</a></li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="references">References<a href="#references" class="hash-link" aria-label="Direct link to References" title="Direct link to References">​</a></h4>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=vrlFozqB0jA" target="_blank" rel="noopener noreferrer">Unreal Engine 5 AnimToTexture Plugin, How to Use it to make Vertex Animation Textures for crowds</a>  This is a great video by Kevin Romond based on Unreal 5.2.</li>
+<li><a href="https://docs.google.com/document/d/1P2r3YzPOMZU59o2DaEBim0nmPSTdVg3MmFA3rORg6f0/edit#heading=h.mfv57e40k4rc" target="_blank" rel="noopener noreferrer">UE5 AnimToTexture plug-in</a>  This
+is a translation of an article originally in Japanese</li>
+<li><a href="https://dev.epicgames.com/community/learning/tutorials/daE9/unreal-engine-baking-out-vertex-animation-in-editor-with-animtotexture" target="_blank" rel="noopener noreferrer">Baking Out Vertex Animation Tutorial</a></li>
+<li><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/using-material-layers-in-unreal-engine?application_version=5.4" target="_blank" rel="noopener noreferrer">Material Layers</a></li>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/33">here</a></p></div><footer class="docusaurus-mt-lg"><div class="row margin-top--sm theme-blog-footer-edit-meta-row"><div class="col"><b>Tags:</b><ul class="tags_jXut padding--none margin-left--sm"><li class="tag_QGVx"><a class="tag_zVej tagRegular_sFm0" href="/tags/animation">Animation</a></li><li class="tag_QGVx"><a class="tag_zVej tagRegular_sFm0" href="/tags/materials">Materials</a></li></ul></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Blog post page navigation"><a class="pagination-nav__link pagination-nav__link--prev" href="/AnimationTextureTests"><div class="pagination-nav__sublabel">Newer post</div><div class="pagination-nav__label">Animation Textures Part 3 - Using Animation Textures Characters from Blueprint</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/AnimationTextureMaterials"><div class="pagination-nav__sublabel">Older post</div><div class="pagination-nav__label">Animation Textures Part 1 - Materials</div></a></nav></main><div class="col col--2"><div class="tableOfContents_bqdL thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#its-all-about-materials" class="table-of-contents__link toc-highlight">It&#39;s all about materials</a></li><li><a href="#the-approach" class="table-of-contents__link toc-highlight">The Approach</a></li><li><a href="#what-is-in-the-animtotexture-plugin" class="table-of-contents__link toc-highlight">What is in the AnimToTexture plugin</a></li><li><a href="#steps" class="table-of-contents__link toc-highlight">Steps</a></li></ul></div></div></div></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="col footer__col"><div class="footer__title">Articles</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/">Index</a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2020-2025 John Farrow : john.farrow@unrealcode.net : Built with Docusaurus.</div></div></div></footer></div>
+</body>
+</html>

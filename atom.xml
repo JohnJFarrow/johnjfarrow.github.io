@@ -1,20 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="rss.xsl"?>
-<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
-    <channel>
-        <title>Unrealcode.net Blog</title>
-        <link>https://www.unrealcode.net</link>
-        <description>Unrealcode.net Blog</description>
-        <lastBuildDate>Fri, 06 Dec 2024 00:00:00 GMT</lastBuildDate>
-        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
-        <generator>https://github.com/jpmonette/feed</generator>
-        <language>en</language>
-        <item>
-            <title><![CDATA[Animation Textures Part 3 - Using Animation Textures Characters from Blueprint]]></title>
-            <link>https://www.unrealcode.net/AnimationTextureTests</link>
-            <guid>https://www.unrealcode.net/AnimationTextureTests</guid>
-            <pubDate>Fri, 06 Dec 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Using characters animated with the AnimToTexture plugin in Unreal 5.4]]></description>
-            <content:encoded><![CDATA[<p>This article is part of a series detailing how to use the AnimToTexture plugin to
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="atom.xsl"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://www.unrealcode.net</id>
+    <title>Unrealcode.net Blog</title>
+    <updated>2024-12-06T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://www.unrealcode.net"/>
+    <subtitle>Unrealcode.net Blog</subtitle>
+    <icon>https://www.unrealcode.net/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Animation Textures Part 3 - Using Animation Textures Characters from Blueprint]]></title>
+        <id>https://www.unrealcode.net/AnimationTextureTests</id>
+        <link href="https://www.unrealcode.net/AnimationTextureTests"/>
+        <updated>2024-12-06T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Using characters animated with the AnimToTexture plugin in Unreal 5.4]]></summary>
+        <content type="html"><![CDATA[<p>This article is part of a series detailing how to use the AnimToTexture plugin to
 animate static meshes.   It details tests we can run on the actors which
 use animation textures developed in prior articles</p>
 <p>Previous parts are:</p>
@@ -86,17 +85,17 @@ is a translation of an article originally in Japanese</li>
 <li><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/using-material-layers-in-unreal-engine?application_version=5.4" target="_blank" rel="noopener noreferrer">Material Layers</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/AnimationTextureTests#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/34">here</a></p>]]></content:encoded>
-            <category>Animation</category>
-            <category>Materials</category>
-        </item>
-        <item>
-            <title><![CDATA[Animation Textures Part 2 - Using the AnimToTexture plugin]]></title>
-            <link>https://www.unrealcode.net/AnimationTextures</link>
-            <guid>https://www.unrealcode.net/AnimationTextures</guid>
-            <pubDate>Tue, 03 Dec 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Understanding how the AnimToTexture works in Unreal 5.4]]></description>
-            <content:encoded><![CDATA[<p>Animation Textures is a technique for storing animation data in a texture
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/34">here</a></p>]]></content>
+        <category label="Animation" term="Animation"/>
+        <category label="Materials" term="Materials"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Animation Textures Part 2 - Using the AnimToTexture plugin]]></title>
+        <id>https://www.unrealcode.net/AnimationTextures</id>
+        <link href="https://www.unrealcode.net/AnimationTextures"/>
+        <updated>2024-12-03T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Understanding how the AnimToTexture works in Unreal 5.4]]></summary>
+        <content type="html"><![CDATA[<p>Animation Textures is a technique for storing animation data in a texture
 and animating the mesh by using a special material to read and
 replay the animation data.</p>
 <p>This technique is typically used for animating large numbers of background
@@ -339,17 +338,17 @@ is a translation of an article originally in Japanese</li>
 <li><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/using-material-layers-in-unreal-engine?application_version=5.4" target="_blank" rel="noopener noreferrer">Material Layers</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/AnimationTextures#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/33">here</a></p>]]></content:encoded>
-            <category>Animation</category>
-            <category>Materials</category>
-        </item>
-        <item>
-            <title><![CDATA[Animation Textures Part 1 - Materials]]></title>
-            <link>https://www.unrealcode.net/AnimationTextureMaterials</link>
-            <guid>https://www.unrealcode.net/AnimationTextureMaterials</guid>
-            <pubDate>Sun, 01 Dec 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Creating materials for use with animation textures and the AnimToTexture plugin in Unreal 5.4]]></description>
-            <content:encoded><![CDATA[<p>Animation Textures is a technique for storing animation data in a texture
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/33">here</a></p>]]></content>
+        <category label="Animation" term="Animation"/>
+        <category label="Materials" term="Materials"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Animation Textures Part 1 - Materials]]></title>
+        <id>https://www.unrealcode.net/AnimationTextureMaterials</id>
+        <link href="https://www.unrealcode.net/AnimationTextureMaterials"/>
+        <updated>2024-12-01T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Creating materials for use with animation textures and the AnimToTexture plugin in Unreal 5.4]]></summary>
+        <content type="html"><![CDATA[<p>Animation Textures is a technique for storing animation data in a texture
 and animating a mesh by using a special material to read and
 replay the animation data.</p>
 <p>This technique is typically used for animating large numbers of background
@@ -485,17 +484,17 @@ is a translation of an article originally in Japanese</li>
 <li><a href="https://www.youtube.com/watch?v=edZo8PC5SYc&amp;t=310s" target="_blank" rel="noopener noreferrer">Mastering Material Instances</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/AnimationTextureMaterials#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/32">here</a></p>]]></content:encoded>
-            <category>Animation</category>
-            <category>Materials</category>
-        </item>
-        <item>
-            <title><![CDATA[Optimization Part 4 - Adding Task Data to Traces]]></title>
-            <link>https://www.unrealcode.net/Optimization_Part4</link>
-            <guid>https://www.unrealcode.net/Optimization_Part4</guid>
-            <pubDate>Sun, 17 Nov 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Adding Task Data to Traces to relate tasks executing across multiple threads]]></description>
-            <content:encoded><![CDATA[<p>In <a href="https://www.unrealcode.net/Optimization_Part3.html">Part 3</a> we used Unreal Insights to sample performance data
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/32">here</a></p>]]></content>
+        <category label="Animation" term="Animation"/>
+        <category label="Materials" term="Materials"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Optimization Part 4 - Adding Task Data to Traces]]></title>
+        <id>https://www.unrealcode.net/Optimization_Part4</id>
+        <link href="https://www.unrealcode.net/Optimization_Part4"/>
+        <updated>2024-11-17T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Adding Task Data to Traces to relate tasks executing across multiple threads]]></summary>
+        <content type="html"><![CDATA[<p>In <a href="https://www.unrealcode.net/Optimization_Part3.html">Part 3</a> we used Unreal Insights to sample performance data
 and display it like this:</p>
 <p><img decoding="async" loading="lazy" alt="width100" src="https://www.unrealcode.net/assets/images/insights_017-40f4b38d5fee4482f6a70b665afa66cd.png" width="1664" height="623" class="img_ev3q"></p>
 <p>By default there is no simple way to connect the timing events on the Game Thread track, which create tasks, with the
@@ -601,17 +600,17 @@ selected task and several other filters.</p>
 <li><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/tasks-systems-in-unreal-engine?application_version=5.0" target="_blank" rel="noopener noreferrer">Task System</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/Optimization_Part4#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/31">here</a></p>]]></content:encoded>
-            <category>C++</category>
-            <category>Optimization</category>
-        </item>
-        <item>
-            <title><![CDATA[Optimization Part 3 - Using Unreal Insights]]></title>
-            <link>https://www.unrealcode.net/Optimization_Part3</link>
-            <guid>https://www.unrealcode.net/Optimization_Part3</guid>
-            <pubDate>Thu, 14 Nov 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Using Unreal Insights to see why the test project is (intentionally) so slow]]></description>
-            <content:encoded><![CDATA[<p>In <a href="https://www.unrealcode.net/Optimization_Part2.html">Part 2</a> we made a test environment and look at stats usage.  Here we use Unreal Insights
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/31">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+        <category label="Optimization" term="Optimization"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Optimization Part 3 - Using Unreal Insights]]></title>
+        <id>https://www.unrealcode.net/Optimization_Part3</id>
+        <link href="https://www.unrealcode.net/Optimization_Part3"/>
+        <updated>2024-11-14T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Using Unreal Insights to see why the test project is (intentionally) so slow]]></summary>
+        <content type="html"><![CDATA[<p>In <a href="https://www.unrealcode.net/Optimization_Part2.html">Part 2</a> we made a test environment and look at stats usage.  Here we use Unreal Insights
 to determine what specifically is making the project run slow.</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="using-unreal-insights">Using Unreal Insights<a href="https://www.unrealcode.net/Optimization_Part3#using-unreal-insights" class="hash-link" aria-label="Direct link to Using Unreal Insights" title="Direct link to Using Unreal Insights">​</a></h2>
 <p>Unreal Insights is a tool for measuring performance of Unreal Engine applications. Unreal Insights
@@ -778,17 +777,17 @@ to which foreground worker threads. Associating tasks across threads is the subj
 <li><a href="https://docs.unrealengine.com/4.27/en-US/TestingAndOptimization/PerformanceAndProfiling/StatCommands/" target="_blank" rel="noopener noreferrer">Statistics</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/Optimization_Part3#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/30">here</a></p>]]></content:encoded>
-            <category>C++</category>
-            <category>Optimization</category>
-        </item>
-        <item>
-            <title><![CDATA[Making an AI Controller and Behavior Tree in C++]]></title>
-            <link>https://www.unrealcode.net/AIDev</link>
-            <guid>https://www.unrealcode.net/AIDev</guid>
-            <pubDate>Wed, 13 Nov 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[This shows an example AI controller and behaviour tree entirely in C++]]></description>
-            <content:encoded><![CDATA[<p>Unreal AI is implemented using three major components, namely:</p>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/30">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+        <category label="Optimization" term="Optimization"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Making an AI Controller and Behavior Tree in C++]]></title>
+        <id>https://www.unrealcode.net/AIDev</id>
+        <link href="https://www.unrealcode.net/AIDev"/>
+        <updated>2024-11-13T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[This shows an example AI controller and behaviour tree entirely in C++]]></summary>
+        <content type="html"><![CDATA[<p>Unreal AI is implemented using three major components, namely:</p>
 <ul>
 <li>an <strong>AI controller</strong> which is an object which controls the actions of a non-player (i.e. enemy) actor</li>
 <li>a <strong>Behaviour Tree</strong> which is a structure which controls the actions of the enemy actor - it has a series of nodes and states which
@@ -964,17 +963,17 @@ property is checked on the enemy character.</p>
 <li><a href="https://dev.epicgames.com/community/learning/courses/67R/unreal-engine-introduction-to-ai-with-blueprints/9YP/testing-the-behavior-tree" target="_blank" rel="noopener noreferrer">Introduction to AI</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/AIDev#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/25">here</a></p>]]></content:encoded>
-            <category>C++</category>
-            <category>Optimization</category>
-        </item>
-        <item>
-            <title><![CDATA[Optimization Part 2 - A Simple Test Program]]></title>
-            <link>https://www.unrealcode.net/Optimization_Part2</link>
-            <guid>https://www.unrealcode.net/Optimization_Part2</guid>
-            <pubDate>Tue, 12 Nov 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Making a simple test project which needs optimizing]]></description>
-            <content:encoded><![CDATA[<p>This page describes a simple test project which can be used to experiment with  optimization in Unreal Engine. The test project is created based on the Game | Third Person | C++ project including
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/25">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+        <category label="Optimization" term="Optimization"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Optimization Part 2 - A Simple Test Program]]></title>
+        <id>https://www.unrealcode.net/Optimization_Part2</id>
+        <link href="https://www.unrealcode.net/Optimization_Part2"/>
+        <updated>2024-11-12T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Making a simple test project which needs optimizing]]></summary>
+        <content type="html"><![CDATA[<p>This page describes a simple test project which can be used to experiment with  optimization in Unreal Engine. The test project is created based on the Game | Third Person | C++ project including
 the starter content.</p>
 <p>The picture below shows the layout of the test map:</p>
 <p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/optmap_001-dbb278a76b0b91f330e80f08e9cfbef1.png" width="1749" height="819" class="img_ev3q"></p>
@@ -1049,17 +1048,17 @@ that is run using editor code.</p>
 <li><a href="https://docs.unrealengine.com/4.27/en-US/TestingAndOptimization/PerformanceAndProfiling/StatCommands/" target="_blank" rel="noopener noreferrer">Statistics</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/Optimization_Part2#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/26">here</a></p>]]></content:encoded>
-            <category>C++</category>
-            <category>Optimization</category>
-        </item>
-        <item>
-            <title><![CDATA[Optimization Part 1 - Build Configurations]]></title>
-            <link>https://www.unrealcode.net/Optimization_Part1</link>
-            <guid>https://www.unrealcode.net/Optimization_Part1</guid>
-            <pubDate>Mon, 11 Nov 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Available build configurations with and without the engine source]]></description>
-            <content:encoded><![CDATA[<p>This article explores project build configurations.</p>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/26">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+        <category label="Optimization" term="Optimization"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Optimization Part 1 - Build Configurations]]></title>
+        <id>https://www.unrealcode.net/Optimization_Part1</id>
+        <link href="https://www.unrealcode.net/Optimization_Part1"/>
+        <updated>2024-11-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Available build configurations with and without the engine source]]></summary>
+        <content type="html"><![CDATA[<p>This article explores project build configurations.</p>
 <p>Unreal Engine projects can be built with different configurations which serve different purposes.  The solution configurations available depend on the whether you are building with the Unreal Engine source code.</p>
 <p>If you create a project by launching Unreal Editor from the Epic Launcher, then you are using the engine compiled by Epic
 and you will see these configuration options in Visual Studio:</p>
@@ -1139,17 +1138,17 @@ this error message:</p>
 <li><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine" target="_blank" rel="noopener noreferrer">Advanced Debugging</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/Optimization_Part1#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/24">here</a></p>]]></content:encoded>
-            <category>C++</category>
-            <category>Optimization</category>
-        </item>
-        <item>
-            <title><![CDATA[Changing a Component in a Parent Object]]></title>
-            <link>https://www.unrealcode.net/ChangingComponentInParent</link>
-            <guid>https://www.unrealcode.net/ChangingComponentInParent</guid>
-            <pubDate>Sat, 02 Nov 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Changing the class of a component in ones parent object]]></description>
-            <content:encoded><![CDATA[<p>If we derive a C++ class from an existing Unreal class, and that existing class
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/24">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+        <category label="Optimization" term="Optimization"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Changing a Component in a Parent Object]]></title>
+        <id>https://www.unrealcode.net/ChangingComponentInParent</id>
+        <link href="https://www.unrealcode.net/ChangingComponentInParent"/>
+        <updated>2024-11-02T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Changing the class of a component in ones parent object]]></summary>
+        <content type="html"><![CDATA[<p>If we derive a C++ class from an existing Unreal class, and that existing class
 contains components, we can extend (subclass)  those components without changing the source
 code of the base class.</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="an-example">An Example<a href="https://www.unrealcode.net/ChangingComponentInParent#an-example" class="hash-link" aria-label="Direct link to An Example" title="Direct link to An Example">​</a></h2>
@@ -1196,16 +1195,16 @@ from the original component.  If you try to change it to something
 unrelated the engine will log a message like this:</p>
 <div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">Error: Class /Script/Test.Unrelated is not a legal override for component CharMoveComp because it does not derive </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">from Class /Script/Engine.CharacterMovementComponent.  Using Class /Script/Engine.CharacterMovementComponent to construct</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">component.</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/ChangingComponentInParent#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/22">here</a></p>]]></content:encoded>
-            <category>C++</category>
-        </item>
-        <item>
-            <title><![CDATA[Using Visual Studio Team Services with Unreal Engine]]></title>
-            <link>https://www.unrealcode.net/VSTS</link>
-            <guid>https://www.unrealcode.net/VSTS</guid>
-            <pubDate>Fri, 09 Aug 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[How to create Git LFS repositories with unlimited free storage]]></description>
-            <content:encoded><![CDATA[<p>Visual Studio Team Services (VSTS)  provides cloud-based git repositories hosted
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/22">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Using Visual Studio Team Services with Unreal Engine]]></title>
+        <id>https://www.unrealcode.net/VSTS</id>
+        <link href="https://www.unrealcode.net/VSTS"/>
+        <updated>2024-08-09T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[How to create Git LFS repositories with unlimited free storage]]></summary>
+        <content type="html"><![CDATA[<p>Visual Studio Team Services (VSTS)  provides cloud-based git repositories hosted
 on Microsoft's Azure cloud system. This can be used to store git LFS repositories
 with unlimited private repositories accessible for free for up to five users.</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="setup-steps">Setup Steps<a href="https://www.unrealcode.net/VSTS#setup-steps" class="hash-link" aria-label="Direct link to Setup Steps" title="Direct link to Setup Steps">​</a></h2>
@@ -1350,16 +1349,16 @@ a few changes to project configuration files.</p>
 <li><a href="https://www.atlassian.com/git/tutorials/git-lfs" target="_blank" rel="noopener noreferrer">Git lfs Tutorial</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/VSTS#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/23">here</a></p>]]></content:encoded>
-            <category>Tools</category>
-        </item>
-        <item>
-            <title><![CDATA[Mass - Cache Concepts and Optimization]]></title>
-            <link>https://www.unrealcode.net/MASS_001</link>
-            <guid>https://www.unrealcode.net/MASS_001</guid>
-            <pubDate>Thu, 06 Jun 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Why Mass is a good idea, or a quick background on CPU memory caching]]></description>
-            <content:encoded><![CDATA[<p>This is the first of a series of articles about the Unreal Mass framework.</p>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/23">here</a></p>]]></content>
+        <category label="Tools" term="Tools"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Mass - Cache Concepts and Optimization]]></title>
+        <id>https://www.unrealcode.net/MASS_001</id>
+        <link href="https://www.unrealcode.net/MASS_001"/>
+        <updated>2024-06-06T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Why Mass is a good idea, or a quick background on CPU memory caching]]></summary>
+        <content type="html"><![CDATA[<p>This is the first of a series of articles about the Unreal Mass framework.</p>
 <p>Mass is an Unreal Engine module which implements an <a href="https://en.wikipedia.org/wiki/Entity_component_system" target="_blank" rel="noopener noreferrer">Entity Component System</a> or ECS.</p>
 <p>An entity component system is an architectural pattern where data related to objects, such as their velocity or position, is stored in a specific
 way in memory to speed up access to that data.  The way an entity component system stores data in memory is influenced by the memory caching architecture of the CPU it is running on.</p>
@@ -1534,17 +1533,17 @@ and reduces the time from 1,300ms to 140ms.</p>
 <li><a href="https://www.youtube.com/watch?v=BP6NxVxDQIs" target="_blank" rel="noopener noreferrer">Fast C++ Video</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/MASS_001#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/20">here</a></p>]]></content:encoded>
-            <category>C++</category>
-            <category>Optimization</category>
-        </item>
-        <item>
-            <title><![CDATA[Allocating a TArray on the stack]]></title>
-            <link>https://www.unrealcode.net/TArrayOnStack</link>
-            <guid>https://www.unrealcode.net/TArrayOnStack</guid>
-            <pubDate>Thu, 04 Apr 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[This shows how to allocate a TArray on the stack to improve performance]]></description>
-            <content:encoded><![CDATA[<p>The TArray type is used in Unreal C++ to store a variable sized array of items.</p>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/20">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+        <category label="Optimization" term="Optimization"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Allocating a TArray on the stack]]></title>
+        <id>https://www.unrealcode.net/TArrayOnStack</id>
+        <link href="https://www.unrealcode.net/TArrayOnStack"/>
+        <updated>2024-04-04T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[This shows how to allocate a TArray on the stack to improve performance]]></summary>
+        <content type="html"><![CDATA[<p>The TArray type is used in Unreal C++ to store a variable sized array of items.</p>
 <p>Conceptually a TArray has two parts:</p>
 <ul>
 <li>the TArray variable which contains stuff like the capacity of the array and how many elements are stored in it, and</li>
@@ -1582,16 +1581,16 @@ is destroyed.</li>
 <p>This can be remedied by using an rvalue reference like this:</p>
 <div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">void</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">SumFuncByRValueReference</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">TArrayView</span><span class="token operator">&lt;</span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">int</span><span class="token operator">&gt;</span><span class="token operator">&amp;&amp;</span><span class="token plain"> View</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">	</span><span class="token function" style="color:rgb(80, 250, 123)">UE_LOG</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">LogTemp</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> Warning</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">TEXT</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token string" style="color:rgb(255, 121, 198)">"viewsize %d"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> View</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token function" style="color:rgb(80, 250, 123)">Num</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/TArrayOnStack#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/21">here</a></p>]]></content:encoded>
-            <category>C++</category>
-        </item>
-        <item>
-            <title><![CDATA[Changing a Project to use the Engine Source Code]]></title>
-            <link>https://www.unrealcode.net/SwitchingToSourceEngine</link>
-            <guid>https://www.unrealcode.net/SwitchingToSourceEngine</guid>
-            <pubDate>Sun, 03 Mar 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Changing a Project to use the Engine Source Code]]></description>
-            <content:encoded><![CDATA[<p>Sometimes you need to change an existing Unreal Engine project to use the engine source code to:</p>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/21">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Changing a Project to use the Engine Source Code]]></title>
+        <id>https://www.unrealcode.net/SwitchingToSourceEngine</id>
+        <link href="https://www.unrealcode.net/SwitchingToSourceEngine"/>
+        <updated>2024-03-03T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Changing a Project to use the Engine Source Code]]></summary>
+        <content type="html"><![CDATA[<p>Sometimes you need to change an existing Unreal Engine project to use the engine source code to:</p>
 <ul>
 <li>gain access to more build configurations, such as debug versions of engine code</li>
 <li>customize the engine code</li>
@@ -1613,17 +1612,17 @@ to select a branch and build it</li>
 <li>changing to the source build will automatically regenerate the .sln file</li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/SwitchingToSourceEngine#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/29">here</a></p>]]></content:encoded>
-            <category>C++</category>
-            <category>Tools</category>
-        </item>
-        <item>
-            <title><![CDATA[Understanding the Game Features Subsystem]]></title>
-            <link>https://www.unrealcode.net/GameFeaturesSubsystem</link>
-            <guid>https://www.unrealcode.net/GameFeaturesSubsystem</guid>
-            <pubDate>Mon, 01 Jan 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Using the Game Features Subsystem to extend an existing project using plugins]]></description>
-            <content:encoded><![CDATA[<p>This is an attempt to understand the Unreal Game Features Subsystem.  The Game Features Subsystem is used
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/29">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+        <category label="Tools" term="Tools"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Understanding the Game Features Subsystem]]></title>
+        <id>https://www.unrealcode.net/GameFeaturesSubsystem</id>
+        <link href="https://www.unrealcode.net/GameFeaturesSubsystem"/>
+        <updated>2024-01-01T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Using the Game Features Subsystem to extend an existing project using plugins]]></summary>
+        <content type="html"><![CDATA[<p>This is an attempt to understand the Unreal Game Features Subsystem.  The Game Features Subsystem is used
 in the Valley of the Ancient and Lyra examples, and in Fortnite, to distribute game assets and functions as plugins.</p>
 <p>Plugins can contained both code and assets. Once support for the Game Features Subsystem is in place a particular game mode or map (or anything really) can be developed and distributed as a
 plugin and added to a game without modifying the base game.  This has a lot of benefits including flexibility in
@@ -1835,16 +1834,16 @@ which calls <code>InputSystem-&gt;AddMappingContext()</code> to add the Input Ma
 <li><a href="https://forums.unrealengine.com/docs?topic=265041" target="_blank" rel="noopener noreferrer">Unreal Forums: A holistic look at replicated movement</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/GameFeaturesSubsystem#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/15">here</a></p>]]></content:encoded>
-            <category>C++</category>
-        </item>
-        <item>
-            <title><![CDATA[Diagnosing EQS Error Messages]]></title>
-            <link>https://www.unrealcode.net/EQS</link>
-            <guid>https://www.unrealcode.net/EQS</guid>
-            <pubDate>Sat, 11 Nov 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[What does "Listener must have a valid id to update its sense config" mean?]]></description>
-            <content:encoded><![CDATA[<p>What does "Listener must have a valid id to update its sense config" mean?</p>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/15">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Diagnosing EQS Error Messages]]></title>
+        <id>https://www.unrealcode.net/EQS</id>
+        <link href="https://www.unrealcode.net/EQS"/>
+        <updated>2023-11-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[What does "Listener must have a valid id to update its sense config" mean?]]></summary>
+        <content type="html"><![CDATA[<p>What does "Listener must have a valid id to update its sense config" mean?</p>
 <p>The message comes from <code>UAIPerceptionSystem::OnListenerConfigUpdated()</code> when you call
 <code>UAIPerceptionComponent::ConfigureSense()</code> can pass in a sense object such as
 an instance of <code>UAISenseConfig_Sight</code>.</p>
@@ -1866,16 +1865,16 @@ in the actor's constructor, so to make this work move this line:</p>
 <div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">AIPerceptionComponent</span><span class="token operator">-&gt;</span><span class="token function" style="color:rgb(80, 250, 123)">ConfigureSense</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain"> </span><span class="token operator">*</span><span class="token plain">AISenseConfig_Sight </span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 <p>to the constructor.  The rest of the lines can remain in <code>OnPossess()</code>.</p>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/EQS#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/27">here</a></p>]]></content:encoded>
-            <category>C++</category>
-        </item>
-        <item>
-            <title><![CDATA[Order of Operations - Variable call sequences using BeginPlay() and OnPossess() for AI Controllers]]></title>
-            <link>https://www.unrealcode.net/OrderOfOperations</link>
-            <guid>https://www.unrealcode.net/OrderOfOperations</guid>
-            <pubDate>Thu, 02 Nov 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[Sometimes BeginPlay() and OnPossess() methods get called different sequences]]></description>
-            <content:encoded><![CDATA[<p>When you make an Unreal Engine character (based on the <code>ACharacter</code> class) and it has a controller derived from the <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Runtime/AIModule/AAIController" target="_blank" rel="noopener noreferrer"><code>AAIController</code></a>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/27">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Order of Operations - Variable call sequences using BeginPlay() and OnPossess() for AI Controllers]]></title>
+        <id>https://www.unrealcode.net/OrderOfOperations</id>
+        <link href="https://www.unrealcode.net/OrderOfOperations"/>
+        <updated>2023-11-02T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Sometimes BeginPlay() and OnPossess() methods get called different sequences]]></summary>
+        <content type="html"><![CDATA[<p>When you make an Unreal Engine character (based on the <code>ACharacter</code> class) and it has a controller derived from the <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Runtime/AIModule/AAIController" target="_blank" rel="noopener noreferrer"><code>AAIController</code></a>
 class, calls
 to the methods <code>BeginPlay()</code> and <code>OnPossess()</code> happen in a different sequence depending on how the character is created:</p>
 <ul>
@@ -1901,16 +1900,16 @@ values it sees also depend on how the character was created.</p>
 <li><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine" target="_blank" rel="noopener noreferrer">Advanced Debugging In Unreal Engine</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/OrderOfOperations#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/28">here</a></p>]]></content:encoded>
-            <category>C++</category>
-        </item>
-        <item>
-            <title><![CDATA[Delegates in C++]]></title>
-            <link>https://www.unrealcode.net/Delegates</link>
-            <guid>https://www.unrealcode.net/Delegates</guid>
-            <pubDate>Sun, 01 Oct 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[Looking at how the Unreal Engine uses delegates]]></description>
-            <content:encoded><![CDATA[<p>A delegate is a object which can be used to call:</p>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/28">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Delegates in C++]]></title>
+        <id>https://www.unrealcode.net/Delegates</id>
+        <link href="https://www.unrealcode.net/Delegates"/>
+        <updated>2023-10-01T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Looking at how the Unreal Engine uses delegates]]></summary>
+        <content type="html"><![CDATA[<p>A delegate is a object which can be used to call:</p>
 <ul>
 <li>a specific method on a specific object</li>
 <li>a static function</li>
@@ -2021,16 +2020,16 @@ object and, at least historically, have cause problems when interacting with blu
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="reference">Reference<a href="https://www.unrealcode.net/Delegates#reference" class="hash-link" aria-label="Direct link to Reference" title="Direct link to Reference">​</a></h4>
 <p><a href="https://docs.unrealengine.com/5.0/en-US/delegates-and-lamba-functions-in-unreal-engine/" target="_blank" rel="noopener noreferrer">Epic Delegates</a></p>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/Delegates#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/14">here</a></p>]]></content:encoded>
-            <category>C++</category>
-        </item>
-        <item>
-            <title><![CDATA[Looking into Lyra - Inputs and the Gameplay Ability System]]></title>
-            <link>https://www.unrealcode.net/LyraPart2</link>
-            <guid>https://www.unrealcode.net/LyraPart2</guid>
-            <pubDate>Sun, 03 Sep 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[Looking at how the Epic Lyra example processes inputs and uses the Gameplay Ability System]]></description>
-            <content:encoded><![CDATA[<p>The aim of this is to examine the source code from the Lyra example provided by Epic Games
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/14">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Looking into Lyra - Inputs and the Gameplay Ability System]]></title>
+        <id>https://www.unrealcode.net/LyraPart2</id>
+        <link href="https://www.unrealcode.net/LyraPart2"/>
+        <updated>2023-09-03T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Looking at how the Epic Lyra example processes inputs and uses the Gameplay Ability System]]></summary>
+        <content type="html"><![CDATA[<p>The aim of this is to examine the source code from the Lyra example provided by Epic Games
 and to try and identify and document practices and approaches for using c++.</p>
 <p>Here we look at use of Gameplay Tags and the Gameplay Ability System (GAS), and
 try and trace the use of gameplay tags from pressing a button
@@ -2130,18 +2129,18 @@ to its pawn extension component:</p>
 <li><a href="https://github.com/tranek/GASDocumentation" target="_blank" rel="noopener noreferrer">tranek/GASDocumentation</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/LyraPart2#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/13">here</a></p>]]></content:encoded>
-            <category>C++</category>
-            <category>Epic Examples</category>
-            <category>GAS</category>
-        </item>
-        <item>
-            <title><![CDATA[Looking into Lyra - Experiences]]></title>
-            <link>https://www.unrealcode.net/LyraPart1</link>
-            <guid>https://www.unrealcode.net/LyraPart1</guid>
-            <pubDate>Sat, 02 Sep 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[Looking at how the Epic Lyra example manages different game modes and handles loading assets for each game mode]]></description>
-            <content:encoded><![CDATA[<p>Examining the source code from the Lyra example provided by Epic Games
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/13">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+        <category label="Epic Examples" term="Epic Examples"/>
+        <category label="GAS" term="GAS"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Looking into Lyra - Experiences]]></title>
+        <id>https://www.unrealcode.net/LyraPart1</id>
+        <link href="https://www.unrealcode.net/LyraPart1"/>
+        <updated>2023-09-02T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Looking at how the Epic Lyra example manages different game modes and handles loading assets for each game mode]]></summary>
+        <content type="html"><![CDATA[<p>Examining the source code from the Lyra example provided by Epic Games
 and to try and identify and document practices and approaches for using c++.</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="experiences">Experiences<a href="https://www.unrealcode.net/LyraPart1#experiences" class="hash-link" aria-label="Direct link to Experiences" title="Direct link to Experiences">​</a></h2>
 <p>"Experience" is the term Lyra uses for game modes such as first person, top down etc.</p>
@@ -2255,17 +2254,17 @@ changing any of the Lyra code</li>
 <li><a href="https://www.tomlooman.com/unreal-engine-asset-manager-async-loading/" target="_blank" rel="noopener noreferrer">Tom Looman: Async Asset Loading</a></li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/LyraPart1#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/12">here</a></p>]]></content:encoded>
-            <category>C++</category>
-            <category>Epic Examples</category>
-        </item>
-        <item>
-            <title><![CDATA[Unexpected Unreal Behaviour]]></title>
-            <link>https://www.unrealcode.net/Unexpected</link>
-            <guid>https://www.unrealcode.net/Unexpected</guid>
-            <pubDate>Wed, 23 Aug 2023 00:00:00 GMT</pubDate>
-            <description><![CDATA[Unexpected Unreal Behaviour]]></description>
-            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="introduction">Introduction<a href="https://www.unrealcode.net/Unexpected#introduction" class="hash-link" aria-label="Direct link to Introduction" title="Direct link to Introduction">​</a></h2>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/12">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+        <category label="Epic Examples" term="Epic Examples"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Unexpected Unreal Behaviour]]></title>
+        <id>https://www.unrealcode.net/Unexpected</id>
+        <link href="https://www.unrealcode.net/Unexpected"/>
+        <updated>2023-08-23T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Unexpected Unreal Behaviour]]></summary>
+        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="introduction">Introduction<a href="https://www.unrealcode.net/Unexpected#introduction" class="hash-link" aria-label="Direct link to Introduction" title="Direct link to Introduction">​</a></h2>
 <p>This is notes on Unreal Engine behaviour which might surprise.</p>
 <ol>
 <li>
@@ -2313,9 +2312,8 @@ change the <code>USkeletalMeshComponent</code> type to something which does not 
 the UHT must be parsing the engine and project code and maintaining a list of UCLASS, USTRUCT, UENUM types and
 failing if it does not find the specified type.</p>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/Unexpected#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/10">here</a></p>]]></content:encoded>
-            <category>C++</category>
-            <category>Tools</category>
-        </item>
-    </channel>
-</rss>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/10">here</a></p>]]></content>
+        <category label="C++" term="C++"/>
+        <category label="Tools" term="Tools"/>
+    </entry>
+</feed>

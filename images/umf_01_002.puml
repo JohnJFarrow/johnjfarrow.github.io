@@ -1,9 +1,0 @@
-
-@startuml
-UBaseMediaSource <|-- UKLVMediaSource
-
-UKLVImgMediaSourceFactory --> UKLVMediaSource  
-UKLVImgMediaSourceFactoryNew --> UKLVMediaSource  
-FKLVImgMediaSourceCustomization --> UKLVMediaSource : uses for mipmap info
-FKLVImgMediaSourceActions --> UKLVMediaSource 
-@enduml

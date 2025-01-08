@@ -10,7 +10,7 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="Unrealcode.net" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.fc2997df.css">
-<script src="/assets/js/runtime~main.8e840188.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.52cb5c2a.js" defer="defer"></script>
 <script src="/assets/js/main.bc04a2d7.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -80,7 +80,7 @@ that is run using editor code.</p>
 <p>The explanation for these values is:</p>
 <table><thead><tr><th>Name</th><th style="text-align:left">Description</th></tr></thead><tbody><tr><td>Frame</td><td style="text-align:left">Frame time is the total amount of time spent generating one frame of the game. Since both the Game and Draw threads sync up   before finishing a frame, Frame time is often close to the time being shown in one of these threads.</td></tr><tr><td>Game</td><td style="text-align:left">If Frame time is close to Game time, the game&#x27;s performance is likely being bottlenecked (negatively impacted) by the game thread.</td></tr><tr><td>Draw</td><td style="text-align:left">If Frame time is close to Draw time, the game&#x27;s performance is likely being bottlenecked by the rendering thread</td></tr><tr><td>GPU</td><td style="text-align:left">GPU time measures how long the video card takes to render the scene. Since GPU time is synced to the frame, it will likely be similar to Frame time.</td></tr><tr><td>RHIT</td><td style="text-align:left">Typically, RHI Thread time is synced to the frame, and it will likely be similar to Frame time.</td></tr><tr><td>DynRes</td><td style="text-align:left">If supported (and enabled), DynRes shows Primary Screen Percentage by Secondary Screen Percentage.</td></tr></tbody></table>
 <p>Only the first 3 are important here.  At 60 frames per second that target time to generate a frame is 16.666ms - clearly our 60.59 is way over this.  We can see that the Draw time is under that but the Game time (48.73) is over.  From this we can infer that the problem is in the game performance rather than the rendering performance.</p>
-<p>At this point we will to investigate the slowness in <a href="/Optimization_Part2/Optimization_Part3/">Part 3: Using Unreal Insights</a></p>
+<p>At this point we will to investigate the slowness in <a href="/Optimization_Part3/">Part 3: Using Unreal Insights</a></p>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="reference">Reference<a href="#reference" class="hash-link" aria-label="Direct link to Reference" title="Direct link to Reference">​</a></h4>
 <ul>
 <li><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine" target="_blank" rel="noopener noreferrer">Advanced Debugging In Unreal Engine</a></li>

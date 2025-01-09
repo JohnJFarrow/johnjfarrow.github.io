@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkunrealcode=self.webpackChunkunrealcode||[]).push([[2955],{77372:a=>{a.exports=JSON.parse('{"tag":{"label":"GAS","permalink":"/tags/gas","allTagsPath":"/tags","count":3,"unlisted":false},"listMetadata":{"permalink":"/tags/gas","page":1,"postsPerPage":3,"totalPages":1,"totalCount":3,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);

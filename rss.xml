@@ -15,7 +15,7 @@
             <pubDate>Thu, 23 Jan 2025 00:00:00 GMT</pubDate>
             <description><![CDATA[Using Pix with Unreal 5.5]]></description>
             <content:encoded><![CDATA[<p>This page shows how to get the  Pix GPU Capture program working with Unreal 5.5.1
-so you can debug and profile materials and shaders:</p>
+so you can debug and profile materials and shaders.</p>
 <p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_083-c3dff0478107169e05524f7f19c65f8b.png" width="2119" height="1029" class="img_ev3q"></p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="approach">Approach<a href="https://www.unrealcode.net/PixTitan/#approach" class="hash-link" aria-label="Direct link to Approach" title="Direct link to Approach">​</a></h2>
 <p>We will be running <a href="https://devblogs.microsoft.com/pix/download/" target="_blank" rel="noopener noreferrer">PIX-2412.12</a> on Windows, and using the Epic <a href="https://www.fab.com/listings/93faede1-4434-47c0-85f1-bf27c0820ad0" target="_blank" rel="noopener noreferrer">Lyra Starter Game</a>
@@ -113,7 +113,9 @@ created:</li>
 <li>
 <p><a href="https://dev.epicgames.com/community/learning/tutorials/dXl5/advanced-debugging-in-unreal-engine#gpu%E2%80%93debuggingshaders" target="_blank" rel="noopener noreferrer">Advanced Debugging in Unreal Engine</a></p>
 </li>
-</ul>]]></content:encoded>
+</ul>
+<h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/PixTitan/#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/35">here</a></p>]]></content:encoded>
             <category>Materials</category>
             <category>pix</category>
         </item>

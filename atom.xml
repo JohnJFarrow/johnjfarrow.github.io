@@ -74,37 +74,17 @@ a small delay you will see this confirmation screen:</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="configuring-your-project">Configuring your project<a href="https://www.unrealcode.net/HordeUBA/#configuring-your-project" class="hash-link" aria-label="Direct link to Configuring your project" title="Direct link to Configuring your project">​</a></h2>
 <p>The build process looks in various places for the file <code>BuildConfiguration.xml</code>.</p>
 <p>This <a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/build-configuration-for-unreal-engine" target="_blank" rel="noopener noreferrer">article</a>
-says the file could be in:</p>
-<blockquote>
-<p>Engine/Saved/UnrealBuildTool/BuildConfiguration.xml
-&lt;USER&gt;/AppData/Roaming/Unreal Engine/UnrealBuildTool/BuildConfiguration.xml
-My Documents/Unreal Engine/UnrealBuildTool/BuildConfiguration.xml
-&lt;PROJECT_DIRECTORY&gt;/Saved/UnrealBuildTool/BuildConfiguration.xml</p>
-</blockquote>
-<p>whereas the source file <code>Engine\Source\Programs\UnrealBuildTool\System\XmlConfig.cs</code> looks in these
-places:</p>
-<p>If it's not an installed engine build (i.e. it is using engine source):</p>
-<blockquote>
-<p>Engine/Programs/NotForLicensees/UnrealBuildTool  "Engine (NotForLicensees)"
-Engine/Saved/UnrealBuildTool "Engine (Saved)"</p>
-</blockquote>
-<p>And always:</p>
-<blockquote>
-<p>c:\ProgramData\Unreal Engine\UnrealBuildTool  "Global (ProgramData)"
-c:\user$USER\AppData\Roaming\Unreal Engine\UnrealBuildTool "Global (AppData)"
-c:\user$USER\LocalAppData\Unreal Engine\UnrealBuildTool "Global (LocalAppData)"
-c:\user$USER\My Documents/Unreal Engine/UnrealBuildTool  "Global (Documents)"</p>
-</blockquote>
-<p>So, it looks as though the location "&lt;PROJECT_DIRECTORY&gt;/Saved/UnrealBuildTool/BuildConfiguration.xml" described
-on the web page is not in fact used.</p>
+describes <em>some</em> locations where the <code>BuildConfiguration.xml</code> can be located, and the source file
+<code>Engine\Source\Programs\UnrealBuildTool\System\XmlConfig.cs</code> adds a few more places:</p>
+<table><thead><tr><th style="text-align:left">Description</th><th style="text-align:left">Location</th><th style="text-align:left">Condition</th></tr></thead><tbody><tr><td style="text-align:left">"Engine (NotForLicensees)"</td><td style="text-align:left">Engine/Programs/NotForLicensees/UnrealBuildTool</td><td style="text-align:left">Only when using an engine source build</td></tr><tr><td style="text-align:left">"Engine (Saved)"</td><td style="text-align:left">Engine/Saved/UnrealBuildTool</td><td style="text-align:left">Only when using an engine source build</td></tr><tr><td style="text-align:left">"Global (ProgramData)"</td><td style="text-align:left">c:\ProgramData\Unreal Engine\UnrealBuildTool</td><td style="text-align:left"></td></tr><tr><td style="text-align:left">"Global (AppData)"</td><td style="text-align:left">c:\user\$USER\AppData\Roaming\Unreal Engine\UnrealBuildTool</td><td style="text-align:left"></td></tr><tr><td style="text-align:left">"Global (LocalAppData)"</td><td style="text-align:left">c:\user\$USER\LocalAppData\Unreal Engine\UnrealBuildTool</td><td style="text-align:left"></td></tr><tr><td style="text-align:left">"Global (Documents)"</td><td style="text-align:left">c:\user\$USER\My Documents/Unreal Engine/UnrealBuildTool</td><td style="text-align:left"></td></tr></tbody></table>
 <p>If more than one file exists, they will all be read, and listed in the log like this:</p>
 <blockquote>
-<p>Log started at 05/14/2025 19:21:22 (2025-05-14T07:21:22Z)
-No config file at C:\Users\jfarrow\AppData\Local\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
-No config file at C:\Users\jfarrow\Documents\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
-Configuration will be read from:
-C:\ProgramData\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
-C:\Users\jfarrow\AppData\Roaming\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml</p>
+<p>Log started at 05/14/2025 19:21:22 (2025-05-14T07:21:22Z)<br>
+<!-- -->No config file at C:\Users\jfarrow\AppData\Local\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml<br>
+<!-- -->No config file at C:\Users\jfarrow\Documents\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml<br>
+<!-- -->Configuration will be read from:<br>
+<!-- -->C:\ProgramData\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml<br>
+<!-- -->C:\Users\jfarrow\AppData\Roaming\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml</p>
 </blockquote>
 <p>Choose one of these files
 and add these elements to

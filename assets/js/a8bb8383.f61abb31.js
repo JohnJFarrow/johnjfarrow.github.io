@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkunrealcode=self.webpackChunkunrealcode||[]).push([[1088],{49762:a=>{a.exports=JSON.parse('{"tag":{"label":"Physics","permalink":"/tags/physics","allTagsPath":"/tags","count":4,"unlisted":false},"listMetadata":{"permalink":"/tags/physics","page":1,"postsPerPage":4,"totalPages":1,"totalCount":4,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);

@@ -2,36 +2,18 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://www.unrealcode.net/</id>
     <title>Unrealcode.net Blog</title>
-    <updated>2025-09-12T00:00:00.000Z</updated>
+    <updated>2025-09-13T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://www.unrealcode.net/"/>
     <subtitle>Unrealcode.net Blog</subtitle>
     <icon>https://www.unrealcode.net/img/favicon.ico</icon>
     <entry>
-        <title type="html"><![CDATA[Compiler Flags]]></title>
-        <id>https://www.unrealcode.net/CompilerFlags/</id>
-        <link href="https://www.unrealcode.net/CompilerFlags/"/>
-        <updated>2025-09-12T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Passing Compiler Flags to Visual Studio]]></summary>
-        <content type="html"><![CDATA[<p>How to pass compiler flags such as /Zc:nrvo- to the Unreal build process.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="visual-studio-debugger-cant-see-c-structs-if-they-are-returned-in-a-function">Visual Studio debugger can't see C structs if they are returned in a function<a href="https://www.unrealcode.net/CompilerFlags/#visual-studio-debugger-cant-see-c-structs-if-they-are-returned-in-a-function" class="hash-link" aria-label="Direct link to Visual Studio debugger can't see C structs if they are returned in a function" title="Direct link to Visual Studio debugger can't see C structs if they are returned in a function">​</a></h2>
-<p>This has been raised as a bug in the MSVC compiler <a href="https://www.reddit.com/r/C_Programming/comments/1b70l38/visual_studio_debugger_cant_see_c_structs_if_they/" target="_blank" rel="noopener noreferrer">here</a>
-and as at September 2025 there is no fix.</p>
-<p>When debugging a function which returns a struct created in that function, like this:</p>
-<div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">FSavitskyResult </span><span class="token function" style="color:rgb(80, 250, 123)">Savitsky2</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> FSavitskyInput</span><span class="token operator">&amp;</span><span class="token plain"> In</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    FSavitskyResult Out</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    Out</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Lift </span><span class="token operator">=</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">return</span><span class="token plain"> Out</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre></div></div>
-<p>the compiler won't show you the members of  the struct, instead you see
-this error message:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/compiler_001-fedbf45c5fbd36018a4eea9f802cca48.png" width="849" height="357" class="img_ev3q"></p>
-<p>There is more
-discussion of the cause of this problem <a href="https://developercommunity.visualstudio.com/t/When-a-custom-function-returns-a-custom-/10422600#T-N10429551" target="_blank" rel="noopener noreferrer">here</a>
-and <a href="https://devblogs.microsoft.com/cppblog/improving-copy-and-move-elision/" target="_blank" rel="noopener noreferrer">here</a></p>
-<p>The workaround is to pass the flag  /Zc:nrvo- on the compiler line.</p>
-<p>To do this add this to the project [ProjectName]EditorTarget.cs file:</p>
-<div class="language-cs codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cs codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">if</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">Target</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Configuration </span><span class="token operator">==</span><span class="token plain"> UnrealTargetConfiguration</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Debug </span><span class="token operator">||</span><span class="token plain"> </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    Target</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Configuration </span><span class="token operator">==</span><span class="token plain"> UnrealTargetConfiguration</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">DebugGame</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    bOverrideBuildEnvironment </span><span class="token operator">=</span><span class="token plain"> </span><span class="token boolean">true</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    AdditionalCompilerArguments </span><span class="token operator">+=</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"/Zc:nrvo-"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre></div></div>
-<p>Once you have made this change and recompiled the project
-you should be able to see the members of the struct:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/compiler_002-50499631c0a58c882823f2d2cae0652d.png" width="970" height="312" class="img_ev3q"></p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="building-from-source">Building from Source<a href="https://www.unrealcode.net/CompilerFlags/#building-from-source" class="hash-link" aria-label="Direct link to Building from Source" title="Direct link to Building from Source">​</a></h2>
+        <title type="html"><![CDATA[What Causes a Complete Engine Rebuild When Building From Source]]></title>
+        <id>https://www.unrealcode.net/CompleteRebuild/</id>
+        <link href="https://www.unrealcode.net/CompleteRebuild/"/>
+        <updated>2025-09-13T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[What causes a complete engine rebuild when building from source]]></summary>
+        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="the-problem">The Problem<a href="https://www.unrealcode.net/CompleteRebuild/#the-problem" class="hash-link" aria-label="Direct link to The Problem" title="Direct link to The Problem">​</a></h2>
 <p>If you have a project with this:</p>
 <div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">bOverrideBuildEnvironment = true;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">AdditionalCompilerArguments += "/Zc:nrvo-";</span><br></span></code></pre></div></div>
 <p>and you change it to build using the engine source, when you make a change to <strong>your</strong> code the whole engine will rebuild.</p>
@@ -58,7 +40,7 @@ the <code>AdditionalCompilerArguments += "/Zc:nrvo-"</code>, thinks it applies t
 build
 and updates the response file.  Next time you do a build, the build process  sees the response file has changed
 and does a complete rebuild.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="fix-1---using-a-unique-build-environment">Fix #1 - Using a Unique Build Environment<a href="https://www.unrealcode.net/CompilerFlags/#fix-1---using-a-unique-build-environment" class="hash-link" aria-label="Direct link to Fix #1 - Using a Unique Build Environment" title="Direct link to Fix #1 - Using a Unique Build Environment">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="fix-1---using-a-unique-build-environment">Fix #1 - Using a Unique Build Environment<a href="https://www.unrealcode.net/CompleteRebuild/#fix-1---using-a-unique-build-environment" class="hash-link" aria-label="Direct link to Fix #1 - Using a Unique Build Environment" title="Direct link to Fix #1 - Using a Unique Build Environment">​</a></h2>
 <p>This means changing:</p>
 <div class="language-cs codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cs codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">if</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">Target</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Configuration </span><span class="token operator">==</span><span class="token plain"> UnrealTargetConfiguration</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Debug </span><span class="token operator">||</span><span class="token plain"> </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    Target</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Configuration </span><span class="token operator">==</span><span class="token plain"> UnrealTargetConfiguration</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">DebugGame</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    bOverrideBuildEnvironment </span><span class="token operator">=</span><span class="token plain"> </span><span class="token boolean">true</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    AdditionalCompilerArguments </span><span class="token operator">+=</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"/Zc:nrvo-"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre></div></div>
 <p>to:</p>
@@ -72,7 +54,7 @@ into directories under your own project.  So, the response file which was at<br>
 <p>This approach takes approximately 100 GB of disk space.</p>
 <p>Making a change to a file in your project does not cause an engine rebuild
 so this approach works.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="fix-2---turning-off-pch-files">Fix #2 - Turning off PCH files<a href="https://www.unrealcode.net/CompilerFlags/#fix-2---turning-off-pch-files" class="hash-link" aria-label="Direct link to Fix #2 - Turning off PCH files" title="Direct link to Fix #2 - Turning off PCH files">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="fix-2---turning-off-pch-files">Fix #2 - Turning off PCH files<a href="https://www.unrealcode.net/CompleteRebuild/#fix-2---turning-off-pch-files" class="hash-link" aria-label="Direct link to Fix #2 - Turning off PCH files" title="Direct link to Fix #2 - Turning off PCH files">​</a></h2>
 <p>Turn off PCH in your project like this:</p>
 <div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">if (Target.Configuration == UnrealTargetConfiguration.Debug || Target.Configuration == UnrealTargetConfiguration.DebugGame)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">{</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    bUsePCHFiles = false;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    bOverrideBuildEnvironment = true;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    AdditionalCompilerArguments += "/Zc:nrvo-";</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">}</span><br></span></code></pre></div></div>
 <p>In theory the engine source will compile with shared precompiled headers
@@ -81,11 +63,39 @@ but your code will not, so the response file will never be updated with the <cod
 <p>When attempting to run the project it rebuilds with this message:</p>
 <p>1&gt;Invalidating makefile for ... (Module.Launch.cpp.obj.rsp modified)</p>
 <p>So, this approach does not work.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="fix-3---disabling-additionalcompilerarguments-for-source-builds">Fix #3 - Disabling AdditionalCompilerArguments for Source Builds<a href="https://www.unrealcode.net/CompilerFlags/#fix-3---disabling-additionalcompilerarguments-for-source-builds" class="hash-link" aria-label="Direct link to Fix #3 - Disabling AdditionalCompilerArguments for Source Builds" title="Direct link to Fix #3 - Disabling AdditionalCompilerArguments for Source Builds">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="fix-3---disabling-additionalcompilerarguments-for-source-builds">Fix #3 - Disabling AdditionalCompilerArguments for Source Builds<a href="https://www.unrealcode.net/CompleteRebuild/#fix-3---disabling-additionalcompilerarguments-for-source-builds" class="hash-link" aria-label="Direct link to Fix #3 - Disabling AdditionalCompilerArguments for Source Builds" title="Direct link to Fix #3 - Disabling AdditionalCompilerArguments for Source Builds">​</a></h2>
 <p>Depending on why you added additional arguments, this may be appropriate.  In
 [Project].Target.cs you can check so see if the build is a source build (bIsEngineInstalled will be false)
 and only if it is not a source build then use AdditionalCompilerArguments.</p>
 <div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">if ( bIsEngineInstalled )</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">{</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    if (Target.Configuration == UnrealTargetConfiguration.Debug || </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        Target.Configuration == UnrealTargetConfiguration.DebugGame)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    {</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        bOverrideBuildEnvironment = true;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">        AdditionalCompilerArguments += "/Zc:nrvo-";</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    }</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">}</span><br></span></code></pre></div></div>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="references">References<a href="https://www.unrealcode.net/CompleteRebuild/#references" class="hash-link" aria-label="Direct link to References" title="Direct link to References">​</a></h2>
+<p><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/unreal-engine-build-tool-target-reference?application_version=5.6" target="_blank" rel="noopener noreferrer">Build Tool Target Reference</a></p>]]></content>
+        <category label="C++" term="C++"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Compiler Flags]]></title>
+        <id>https://www.unrealcode.net/CompilerFlags/</id>
+        <link href="https://www.unrealcode.net/CompilerFlags/"/>
+        <updated>2025-09-12T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Passing Compiler Flags to Visual Studio]]></summary>
+        <content type="html"><![CDATA[<p>How to pass compiler flags such as /Zc:nrvo- to the Unreal build process.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="visual-studio-debugger-cant-see-c-structs-if-they-are-returned-in-a-function">Visual Studio debugger can't see C structs if they are returned in a function<a href="https://www.unrealcode.net/CompilerFlags/#visual-studio-debugger-cant-see-c-structs-if-they-are-returned-in-a-function" class="hash-link" aria-label="Direct link to Visual Studio debugger can't see C structs if they are returned in a function" title="Direct link to Visual Studio debugger can't see C structs if they are returned in a function">​</a></h2>
+<p>This has been raised as a bug in the MSVC compiler <a href="https://www.reddit.com/r/C_Programming/comments/1b70l38/visual_studio_debugger_cant_see_c_structs_if_they/" target="_blank" rel="noopener noreferrer">here</a>
+and as at September 2025 there is no fix.</p>
+<p>When debugging a function which returns a struct created in that function, like this:</p>
+<div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">FSavitskyResult </span><span class="token function" style="color:rgb(80, 250, 123)">Savitsky2</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> FSavitskyInput</span><span class="token operator">&amp;</span><span class="token plain"> In</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    FSavitskyResult Out</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    Out</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Lift </span><span class="token operator">=</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">return</span><span class="token plain"> Out</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre></div></div>
+<p>the compiler won't show you the members of  the struct, instead you see
+this error message:</p>
+<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/compiler_001-fedbf45c5fbd36018a4eea9f802cca48.png" width="849" height="357" class="img_ev3q"></p>
+<p>There is more
+discussion of the cause of this problem <a href="https://developercommunity.visualstudio.com/t/When-a-custom-function-returns-a-custom-/10422600#T-N10429551" target="_blank" rel="noopener noreferrer">here</a>
+and <a href="https://devblogs.microsoft.com/cppblog/improving-copy-and-move-elision/" target="_blank" rel="noopener noreferrer">here</a></p>
+<p>The workaround is to pass the flag  /Zc:nrvo- on the compiler line.</p>
+<p>To do this add this to the project [ProjectName]EditorTarget.cs file:</p>
+<div class="language-cs codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cs codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">if</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">Target</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Configuration </span><span class="token operator">==</span><span class="token plain"> UnrealTargetConfiguration</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Debug </span><span class="token operator">||</span><span class="token plain"> </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    Target</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">Configuration </span><span class="token operator">==</span><span class="token plain"> UnrealTargetConfiguration</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">DebugGame</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    bOverrideBuildEnvironment </span><span class="token operator">=</span><span class="token plain"> </span><span class="token boolean">true</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    AdditionalCompilerArguments </span><span class="token operator">+=</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"/Zc:nrvo-"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre></div></div>
+<p>Once you have made this change and recompiled the project
+you should be able to see the members of the struct:</p>
+<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/compiler_002-50499631c0a58c882823f2d2cae0652d.png" width="970" height="312" class="img_ev3q"></p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="references">References<a href="https://www.unrealcode.net/CompilerFlags/#references" class="hash-link" aria-label="Direct link to References" title="Direct link to References">​</a></h2>
 <p><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/unreal-engine-build-tool-target-reference?application_version=5.6" target="_blank" rel="noopener noreferrer">Build Tool Target Reference</a></p>]]></content>
         <category label="C++" term="C++"/>
@@ -2986,155 +2996,6 @@ is a translation of an article originally in Japanese</li>
 </ul>
 <h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/AnimationTextures/#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
 <p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/33">here</a></p>]]></content>
-        <category label="Animation" term="Animation"/>
-        <category label="Materials" term="Materials"/>
-        <category label="AnimationTextures" term="AnimationTextures"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Animation Textures Part 1 - Materials]]></title>
-        <id>https://www.unrealcode.net/AnimationTextureMaterials/</id>
-        <link href="https://www.unrealcode.net/AnimationTextureMaterials/"/>
-        <updated>2024-12-01T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Creating materials for use with animation textures and the AnimToTexture plugin in Unreal 5.4]]></summary>
-        <content type="html"><![CDATA[<p>Animation Textures is a technique for storing animation data in a texture
-and animating a mesh by using a special material to read and
-replay the animation data.</p>
-<p>This technique is typically used for animating large numbers of background
-characters with minimal overhead.  It's used in the Epic Games
-<a href="https://www.unrealengine.com/marketplace/en-US/product/city-sample" target="_blank" rel="noopener noreferrer">City Sample</a>
-to animate the crowds walking around the city.  If you open the
-City Sample and play the MassCrowd map you will see a scene like this in which
-animation textures are used to animate the crowd members:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_001-b2d15a0e36f3805c20ce5fd92623ba24.png" width="1756" height="750" class="img_ev3q"></p>
-<p>This article describes materials which work with animation textures.  It is part of
-a set of articles about animation textures which describe how animation textures
-are created and how they can be used by MASS, PCG and Niagara.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="its-all-about-materials">It's all about materials<a href="https://www.unrealcode.net/AnimationTextureMaterials/#its-all-about-materials" class="hash-link" aria-label="Direct link to It's all about materials" title="Direct link to It's all about materials">​</a></h2>
-<p>Unreal Engine implements vertex animation by using materials, material instances
-and material layers.  It's helpful to understand the relationship between these parts:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_017-02cc524e4e42ff08d4a2906f11224c54.png" width="1403" height="1132" class="img_ev3q"></p>
-<p>This picture shows:</p>
-<ul>
-<li>a skeletal mesh has material instances which are specified in its material slots.  When a static
-mesh is created from that skeletal mesh these material instances are copied to the material slots of
-the static mesh;</li>
-<li>a static mesh can have one or more material instances;</li>
-<li>these materials instances are created from a material.  This parent material
-is where the actual shader program is created, the material instance holds parameters which are used by
-the shader at runtime;</li>
-<li>the parent material uses the <em>material layers system</em> which allows materials
-to be composed from layers of functions and other materials in a relatively straightforward manner;</li>
-<li>the parent material  references  a specific material layer
-(either ML_BoneAnimation or ML_VertexAnimation) which animates the
-bones or vertices of the mesh at runtime;</li>
-<li>the material layer (such as ML_BoneAnimation) is <em>created</em> on the parent material but
-it is <em>used</em> on the material instance, not on the parent material;</li>
-<li>the material layer (such as ML_BoneAnimation) references specific textures
-which store the bone or vertex position, rotation and weight data for use
-in animating the elements of the mesh</li>
-</ul>
-<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_BuS1"><p>It's important to realise that when the animation textures are generated
-by the AnimToTexture process the associated material instance(s) are updated with
-values specific to the animations (such as the first and last frame numbers)
-so every static mesh which is animated this way needs its own
-material instance(s).</p></div></div>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="creating-the-example-project">Creating the example project<a href="https://www.unrealcode.net/AnimationTextureMaterials/#creating-the-example-project" class="hash-link" aria-label="Direct link to Creating the example project" title="Direct link to Creating the example project">​</a></h2>
-<p>For this example, from the launcher create a new Game, Third Person, Blueprint, Desktop project with starter content.  Call it "VertexAnimation".  This example was created using Unreal version 5.4.3.</p>
-<p>Go into Edit | Plugins and enabled the AnimToTexture plugin an restart.</p>
-<p>In the content browser settings make sure "Show Plugin Content" and "Show Engine Content"
-are both enabled.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="updating-an-existing-material">Updating an existing material<a href="https://www.unrealcode.net/AnimationTextureMaterials/#updating-an-existing-material" class="hash-link" aria-label="Direct link to Updating an existing material" title="Direct link to Updating an existing material">​</a></h2>
-<p>To demonstrate how materials support animation textures we will update the materials
-and material instances associated with  the skeletal mesh
-SKM_Manny_Simple which is found in the folder /Content/Characters/Mannequins/Meshes.</p>
-<p>This skeletal mesh uses these materials and material instances:</p>
-<table><thead><tr><th style="text-align:left">Material Instance</th><th style="text-align:left">Parent Material</th><th style="text-align:left">Parent Material Instance</th></tr></thead><tbody><tr><td style="text-align:left">MI_Manny_01</td><td style="text-align:left">M_Mannequin</td><td style="text-align:left"></td></tr><tr><td style="text-align:left">MI_Manny_02</td><td style="text-align:left"></td><td style="text-align:left">MI_Manny_01</td></tr></tbody></table>
-<p>Both these material instances derived from the same material M_Mannequin.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="making-the-static-mesh-and-copying-the-material-assets">Making the static mesh and copying the material assets<a href="https://www.unrealcode.net/AnimationTextureMaterials/#making-the-static-mesh-and-copying-the-material-assets" class="hash-link" aria-label="Direct link to Making the static mesh and copying the material assets" title="Direct link to Making the static mesh and copying the material assets">​</a></h2>
-<p>Make a new folder under the /Content folder called "ATMaterials".  We will
-put all our content there.</p>
-<p>Open the SKM_Manny_Simple skeletal mesh and use the
-"Make Static Mesh" button in the top toolbar to create a new static
-mesh in the /Content/ATMaterials folder.  Name the static mesh "SM_ATManny_Simple".</p>
-<p>Find the material instances MI_Manny_01 and MI_Manny_02 in the
-folder /Content/Characters/Mannequins/Materials/Instances/Manny
-and copy them to the /Content/ATMaterials folder.  Rename them
-MI_ATManny_01 and MI_ATManny_02, just to make it easier to check
-we are altering our own files.</p>
-<p>Find the material  M_Mannequin  in the
-folder /Content/Characters/Mannequins/Materials
-and copy it to the /Content/ATMaterials folder.  Rename it
-M_ATMannequin.</p>
-<p>Now, in the ATMaterials folder:</p>
-<ul>
-<li>open MI_ATManny_01 and change the parent to M_ATMannequin</li>
-<li>open MI_ATManny_02 and change the parent to MI_ATManny_01</li>
-<li>open SM_ATMannySimple and change the materials to MI_ATManny_01 and MI_ATManny_02</li>
-</ul>
-<p>This should result in the static mesh only referencing materials and
-material instances in our /Content/ATMaterials folder.  If you look
-at SM_ATMannySimple in the reference viewer you will that we
-still reference textures from the original folders, that's ok we won't
-be changing them:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_018-c850585f744c7a87d543e69204dfef9f.png" width="827" height="1046" class="img_ev3q"></p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="adding-the-material-layer">Adding the material layer<a href="https://www.unrealcode.net/AnimationTextureMaterials/#adding-the-material-layer" class="hash-link" aria-label="Direct link to Adding the material layer" title="Direct link to Adding the material layer">​</a></h2>
-<p>We need to change the material M_ATMannequin to support material layers so it can be used
-with animation textures.</p>
-<p>Open the material M_ATMannequin.</p>
-<p>The part we want to change is on the right side:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_019-e135dcdcbb72f9911aa43e25b5ef975b.png" width="1377" height="818" class="img_ev3q"></p>
-<p>We want to change the material to use material attributes.  First we need to add a MakeMaterialAttributes node and connect all the nodes
-which are inputs into the M_ATMannequin into the MakeMaterialAttributes that way
-we don't have to remember where they where connected.</p>
-<p>Add a MakeMaterialAttributes node and connect it like this:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_021-c536c60f3a79be29d7266439d1f9a207.png" width="1141" height="807" class="img_ev3q"></p>
-<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>Note you can Ctrl-Left-Click and hold down the mouse to move a connection from the M_ATMannequin node to the same-named
-connection on the MakeMaterialAttributes node.</p></div></div>
-<p>There is a property called "Use Material Attributes" on the material itself:</p>
-<p><img decoding="async" loading="lazy" alt="width30" src="https://www.unrealcode.net/assets/images/vam_020-27cb7ea329c51caead1cb19422ee5ece.png" width="454" height="628" class="img_ev3q"></p>
-<p>Check the "Use Material Attributes" property.  This will delete the
-big M_ATMannequin and replace it with a small one. This should leave
-you with this:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_022-935c915e69a47b87ebac87c73dfae4c4.png" width="1294" height="732" class="img_ev3q"></p>
-<p>The above nodes create the visual appearance, now we have to add the nodes which
-do the actual bone or vertex animation. Here we will do bone animation, the
-vertex animation process is similar.</p>
-<p>We want to end up with these nodes and connections:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_023-85899fa31be2ee0dbe6963b1263860fe.png" width="1592" height="681" class="img_ev3q"></p>
-<p>To do this add these nodes:</p>
-<table><thead><tr><th style="text-align:left">Node</th><th style="text-align:left">Notes</th></tr></thead><tbody><tr><td style="text-align:left">GetMaterialAttributes<br>(the top one)</td><td style="text-align:left">In order to get the pins shown on the picture above edit the node details and add these elements to the "Attribute Get Types" property <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_025-e78ef89057d3b59198df2f98457cc876.png" width="620" height="212" class="img_ev3q"></td></tr><tr><td style="text-align:left">MaterialAttributeLayers</td><td style="text-align:left">Edit the node details and set these properties:<img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_026-10c56ccdc9ba0b41bc4aa35172e6a84a.png" width="605" height="276" class="img_ev3q">If the ML_BoneAnimation is missing click the settings button and enable Show Plugin Content: <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_048-4947787a6a848f67e7a25c1a33d9bc1b.png" width="928" height="743" class="img_ev3q"></td></tr><tr><td style="text-align:left">GetMaterialAttributes<br>(the bottom one)</td><td style="text-align:left">In order to get the pins shown on the picture above edit the node details and add these elements to the "Attribute Get Types" property <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_024-4c6942e0ef8be6e2f6a08a744544ced9.png" width="462" height="243" class="img_ev3q"></td></tr><tr><td style="text-align:left">BlendAngleCorrectedNormals</td><td style="text-align:left"></td></tr><tr><td style="text-align:left">SetMaterialAttributes</td><td style="text-align:left">In order to get the pins shown on the picture above edit the node details and add these elements to the "Attribute Set Types" property <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_042-75fad2e86a28b42ef02547e552b9cfe4.png" width="444" height="227" class="img_ev3q"></td></tr></tbody></table>
-<p>Then make connections shown in the diagram above.</p>
-<p>Save the M_ATMannequin material node.</p>
-<p>We can't set the  properties of the ML_BoneAnimation
-here in the material, but if you open a material instance
-derived from this material (such as MI_ATManny_01),
-in the Layer Parameters tab you will see parameters from the
-ML_BoneAnimation. These parameters will be assigned values when the
-AnimToTexture process is run:</p>
-<p><img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_028-665cfb4436407e2191ec2013adf93fb0.png" width="1277" height="1235" class="img_ev3q"></p>
-<p>If you don't see the Layer Parameters tab you can open it using the Window | Layer Parameters
-menu option.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="other-approaches-to-materials---layer-blend-nodes">Other approaches to materials - layer blend nodes<a href="https://www.unrealcode.net/AnimationTextureMaterials/#other-approaches-to-materials---layer-blend-nodes" class="hash-link" aria-label="Direct link to Other approaches to materials - layer blend nodes" title="Direct link to Other approaches to materials - layer blend nodes">​</a></h2>
-<p>We modified the material above by adding a MakeMaterialAttributes node, but
-is only one way of modifying a material.  We took this approach because it suited the material we were modifying, enabling us to simply replace the M_ATMannequin node with a MakeMaterialAttributes and use
-all of the same connections.</p>
-<p>The AnimToTexture plugin in Unreal Engine 5.4 has materials constructed
-using layer blend nodes like this:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_030-f7eef8d8b279f222731caad4d64cc691.png" width="1662" height="1058" class="img_ev3q"></p>
-<p>To extended this material to support animation textures we would add the same set of
-modes we added to the M_ATMannequin material but without having to use a MakeMaterialAttributes node:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_029-6bffee38b674f2e5fcb1d72ab66f6cdc.png" width="1361" height="614" class="img_ev3q"></p>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="reference">Reference<a href="https://www.unrealcode.net/AnimationTextureMaterials/#reference" class="hash-link" aria-label="Direct link to Reference" title="Direct link to Reference">​</a></h4>
-<ul>
-<li><a href="https://www.youtube.com/watch?v=vrlFozqB0jA" target="_blank" rel="noopener noreferrer">Unreal Engine 5 AnimToTexture Plugin, How to Use it to make Vertex Animation Textures for crowds</a>  This is a great video by Kevin Romond based on Unreal 5.2.</li>
-<li><a href="https://docs.google.com/document/d/1P2r3YzPOMZU59o2DaEBim0nmPSTdVg3MmFA3rORg6f0/edit#heading=h.mfv57e40k4rc" target="_blank" rel="noopener noreferrer">UE5 AnimToTexture plug-in</a>  This
-is a translation of an article originally in Japanese</li>
-<li><a href="https://dev.epicgames.com/community/learning/tutorials/daE9/unreal-engine-baking-out-vertex-animation-in-editor-with-animtotexture" target="_blank" rel="noopener noreferrer">Baking Out Vertex Animation Tutorial</a></li>
-<li><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/using-material-layers-in-unreal-engine?application_version=5.4" target="_blank" rel="noopener noreferrer">Material Layers</a></li>
-<li><a href="https://www.youtube.com/watch?v=edZo8PC5SYc&amp;t=310s" target="_blank" rel="noopener noreferrer">Mastering Material Instances</a></li>
-</ul>
-<h4 class="anchor anchorWithStickyNavbar_LWe7" id="feedback">Feedback<a href="https://www.unrealcode.net/AnimationTextureMaterials/#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/32">here</a></p>]]></content>
         <category label="Animation" term="Animation"/>
         <category label="Materials" term="Materials"/>
         <category label="AnimationTextures" term="AnimationTextures"/>

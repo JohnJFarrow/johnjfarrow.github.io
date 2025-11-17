@@ -325,396 +325,6 @@ if it is not, it does nothing</li>
         <category label="Python" term="Python"/>
     </entry>
     <entry>
-        <title type="html"><![CDATA[Backing up Gitea to Backblaze]]></title>
-        <id>https://www.unrealcode.net/GiteaBackup/</id>
-        <link href="https://www.unrealcode.net/GiteaBackup/"/>
-        <updated>2025-08-21T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Backing up Gitea to Backblaze]]></summary>
-        <content type="html"><![CDATA[<p><a href="https://about.gitea.com/" target="_blank" rel="noopener noreferrer" class="">Gitea</a> is a self-hosted git server.  <a href="https://www.backblaze.com/" target="_blank" rel="noopener noreferrer" class="">Backblaze</a>
-is a cloud storage provider</p>
-<p>This page has brief instructions for backing up git repositories
-hosted in gitea to Backblaze b2 cloud storage</p>
-<p>Assuming we have a gitea server hosted in a docker
-container as described <a class="" href="https://www.unrealcode.net/Gitea/">here</a>
-we want to back up the contents of the server.</p>
-<p>There are multiple ways of backing up docker hosted gitea, including:</p>
-<ul>
-<li class="">back up the docker volume from the host, outside of the container</li>
-<li class="">run the <code>gitea backup</code> command inside the container
-then copy the data out of the container</li>
-<li class="">back up individual repositories from outside the container</li>
-</ul>
-<p>Here I focus on backing up individual repositories
-because backing up the whole docker volume or using <code>gitea dump</code>
-to back up the whole git server (1) makes it difficult to restore one repository
-and (2) backs up all the git-lfs data making each backup file very large.  If
-I want to restore a small repository from Backblaze backup servers I don't
-want to have to download some massive file containing all my git data to do it.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="backing-up-a-git-repository-to-file">Backing up a git repository to file<a href="https://www.unrealcode.net/GiteaBackup/#backing-up-a-git-repository-to-file" class="hash-link" aria-label="Direct link to Backing up a git repository to file" title="Direct link to Backing up a git repository to file" translate="no">​</a></h2>
-<p>The <code>gitea dump</code> command does not support
-specifying which repository to back up, it just backs up everything, so we
-need to clone the repository to another directory outside
-the docker container and then back up that directory.</p>
-<p>This kind of backup does not save the gitea database which contains
-stuff not stored by git, such as issues.</p>
-<p>We do these steps:</p>
-<ul>
-<li class="">clone the git repository</li>
-<li class="">then fetch its lfs data</li>
-<li class="">then tar everything up to one file</li>
-</ul>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">git clone --mirror [repo-name] [temp-dir-name] </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">cd [temp-dir-name]</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">git lfs fetch --all</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">tar -czf [backup-file-name] .</span><br></span></code></pre></div></div>
-<p>A bash shell which takes the repository name as a parameter looks like:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">#!/bin/bash</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">if [ "$#" -ne 1 ]; then</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    echo "Usage: $0 repo"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    exit 1</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">fi</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># check we in correct dir</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">if [[ ! -f "$PWD/docker-compose.yml" ]]; then</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    echo "You must run this inside a folder containing docker-compose.yml"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    exit 1</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">fi</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># stop on errors</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">set -e </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">REPO=$1</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">URL=ssh://git@tower:2222/jfarrow/$REPO.git</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">HOST_BACKUP_DIR=/home/jfarrow/backblaze/backups</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">TEMP_REPO_DIR=/tmp/$REPO</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">mkdir -p $TEMP_REPO_DIR</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">rm -rf $TEMP_REPO_DIR/*</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">TAR_FILENAME="gitea_backup_$REPO.tar"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">HOST_BACKUP_FILE="$HOST_BACKUP_DIR/$TAR_FILENAME"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># use git clone to copy the non-lfs files</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">git clone --mirror $URL $TEMP_REPO_DIR</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">pushd $TEMP_REPO_DIR</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># fetch lfs content</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">git lfs fetch --all</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">tar -cf $HOST_BACKUP_FILE .</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">popd</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">source .venv/bin/activate</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">python upload.py $HOST_BACKUP_FILE</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">deactivate</span><br></span></code></pre></div></div>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="uploading-the-backup-file-to-backblaze">Uploading the backup file to Backblaze<a href="https://www.unrealcode.net/GiteaBackup/#uploading-the-backup-file-to-backblaze" class="hash-link" aria-label="Direct link to Uploading the backup file to Backblaze" title="Direct link to Uploading the backup file to Backblaze" translate="no">​</a></h2>
-<p>In the previous stage we created a file
-called something like /home/jfarrow/backblaze/backups/gitea_backup_test.zip
-where the "test" part of the file is the repository name.</p>
-<p>Now we can use the Backblaze python API to upload that file.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="making-a-python-virtual-environment">Making a python virtual environment<a href="https://www.unrealcode.net/GiteaBackup/#making-a-python-virtual-environment" class="hash-link" aria-label="Direct link to Making a python virtual environment" title="Direct link to Making a python virtual environment" translate="no">​</a></h3>
-<p>These commands make a python virtual environment containing
-the Backblaze API.</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">python -m venv .venv</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">source .venv/bin/activate</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">pip install b2sdk</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">pip install python-dotenv</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="using-python-dotenv">Using python-dotenv<a href="https://www.unrealcode.net/GiteaBackup/#using-python-dotenv" class="hash-link" aria-label="Direct link to Using python-dotenv" title="Direct link to Using python-dotenv" translate="no">​</a></h3>
-<p>This allows you to store values such as the Backblaze application
-id and application API key in a file called ".env", like this:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">APPLICATION_KEY_ID=0077777777776100000000001</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">APPLICATION_API_KEY=K77777777777777777777777777777I</span><br></span></code></pre></div></div>
-<p>The python code loads these values into the environment
-and they can be accessed using <code>os.getenv()</code> calls.</p>
-<p>The point in doing this is that you add the .env file
-to your .gitignore file, so that the API keys
-are never stored in git.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="python-code-to-upload-the-file">Python code to upload the file<a href="https://www.unrealcode.net/GiteaBackup/#python-code-to-upload-the-file" class="hash-link" aria-label="Direct link to Python code to upload the file" title="Direct link to Python code to upload the file" translate="no">​</a></h3>
-<p>If you have the name of an existing Backblaze bucket and the
-application key id and API key, you can upload a file using this code:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">import os</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">import os.path</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">import b2sdk.v2 as b2</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">import sys</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">import time</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">import argparse</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">import datetime</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">from zoneinfo import ZoneInfo</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">from dotenv import load_dotenv</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">from pathlib import Path</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">parser=argparse.ArgumentParser()</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">parser.add_argument("file", type=str)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">args = parser.parse_args()</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">local_file = args.file</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">if not os.path.exists(local_file):</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  print(f"file {local_file} does not exist")</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  sys.exit()</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">load_dotenv()</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">info = b2.InMemoryAccountInfo()</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">b2_api = b2.B2Api(info)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">application_key_id = os.getenv("APPLICATION_KEY_ID")</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">application_key = os.getenv("APPLICATION_API_KEY")</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">tz = ZoneInfo("Pacific/Auckland")</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">now = datetime.datetime.now(tz)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">file_name = Path(local_file).stem + now.strftime("_%Y%m%d-%H%M%S") + Path(local_file).suffix</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">print(f"sending {file_name}")</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">metadata = { }</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">b2_api.authorize_account("production", application_key_id, application_key)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">bucket = b2_api.get_bucket_by_name( INSERT_YOUR_BUCKET_NAME )</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">uploaded_file = bucket.upload_local_file( file_name=file_name, local_file=local_file, file_infos=metadata )</span><br></span></code></pre></div></div>
-<p>This code uploads the file and renames it with the date and time
-so gitea_backup_test.zip becomes something like
-gitea_backup_test_20250828-095421.zip</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="usage">Usage<a href="https://www.unrealcode.net/GiteaBackup/#usage" class="hash-link" aria-label="Direct link to Usage" title="Direct link to Usage" translate="no">​</a></h3>
-<p>This code to upload the file is
-at the end of the bash script above:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">source .venv/bin/activate</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">python upload.py $HOST_BACKUP_FILE</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">deactivate</span><br></span></code></pre></div></div>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="backing-up-using-gitea-dump">Backing up using gitea dump<a href="https://www.unrealcode.net/GiteaBackup/#backing-up-using-gitea-dump" class="hash-link" aria-label="Direct link to Backing up using gitea dump" title="Direct link to Backing up using gitea dump" translate="no">​</a></h2>
-<p>The <code>gitea dump</code> command executes inside the gitea docker
-container.  It backs up all of the git data and the gitea
-database.  It also backs up all of the git-lfs files
-for all repositories, so it can create a very big backup file.</p>
-<p>We are backing up to file inside the docker container and then
-copying that file to some directory on the host from where it
-can be copied to off-site backup.</p>
-<p>The steps to create a back up file are:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain"># for the container called 'testgitea'</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># delete existing backup file in the container</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker exec -u git -i testgitea bash -c "rm -f /tmp/backup.zip"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># do the back up</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker exec -u git -i testgitea bash -c "/app/gitea/gitea dump -c /data/gitea/conf/app.ini --skip-log --file /tmp/backup.zip"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">-- copy the backup file from the container to the host</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker cp testgitea:/tmp/backup.zip ~/backblaze/backups/backup.zip</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="restoring">Restoring<a href="https://www.unrealcode.net/GiteaBackup/#restoring" class="hash-link" aria-label="Direct link to Restoring" title="Direct link to Restoring" translate="no">​</a></h3>
-<p>There is no one command for restoring a backup, see <a href="https://docs.gitea.com/next/administration/backup-and-restore" target="_blank" rel="noopener noreferrer" class="">here</a>, so we have to manually unzip the backup
-file and move directories to the correct places.</p>
-<p>Note that the instructions
-at <a href="https://docs.gitea.com/next/administration/backup-and-restore" target="_blank" rel="noopener noreferrer" class="">https://docs.gitea.com/next/administration/backup-and-restore</a> are not correct, at least for
-my configuration.  For example:</p>
-<blockquote>
-<h1>restore the repositories itself</h1>
-<p>mv repos/* /data/git/gitea-repositories/</p>
-</blockquote>
-<p>does not work, the repository directory is called /data/git/repositories, not
-/data/git/gitea-repositories</p>
-<p>Given the file ~/backblaze/backups/backup.zip we can restore
-this using these commands:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">-- assuming we get the backup file from offline storage</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">-- copy the host file into the container</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">-- copy into /data not /tmp so it survives container restart</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker cp ~/backblaze/backups/backup.zip testgitea:/tmp/backup.zip </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">-- to list contents of backup.zip </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">unzip -l backup.zip | wc -l </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">&gt; 37492 </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># to fix "unzip: short read" error</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># login to container as root and install a better version of unzip</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker exec -it --user=root testgitea /bin/sh</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">apk add unzip</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># to fix "error: invalid zip file with overlapped components (possible zip bomb)"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># use  export UNZIP_DISABLE_ZIPBOMB_DETECTION=TRUE</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># unzip</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">cd /tmp</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">export UNZIP_DISABLE_ZIPBOMB_DETECTION=TRUE; unzip backup.zip</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># restore in this order</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># lfs files are backed up to data/lfs but restore to /data/git/lfs</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># repos are backed up to data/repos/jfarrow but restored</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># to /data/git/repositories/jfarrow</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># then</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># all other files in data are restore to /data/gitea</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">rm -rf /data/git/lfs</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">mv /tmp/data/lfs/. /data/git/lfs/*</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">rm -rf /tmp/data/lfs</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">rm -rf /data/git/repositories</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">mkdir /data/git/repositories</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">mv /tmp/repos/jfarrow /data/git/repositories/jfarrow</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">rm -rf /tmp/repos </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">cp -r /tmp/data/. /data/gitea/</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># adjust file permissions</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">chown -R git:git /data</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># Regenerate Git Hooks</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">/usr/local/bin/gitea -c '/data/gitea/conf/app.ini' admin regenerate hooks</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># exit the bash shell</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">^D</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># restart the container</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose down</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose up -d</span><br></span></code></pre></div></div>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="references">References<a href="https://www.unrealcode.net/GiteaBackup/#references" class="hash-link" aria-label="Direct link to References" title="Direct link to References" translate="no">​</a></h2>
-<p><a href="https://www.stevestreeting.com/2020/08/09/my-unreal-engine-vcs-setup-gitea-git-lfs-locking/" target="_blank" rel="noopener noreferrer" class="">My Unreal Engine VCS setup - Gitea + Git + LFS + Locking </a><br>
-<a href="https://github.com/backblaze-b2-samples/b2-python-s3-sample/blob/main/sample.py" target="_blank" rel="noopener noreferrer" class="">Backblaze Python Examples</a><br>
-<a href="https://blog.teclado.com/python-file-upload-backblaze-b2/" target="_blank" rel="noopener noreferrer" class="">How to upload files to Backblaze B2 using Python</a></p>]]></content>
-        <category label="Tools" term="Tools"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Installing Gitea]]></title>
-        <id>https://www.unrealcode.net/Gitea/</id>
-        <link href="https://www.unrealcode.net/Gitea/"/>
-        <updated>2025-08-20T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Installing Gitea on Linux]]></summary>
-        <content type="html"><![CDATA[<p><a href="https://about.gitea.com/" target="_blank" rel="noopener noreferrer" class="">Gitea</a> is a self-hosted
-git server.</p>
-<p>This page has brief instructions and problem solving for setting up a local Git server using Gitea, running in a <a href="https://www.docker.com/" target="_blank" rel="noopener noreferrer" class="">Docker</a> container
-on Ubuntu linux.</p>
-<p>This page uses a docker container called <code>testgitea</code> running
-on HTTP port <code>8081</code> and SSH port <code>2221</code>.  These values
-will vary for every installation.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="installing-git">Installing git<a href="https://www.unrealcode.net/Gitea/#installing-git" class="hash-link" aria-label="Direct link to Installing git" title="Direct link to Installing git" translate="no">​</a></h2>
-<p>Gitea uses git and git-lfs, so install those first:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo apt install git</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo apt install git-lfs</span><br></span></code></pre></div></div>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="installing-docker-compose">Installing docker-compose<a href="https://www.unrealcode.net/Gitea/#installing-docker-compose" class="hash-link" aria-label="Direct link to Installing docker-compose" title="Direct link to Installing docker-compose" translate="no">​</a></h2>
-<p>This is based on instructions <a href="https://docs.docker.com/compose/install/" target="_blank" rel="noopener noreferrer" class="">here</a></p>
-<p>Installation is on an existing ZFS pool at /mnt/zfspool</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain"># make a directory for gitea</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">cd /mnt/zfspool/gitea </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"># install docker</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo apt install gnome-terminal</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo apt-get update</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">curl -O https://desktop.docker.com/linux/main/amd64/docker-desktop-amd64.deb?utm_source=docker&amp;utm_medium=webreferral&amp;utm_campaign=docs-driven-download-linux-amd64</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo apt install -y ca-certificates curl gnupg lsb-release</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo mkdir -p /etc/apt/keyrings</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo apt update -y</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo apt-get install ./docker-desktop-amd64.deb</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo apt install docker.io</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="security">Security<a href="https://www.unrealcode.net/Gitea/#security" class="hash-link" aria-label="Direct link to Security" title="Direct link to Security" translate="no">​</a></h3>
-<p>Add your host user to the docker group on the host machine</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo usermod -aG docker $USER</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">newgrp docker</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="docker-service">Docker service<a href="https://www.unrealcode.net/Gitea/#docker-service" class="hash-link" aria-label="Direct link to Docker service" title="Direct link to Docker service" translate="no">​</a></h3>
-<p>Configure docker to start when the system starts</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">systemctl --user start docker-desktop</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">systemctl --user enable docker-desktop</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo systemctl start docker</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo systemctl daemon-reload</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="docker-volumes">Docker volumes<a href="https://www.unrealcode.net/Gitea/#docker-volumes" class="hash-link" aria-label="Direct link to Docker volumes" title="Direct link to Docker volumes" translate="no">​</a></h3>
-<p>Gitea runs in a docker container. A docker volume  is a directory external to the docker container
-which, if required, can be shared across multiple containers. The
-gitea docker container mounts the docker volume and creates its
-file system in that volume.</p>
-<p>We will be running gitea using a docker volume. This means if we every require
-it we can back up the volume without using the container.</p>
-<p>We link the default directory in which docker volumes
-get created (/var/lib/docker/volumes) to a directory on the ZFS pool (/mnt/zfspool/docker_volumes)
-by doing this:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo systemctl stop docker</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo mv /var/lib/docker/volumes /mnt/zfspool/docker_volumes</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo ln -s /mnt/zfspool/docker_volumes /var/lib/docker/volumes</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo systemctl start docker</span><br></span></code></pre></div></div>
-<p>Then we make a named volume for gitea data.  The volume name is <code>testgiteadata</code></p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker volume create testgiteadata</span><br></span></code></pre></div></div>
-<p>The actual directory for this volume can be found at /mnt/zfspool/docker_volumes/testgiteadata</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="preparing-gitea">Preparing Gitea<a href="https://www.unrealcode.net/Gitea/#preparing-gitea" class="hash-link" aria-label="Direct link to Preparing Gitea" title="Direct link to Preparing Gitea" translate="no">​</a></h2>
-<p>This is based on the 'Basics' section of <a href="https://docs.gitea.com/next/installation/install-with-docker" target="_blank" rel="noopener noreferrer" class="">https://docs.gitea.com/next/installation/install-with-docker</a></p>
-<p>Making a new docker container which will run gitea:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">cd /mnt/zfspool/gitea</span><br></span></code></pre></div></div>
-<p>Paste the lines below into a file called docker-compose.yml:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">networks:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  gitea:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    external: false</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">volumes:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  testgiteadata:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    external: true</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">services:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  server:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    image: docker.gitea.com/gitea:latest</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    container_name: gitea</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    environment:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      - USER_UID=1000</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      - USER_GID=1000</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    restart: always</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    networks:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      - gitea</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    volumes:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      - testgiteadata:/data</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      - /etc/timezone:/etc/timezone:ro</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      - /etc/localtime:/etc/localtime:ro</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    ports:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      - "8081:3000"</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      - "2221:2221"</span><br></span></code></pre></div></div>
-<p>Key settings:</p>
-<ul>
-<li class="">the docker volume is specified in this section:</li>
-</ul>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">volumes:  </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  testgiteadata: </span><br></span></code></pre></div></div>
-<p>and here:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">services:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">  server:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">    volumes:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">      - testgiteadata:/data</span><br></span></code></pre></div></div>
-<p>The name specified in both places needs to correspond to the name
-used in the <code>docker volume create</code> command above.</p>
-<ul>
-<li class="">the image setting is</li>
-</ul>
-<blockquote>
-<p>image: docker.gitea.com/gitea<!-- -->:latest</p>
-</blockquote>
-<p>which will use the latest stable version, whereas
-the gitea installation <a href="https://docs.gitea.com/next/installation/install-with-docker" target="_blank" rel="noopener noreferrer" class="">example</a> uses <!-- -->:nightly<!-- -->
-which is probably not what you want.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="problems-with-port-numbers">Problems with port numbers<a href="https://www.unrealcode.net/Gitea/#problems-with-port-numbers" class="hash-link" aria-label="Direct link to Problems with port numbers" title="Direct link to Problems with port numbers" translate="no">​</a></h2>
-<p>The last lines in docker-compose.yml  define  which
-ports will used for HTTP access and SSH.  It
-looks as though you can map the SSH port
-by setting it to ""2221:22", so you connect
-to 2221 and get forwarded to 22 in the container.  This does not work
-like that.  Attempting
-to connect to 2221 by doing this:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">git clone git@tower:2221/jfarrow/TestRepo.git</span><br></span></code></pre></div></div>
-<p>will connect to port 22 on the <strong>host</strong>, not on the gitea docker container.
-You get this response:</p>
-<blockquote>
-<p>Cloning into 'TestRepo'...<br>
-<!-- -->git@tower's password:</p>
-</blockquote>
-<p>You can verify this is not from the container by using <code>docker compose down</code> to shut down the container - you still get the same response.</p>
-<p>Also, if you set the SSH port in docker-compose.yml to "2221:22" and create a repository
-the SSH connection string will appear like this:</p>
-<blockquote>
-<p>git@tower<!-- -->:jfarrow<!-- -->/TestRepo.git</p>
-</blockquote>
-<p>which is incorrect (and does not work) because it does not contain the port number.</p>
-<p>The fix for  these problems is to make the internal port number
-not be 22, for example setting the port string in docker-compose.yml
-to "2221:2221".  If you do this gitea will give you
-repository connection strings which contain the port number, such
-as <code>ssh://git@tower:2221/jfarrow/TestRepo.git</code></p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="starting-gitea">Starting gitea<a href="https://www.unrealcode.net/Gitea/#starting-gitea" class="hash-link" aria-label="Direct link to Starting gitea" title="Direct link to Starting gitea" translate="no">​</a></h2>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">cd /mnt/zfspool/gitea </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose up -d</span><br></span></code></pre></div></div>
-<p>To run the docker container in the foreground, which shows useful logging information,
-use <code>docker compose up</code>, and to shut it down use control-c.</p>
-<p>To run the docker container in the background, use  <code>docker compose up -d</code>,
-and to shut it down  use <code>docker compose down</code>.</p>
-<p>Once it is started with <code>docker compose up -d</code> and is
-running in the background you can use the <code>docker ps</code>
-command to list docker processes:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker ps</span><br></span></code></pre></div></div>
-<p>This shows useful information including:</p>
-<ul>
-<li class="">the docker id</li>
-</ul>
-<blockquote>
-<p>ddce3fca7e43</p>
-</blockquote>
-<ul>
-<li class="">the mapping of ports from the host machine to inside the docker container:
-run</li>
-</ul>
-<blockquote>
-<p>0.0.0.0:2221-&gt;22/tcp, [::]:2221-&gt;22/tcp, 0.0.0.0:8080-&gt;3000/tcp, [::]:8080-&gt;3000/tcp</p>
-</blockquote>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="initializing-gitea">Initializing gitea<a href="https://www.unrealcode.net/Gitea/#initializing-gitea" class="hash-link" aria-label="Direct link to Initializing gitea" title="Direct link to Initializing gitea" translate="no">​</a></h2>
-<p>Once gitea is running you can point a browser to <a href="http://servername:8081/" target="_blank" rel="noopener noreferrer" class="">http://SERVERNAME:8081</a> to
-access the gitea web interface:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/gitea_001-2fa3a4b4082cb56507d617724fd8e0e2.png" width="736" height="1198" class="img_ev3q"></p>
-<p><strong>Change the SSH Server Port to whatever value you specified
-in the ports section of the docker-compose.yml file</strong>, i.e.
-in this example I changed it to 2221.</p>
-<p>Press the Install Gitea button to install gitea.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="registering-a-user">Registering a user<a href="https://www.unrealcode.net/Gitea/#registering-a-user" class="hash-link" aria-label="Direct link to Registering a user" title="Direct link to Registering a user" translate="no">​</a></h2>
-<p>You will be prompted to register a user.  For simplicity
-make the username the same as your host login name.  Fill
-in the details and press Register Account:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/gitea_002-0086700966594ad15244747efffecc1f.png" width="392" height="543" class="img_ev3q"></p>
-<p>You should see the main gitea screen:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/gitea_003-fae83d218814a8cbbb974ae430ff4f7c.png" width="1141" height="292" class="img_ev3q"></p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="making-a-repository">Making a repository<a href="https://www.unrealcode.net/Gitea/#making-a-repository" class="hash-link" aria-label="Direct link to Making a repository" title="Direct link to Making a repository" translate="no">​</a></h2>
-<p>Gitea behaves very like github.com.  To create
-a new repository, press the + button and select New Repository:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/gitea_004-3505056ffa3ae6be73164e1b3f97056a.png" width="1134" height="262" class="img_ev3q"></p>
-<p>Give it a name and maybe change the default branch and
-the press the Create Repository button.  This screen
-appears, press the SSH tab to show the repository connection string
-which should contain the port number like <code>ssh://git@tower:2221/jfarrow/TestRepo.git</code></p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/gitea_005-d0e82bb9a850702dbc2e27b9df925bc5.png" width="1056" height="507" class="img_ev3q"></p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="setting-up-ssh-in-the-container">Setting up SSH in the container<a href="https://www.unrealcode.net/Gitea/#setting-up-ssh-in-the-container" class="hash-link" aria-label="Direct link to Setting up SSH in the container" title="Direct link to Setting up SSH in the container" translate="no">​</a></h2>
-<p>The SSH server running in the container is configured using a file
-called app.ini.  This is present on the docker volume,
-so use sudo to access it:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo bash</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">nano ../docker_volumes/testgiteadata/_data/gitea/conf/app.ini</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">change the line </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">&gt; SSH_LISTEN_PORT = 22 </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">to match the port specified in docker-compose.yml such as</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">&gt; SSH_LISTEN_PORT = 2222</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">add the line</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">START_SSH_SERVER = true</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">save the file and exit sudo</span><br></span></code></pre></div></div>
-<p>Restart the gitea docker instance:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose down</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose up -d</span><br></span></code></pre></div></div>
-<p>Note that <code>docker compose restart</code> is not enough.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="testing-ssh-on-windows-and-linux">Testing SSH on Windows and Linux<a href="https://www.unrealcode.net/Gitea/#testing-ssh-on-windows-and-linux" class="hash-link" aria-label="Direct link to Testing SSH on Windows and Linux" title="Direct link to Testing SSH on Windows and Linux" translate="no">​</a></h2>
-<p>You can use the command to see what keys are being sent.</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">ssh -vT git@tower -p 2221</span><br></span></code></pre></div></div>
-<p>If you see this:</p>
-<blockquote>
-<p>Are you sure you want to continue connecting (yes/no/[fingerprint])?</p>
-</blockquote>
-<p>type yes</p>
-<p>If you see  this:</p>
-<blockquote>
-<p>debug1: Connecting to tower [10.0.0.10] port 2221.<br>
-<!-- -->debug1: connect to address 10.0.0.10 port 2221: Connection refused<br>
-<!-- -->ssh: connect to host tower port 2221: Connection refused</p>
-</blockquote>
-<p>Mostly likely the SSH server is not running on port 2221 or
-is not running at all; check that the app.ini file contains
-START_SSH_SERVER = true and the other settings as specified above
-and that it has been restarted as described above.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="cloning-the-repository-to-windows">Cloning the repository to Windows<a href="https://www.unrealcode.net/Gitea/#cloning-the-repository-to-windows" class="hash-link" aria-label="Direct link to Cloning the repository to Windows" title="Direct link to Cloning the repository to Windows" translate="no">​</a></h2>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="setting-up-ssh-public-keys">Setting up SSH public keys<a href="https://www.unrealcode.net/Gitea/#setting-up-ssh-public-keys" class="hash-link" aria-label="Direct link to Setting up SSH public keys" title="Direct link to Setting up SSH public keys" translate="no">​</a></h3>
-<p>You Windows SSH keys are in c:\users\USERNAME\.ssh</p>
-<p>If you don't have an ssh key
-see <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent" target="_blank" rel="noopener noreferrer" class="">here</a> for instructions on
-generating one.</p>
-<p>To give gitea your public key:</p>
-<ul>
-<li class="">Open a windows command line window</li>
-<li class="">Find the public key file such as c:\users\USERNAME\.ssh\id_ed25519.pub and open it in a text editor</li>
-<li class="">Copy the contents</li>
-<li class="">Open the gitea UI in a web browser, choose Setting in the dropdown
-next to your username:</li>
-</ul>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/gitea_006-7619bc62ea8e884cad177f1bacd9145c.png" width="212" height="303" class="img_ev3q"></p>
-<ul>
-<li class="">Choose the SSH/GPG Keys on the left-hand side, click Add Key on
-the top right, then enter a key name and the
-contents of the public key file such as id_ed25519.pub</li>
-</ul>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/gitea_007-6648dd75fbe71f57d47c1a91488e7472.png" width="1058" height="463" class="img_ev3q"></p>
-<ul>
-<li class="">click the middle Add Key button to save the key.</li>
-</ul>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="cloning">Cloning<a href="https://www.unrealcode.net/Gitea/#cloning" class="hash-link" aria-label="Direct link to Cloning" title="Direct link to Cloning" translate="no">​</a></h3>
-<p>Clone the repository with a command like this:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">git clone ssh://git@tower:2221/jfarrow/TestRepo.git</span><br></span></code></pre></div></div>
-<p>You should see something like:</p>
-<blockquote>
-<p>Cloning into 'TestRepo'...<br>
-<!-- -->warning: You appear to have cloned an empty repository.</p>
-</blockquote>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="cloning-the-repository-to-linux">Cloning the repository to Linux<a href="https://www.unrealcode.net/Gitea/#cloning-the-repository-to-linux" class="hash-link" aria-label="Direct link to Cloning the repository to Linux" title="Direct link to Cloning the repository to Linux" translate="no">​</a></h2>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="setting-up-ssh-public-keys-1">Setting up SSH public keys<a href="https://www.unrealcode.net/Gitea/#setting-up-ssh-public-keys-1" class="hash-link" aria-label="Direct link to Setting up SSH public keys" title="Direct link to Setting up SSH public keys" translate="no">​</a></h3>
-<p>You linux SSH keys are in ~/.ssh</p>
-<p>If you don't have an ssh key
-see <a href="https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent" target="_blank" rel="noopener noreferrer" class="">here</a> for instructions on
-generating one.</p>
-<p>To give gitea your public key:</p>
-<ul>
-<li class="">Open a command line such as bash</li>
-<li class="">Find the public key file such as id_ed25519.pub and open it in a text editor</li>
-<li class="">Copy the contents</li>
-<li class="">Open the gitea UI in a web browser, choose Setting in the dropdown
-next to your username:</li>
-</ul>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/gitea_006-7619bc62ea8e884cad177f1bacd9145c.png" width="212" height="303" class="img_ev3q"></p>
-<ul>
-<li class="">Choose the SSH/GPG Keys on the left-hand side, click Add Key on
-the top right, then enter a key name and the
-contents of the public key file such as id_ed25519.pub</li>
-</ul>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/gitea_007-6648dd75fbe71f57d47c1a91488e7472.png" width="1058" height="463" class="img_ev3q"></p>
-<ul>
-<li class="">click the middle Add Key button to save the key.</li>
-</ul>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="cloning-1">Cloning<a href="https://www.unrealcode.net/Gitea/#cloning-1" class="hash-link" aria-label="Direct link to Cloning" title="Direct link to Cloning" translate="no">​</a></h3>
-<p>Clone the repository with a command like this:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">git clone ssh://git@tower:2221/jfarrow/TestRepo.git</span><br></span></code></pre></div></div>
-<p>You should see something like:</p>
-<blockquote>
-<p>Cloning into 'TestRepo'...<br>
-<!-- -->warning: You appear to have cloned an empty repository.</p>
-</blockquote>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="setting-up-git-lfs">Setting up git-lfs<a href="https://www.unrealcode.net/Gitea/#setting-up-git-lfs" class="hash-link" aria-label="Direct link to Setting up git-lfs" title="Direct link to Setting up git-lfs" translate="no">​</a></h2>
-<p>Once you have cloned the repository execute these commands
-so setup lfs:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">git lfs track *.uasset</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">git lfs track *.umap</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">git add .gitattributes</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">git commit -m "setup lfs" .</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">git push</span><br></span></code></pre></div></div>
-<p>This ends the section on getting gitea up and running.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="ssh-notes">SSH notes<a href="https://www.unrealcode.net/Gitea/#ssh-notes" class="hash-link" aria-label="Direct link to SSH notes" title="Direct link to SSH notes" translate="no">​</a></h2>
-<p>Things I learned getting gitea to work with SSH.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="making-sure-ssh-is-really-running-on-linux">Making sure SSH is really running on Linux<a href="https://www.unrealcode.net/Gitea/#making-sure-ssh-is-really-running-on-linux" class="hash-link" aria-label="Direct link to Making sure SSH is really running on Linux" title="Direct link to Making sure SSH is really running on Linux" translate="no">​</a></h3>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo systemctl enable --now ssh</span><br></span></code></pre></div></div>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="adding-a-git-user-if-needed-on-linux">Adding a git user if needed on Linux<a href="https://www.unrealcode.net/Gitea/#adding-a-git-user-if-needed-on-linux" class="hash-link" aria-label="Direct link to Adding a git user if needed on Linux" title="Direct link to Adding a git user if needed on Linux" translate="no">​</a></h2>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo adduser --system --group --shell /bin/bash git</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="connection-choices">Connection choices<a href="https://www.unrealcode.net/Gitea/#connection-choices" class="hash-link" aria-label="Direct link to Connection choices" title="Direct link to Connection choices" translate="no">​</a></h3>
-<p>When a Windows or Linux machine attempts to connect to
-the gitea instance it chooses a key from  the ones
-in the .ssh directory.  If you only have one key
-this won't be a problem, but if you have multiple
-keys it might send one which is not the one you
-gave gitea the public key for.</p>
-<p>If the wrong key is being sent, or you were
-using a key and then started using a different
-key, you might see a message about a man-in-the-middle
-attack.</p>
-<p>What key is sent to a server is remembered in the file</p>
-<blockquote>
-<p>c:\users\USERNAME\.ssh\known_hosts.txt
-or
-~/.ssh/known_hosts</p>
-</blockquote>
-<p>For example, if I connected to the host called "tower" on port 2221
-there will be a line in the file like this:</p>
-<blockquote>
-<p>[tower]:2221 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHSRDVujka5tV6ciMIwBovZlfn6hBSltltorhx0L8+7A</p>
-</blockquote>
-<p>To reset that connection delete the line from the known_hosts or
-known_hosts.txt file.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="looking-at-logs">Looking at logs<a href="https://www.unrealcode.net/Gitea/#looking-at-logs" class="hash-link" aria-label="Direct link to Looking at logs" title="Direct link to Looking at logs" translate="no">​</a></h3>
-<p>Use:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker logs [containername] | grep ssh</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="running-netstat-inside-the-container">Running netstat inside the container<a href="https://www.unrealcode.net/Gitea/#running-netstat-inside-the-container" class="hash-link" aria-label="Direct link to Running netstat inside the container" title="Direct link to Running netstat inside the container" translate="no">​</a></h3>
-<p>Use:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker exec -it testgitea sh</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">netstat -tlnp | grep 2222</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resetting-docker">Resetting docker<a href="https://www.unrealcode.net/Gitea/#resetting-docker" class="hash-link" aria-label="Direct link to Resetting docker" title="Direct link to Resetting docker" translate="no">​</a></h3>
-<p>If you are not using docker for anything else you can
-delete the containers, volumes and cached images
-by following the instructions at <a href="https://thelinuxcode.com/how-do-clean-restart-docker-instance/" target="_blank" rel="noopener noreferrer" class="">https://thelinuxcode.com/how-do-clean-restart-docker-instance/</a></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resetting-gitea">Resetting gitea<a href="https://www.unrealcode.net/Gitea/#resetting-gitea" class="hash-link" aria-label="Direct link to Resetting gitea" title="Direct link to Resetting gitea" translate="no">​</a></h3>
-<p>If you don't have anything important running yet you can
-delete the docker volume that the gitea docker container
-uses and recreate it.  Once you restart it, it will
-be back at the Initial Configuration stage.</p>
-<p>To do this identify the docker volume name (we used testgiteadata
-in the example above) and delete it by deleting the
-file, so we need to know where the docker volumes
-are located:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose down</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">sudo rm /mnt/zfspool/docker_volumes/testgiteadata</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker volume create testgiteadata</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">docker compose up -d</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="gitea-documentation">Gitea documentation<a href="https://www.unrealcode.net/Gitea/#gitea-documentation" class="hash-link" aria-label="Direct link to Gitea documentation" title="Direct link to Gitea documentation" translate="no">​</a></h3>
-<p><a href="https://docs.gitea.com/installation/install-with-docker#ssh-container-passthrough" target="_blank" rel="noopener noreferrer" class="">Here</a> is a very long page on SSH container passthrough.</p>]]></content>
-        <category label="Tools" term="Tools"/>
-    </entry>
-    <entry>
         <title type="html"><![CDATA[Building on Two Machines]]></title>
         <id>https://www.unrealcode.net/HordeUBA/</id>
         <link href="https://www.unrealcode.net/HordeUBA/"/>
@@ -2814,6 +2424,409 @@ is a translation of an article originally in Japanese</li>
 </ul>
 <h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="feedback">Feedback<a href="https://www.unrealcode.net/AnimationTextureTests/#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback" translate="no">​</a></h4>
 <p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/34">here</a></p>]]></content>
+        <category label="Animation" term="Animation"/>
+        <category label="Materials" term="Materials"/>
+        <category label="AnimationTextures" term="AnimationTextures"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Animation Textures Part 2 - Using the AnimToTexture plugin]]></title>
+        <id>https://www.unrealcode.net/AnimationTextures/</id>
+        <link href="https://www.unrealcode.net/AnimationTextures/"/>
+        <updated>2024-12-03T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Understanding how the AnimToTexture works in Unreal 5.4]]></summary>
+        <content type="html"><![CDATA[<p>Animation Textures is a technique for storing animation data in a texture
+and animating the mesh by using a special material to read and
+replay the animation data.</p>
+<p>This technique is typically used for animating large numbers of background
+characters with minimal overhead.  It's used in the Epic Games
+<a href="https://www.unrealengine.com/marketplace/en-US/product/city-sample" target="_blank" rel="noopener noreferrer" class="">City Sample</a>
+to animate the crowds walking around the city.  If you open the
+City Sample and play the MassCrowd map you will see a scene like this in which
+animation textures are used to animate the crowd members:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_001-b2d15a0e36f3805c20ce5fd92623ba24.png" width="1756" height="750" class="img_ev3q"></p>
+<p>This article is part of a series detailing how to use the AnimToTexture plugin to
+animate static meshes.</p>
+<p>Previous parts are:</p>
+<ul>
+<li class=""><a class="" href="https://www.unrealcode.net/AnimationTextureMaterials/">Materials for Animation Textures</a></li>
+</ul>
+<p>This article describes how animation textures are created.  It is part of
+a set of articles about animation textures which describe how animation textures
+are created, <a class="" href="https://www.unrealcode.net/AnimationTextureMaterials/">How Animation Texture Materials are created</a>
+and how they can be used by MASS, PCG and Niagara.</p>
+<p>Unreal 5.4 ships with a plugin called AnimToTexture, this is not enabled
+by default so you will need to enable it for anything described
+here to work.  There is lots of content on the web about version 5.1 and 5.2
+of this AnimToTexture plugin but it changed for version 5.4 and
+not much has been written about the latest version.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="its-all-about-materials">It's all about materials<a href="https://www.unrealcode.net/AnimationTextures/#its-all-about-materials" class="hash-link" aria-label="Direct link to It's all about materials" title="Direct link to It's all about materials" translate="no">​</a></h2>
+<p>Unreal Engine implements vertex animation by using materials, material instances
+and material layers.  It's helpful to understand the relationship between these parts:</p>
+<p><img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_006-c2b9463618fad493a17966a562085a9c.png" width="1346" height="682" class="img_ev3q"></p>
+<p>A skeletal mesh has materials and/or material instances which are specified in its material slots.  When a static
+mesh is created from a skelatal mesh these materials or material instances  are copied to the material slots of the static mesh, after
+that the materials on the skeletal mesh are not used.</p>
+<p>The process for creating materials and material instances which
+can be used with animation textures is described in <a class="" href="https://www.unrealcode.net/AnimationTextureMaterials/">Animation Texture Materials</a>.  We will be used materials created using the process described on that page.</p>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_BuS1"><p>It's important to realise that when the animation textures are generated by the AnimToTexture process the associated material instance(s) are updated with values specific to the animations (such as the first and last frame numbers) so every static mesh which is animated this way needs its own material instance(s).</p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="the-approach">The Approach<a href="https://www.unrealcode.net/AnimationTextures/#the-approach" class="hash-link" aria-label="Direct link to The Approach" title="Direct link to The Approach" translate="no">​</a></h2>
+<p>Animation textures are used to animate a static mesh either by
+animating the vertices or by animating the bones.  The AnimToTexture
+plugin supports both.  In this article to keep it simple I will
+only refer to bone animation.</p>
+<p>This is a simplified overview of what happens when we create animation textures:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_002-8b0e4926d22a25698a8055fd77f25803.png" width="1161" height="1161" class="img_ev3q"></p>
+<p>We start with:</p>
+<ul>
+<li class="">a skeletal mesh</li>
+<li class="">a static mesh created from the skeletal mesh</li>
+<li class="">materials</li>
+<li class="">material instances</li>
+<li class="">animations</li>
+</ul>
+<p>The process is controlled by a data asset. The data asset
+stores information such as the paths to the  meshes, the textures,
+the materials, and other parameters such as texture size.</p>
+<p>Once we have populated the data asset we execute the AnimToTexture
+process to:</p>
+<ul>
+<li class="">create multiple textures containing animations for bone positions and rotations</li>
+<li class="">update material instances</li>
+<li class="">update the data asset</li>
+</ul>
+<p>After the process has been run the data asset contains information about the
+animations we processed so that we can, for example, use a blueprint to
+read which frames a set of animation uses and replay those animations.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-is-in-the-animtotexture-plugin">What is in the AnimToTexture plugin<a href="https://www.unrealcode.net/AnimationTextures/#what-is-in-the-animtotexture-plugin" class="hash-link" aria-label="Direct link to What is in the AnimToTexture plugin" title="Direct link to What is in the AnimToTexture plugin" translate="no">​</a></h2>
+<p>The AnimToTexture plugin ships with Unreal 5.4, on a typical installation
+its files can be found in the directory "c:\Program Files\Epic Games\UE_5.4\Engine\Plugins\Experimental\AnimToTexture".</p>
+<p>Everything described here requires this plugin be enabled.</p>
+<p>In addition to the code used to create the animation textures, the
+plugin contains other useful files.  These can be located
+under the /Engine/Plugins/AnimToTexture folder.  This is split into
+two parts "AnimToTexture Content" and "AnimToTexture C++ Classes", we only
+ever use the "AnimToTexture Content" part and just refer to it as "AnimToTexture"
+which is the actual folder name.</p>
+<p>If you can't see the /Engine/Plugins/AnimToTexture folder:</p>
+<ul>
+<li class="">make sure you have the AnimToTexture plugin enabled</li>
+<li class="">in the settings for the content browser (accessed with the
+button in the top right corner of the content browser window) make sure you have "Show Engine Content" and "Show Plugin Content" enabled.</li>
+</ul>
+<table><thead><tr><th style="text-align:left">Files</th><th style="text-align:left">Notes</th></tr></thead><tbody><tr><td style="text-align:left">Characters/Mannequin/BP_AnimToTexture</td><td style="text-align:left">the editor utility blueprint which runs the AnimToTexture process</td></tr><tr><td style="text-align:left">Characters/Mannequin/Data/DA_BoneAnimation</td><td style="text-align:left">example data asset</td></tr><tr><td style="text-align:left">Characters/Mannequin/Materials/BoneAnimation/M_Body_BoneAnimation</td><td style="text-align:left">material</td></tr><tr><td style="text-align:left">Characters/Mannequin/Materials/BoneAnimation/MI_Body_BoneAnimation</td><td style="text-align:left">material instance</td></tr><tr><td style="text-align:left">Characters/Mannequin/Textures/BoneAnimation/TX_*</td><td style="text-align:left">animation textures</td></tr><tr><td style="text-align:left">Materials/ML_BoneAnimation</td><td style="text-align:left">material layer</td></tr></tbody></table>
+<p>Some of these files have shipped in prior versions of Unreal,
+and some  up to date Unreal example projects contain old versions of these files.
+For example if you download the City Sample
+for Unreal 5.4 you will find one version of ML_BoneAnimation in the
+AnimToTexture plugin (in your engine) and another version in /Content/Crowd/VAT/Materials/ (from the project).  These two files are very different - it looks as if the one in
+the City Sample project is from Unreal Engine 5.2.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="steps">Steps<a href="https://www.unrealcode.net/AnimationTextures/#steps" class="hash-link" aria-label="Direct link to Steps" title="Direct link to Steps" translate="no">​</a></h2>
+<p>This section outlines the steps to take to (1) create animation textures
+for a specific static mesh, then (2) create a Niagara system to
+spawn a lot of animated static meshes, then (3) create a PCG system
+to spawn a lot of animated static meshes.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-1-creating-the--project">Step 1: Creating the  project<a href="https://www.unrealcode.net/AnimationTextures/#step-1-creating-the--project" class="hash-link" aria-label="Direct link to Step 1: Creating the  project" title="Direct link to Step 1: Creating the  project" translate="no">​</a></h3>
+<p>For this example from the launcher (I am using 5.4.3) create a new Game, Third Person, Blueprint, Desktop project with starter content.  Call it "VertexAnimation".</p>
+<p>Go into Edit | Plugins and enabled the AnimToTexture plugin an restart.</p>
+<p>Under the Content folder create a new folder called "ATMaterials".</p>
+<p>In the content browser settings make sure "Show Plugin Content" and "Show Engine Content"
+are both enabled.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-2-protecting-the-engine-files-optional">Step 2: Protecting the engine files [Optional]<a href="https://www.unrealcode.net/AnimationTextures/#step-2-protecting-the-engine-files-optional" class="hash-link" aria-label="Direct link to Step 2: Protecting the engine files [Optional]" title="Direct link to Step 2: Protecting the engine files [Optional]" translate="no">​</a></h3>
+<p>The AnimToTexture plugin contains static mesh files which reference material instance files which reference material files which reference material layer files which reference texture files.  This makes it easy to
+accidentally update  files contained in the plugin when  generating new textures.  To
+prevent this it is advisable to open the directory
+"c:\Program Files\Epic Games\UE_5.4\Engine\Plugins\Experimental\AnimToTexture\Content" in
+Windows Explorer and change all the files under this directory to read only.  If you do
+accidently change any of these files you can recover then by running the Verify process
+from the launcher:</p>
+<p><img decoding="async" loading="lazy" alt="width30" src="https://www.unrealcode.net/assets/images/vam_031-1eb5130312fbc2dd57c4f730b9dd1a88.png" width="266" height="277" class="img_ev3q"></p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-3-setting-up-favorites-optional">Step 3: Setting up favorites [Optional]<a href="https://www.unrealcode.net/AnimationTextures/#step-3-setting-up-favorites-optional" class="hash-link" aria-label="Direct link to Step 3: Setting up favorites [Optional]" title="Direct link to Step 3: Setting up favorites [Optional]" translate="no">​</a></h3>
+<p>We will be copying a number of assets from the AnimToTexture plugin folders to the /Content/ATMaterials
+folder and moving between these two folders frequently.</p>
+<p>If you right click on the AnimToTexture folder and choose "Add To Favorites" and do the same thing for the ATMaterials folder you end up with both folders listed in your favorites list:</p>
+<p><img decoding="async" loading="lazy" alt="width30" src="https://www.unrealcode.net/assets/images/vam_032-045430456276e29b21b18831d07069a0.png" width="573" height="570" class="img_ev3q"></p>
+<p>This means you can quickly move from one folder to the other and you can select assets
+in the plugin folder and just drop them on the ATMaterials folder in the favorites list.</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_033-eb32969b0d1d6dedab5dd3dacd6939b8.png" width="1489" height="582" class="img_ev3q"></p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-4-creating-a-static-mesh-and-materials">Step 4: Creating a static mesh and materials<a href="https://www.unrealcode.net/AnimationTextures/#step-4-creating-a-static-mesh-and-materials" class="hash-link" aria-label="Direct link to Step 4: Creating a static mesh and materials" title="Direct link to Step 4: Creating a static mesh and materials" translate="no">​</a></h3>
+<p>Follow the steps detailed in <a class="" href="https://www.unrealcode.net/AnimationTextureMaterials/">Materials for Animation Textures </a>
+to create the static mesh and its  materials  and material instances.</p>
+<p>Once you have completed this you should have an ATMaterials folder
+with the static mesh, a material, and two material instances:</p>
+<p><img decoding="async" loading="lazy" alt="width60" src="https://www.unrealcode.net/assets/images/vam_034-44b3d27bf48588fe39f2102d15ba9ae2.png" width="566" height="280" class="img_ev3q"></p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-5-setting-the-lod-level">Step 5: Setting the LOD level<a href="https://www.unrealcode.net/AnimationTextures/#step-5-setting-the-lod-level" class="hash-link" aria-label="Direct link to Step 5: Setting the LOD level" title="Direct link to Step 5: Setting the LOD level" translate="no">​</a></h3>
+<p>The AnimToTexture plugin only generates animation textures for one level
+of detail.  If the static mesh can be rendered with more than one level
+of detail you will see artifacts.</p>
+<p>This image shows what happens when  the two front characters are
+rendered with LOD 0, which has animation textures, and the two rear characters
+are rendered with LOD 1 which has no animation textures.</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_040-96a5c75769cf7359836745fc1eead7f1.png" width="2159" height="713" class="img_ev3q"></p>
+<p>To prevent this problem  open the static mesh SM_ATMannySimple
+and set the property "Number of LODs" to 1 and then press the "Apply Changes" button:</p>
+<p><img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_041-d1244b12c14e841812c36f847a4b5b2e.png" width="540" height="261" class="img_ev3q"></p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-6-creating-the-data-asset">Step 6: Creating the data asset<a href="https://www.unrealcode.net/AnimationTextures/#step-6-creating-the-data-asset" class="hash-link" aria-label="Direct link to Step 6: Creating the data asset" title="Direct link to Step 6: Creating the data asset" translate="no">​</a></h3>
+<p>The animation texture creation process is controlled by a data asset.  The easiest way to
+make one with the correct structure is to copy the one which ships with the plugin, so
+copy "/Engine/Plugins/AnimToTexture Content/Characters/Mannequin/Data/DA_BoneAnimation" to the ATMaterials folder.  Rename it "DA_ATBoneAnimation" and save it.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-7-creating-texture-files">Step 7: Creating texture files<a href="https://www.unrealcode.net/AnimationTextures/#step-7-creating-texture-files" class="hash-link" aria-label="Direct link to Step 7: Creating texture files" title="Direct link to Step 7: Creating texture files" translate="no">​</a></h3>
+<p>The animation texture process populates pre-existing texture files.  To get these
+go to the "/Engine/Plugins/AnimToTexture Content/Characters/Mannequin/Textures/BoneAnimation"
+and copy the 3 texture files into /Content/ATMaterials and rename them:</p>
+<ul>
+<li class="">TX_BonePosition to TX_ATBonePosition</li>
+<li class="">TX_BoneRotation to TX_ATBoneRotation</li>
+<li class="">TX_BoneWeight to TX_ATBoneWeight</li>
+</ul>
+<p>We are renaming all these assets to make it clear when we are looking at the data object which
+asset it is referencing and to reduce the risk of overwriting the materials and textures which are included
+in the AnimToTexture plugin.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-8-populating-the-data-asset">Step 8: Populating the data asset<a href="https://www.unrealcode.net/AnimationTextures/#step-8-populating-the-data-asset" class="hash-link" aria-label="Direct link to Step 8: Populating the data asset" title="Direct link to Step 8: Populating the data asset" translate="no">​</a></h3>
+<p>Open the data asset DA_ATBoneAnimation.  It will be populated with the values from the
+AnimToTexture plugin like so:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_004-060626ca5accb808ec612cdf132137b7.png" width="1456" height="1161" class="img_ev3q"></p>
+<p>We will be changing all the items in the green boxes.</p>
+<p>Make these changes:</p>
+<ul>
+<li class="">change the Skeletal Mesh to SKM_MannySimple</li>
+<li class="">the static mesh to SM_ATMannySimple</li>
+<li class="">the Bone Position Texture to TX_ATBonePosition</li>
+<li class="">the Bone Rotation Texture to TX_ATBoneRotation</li>
+<li class="">the Bone Weight Texture to TX_ATBoneWeight</li>
+</ul>
+<p>For the purposes of this example we will be using 3 anim sequences which go in the "Anim Sequences" array property.</p>
+<p>Replace the 3 existing anim sequences with ones from the /Content/Characters/Mannequins/Animations/Manny folder.  Change</p>
+<ul>
+<li class="">Anim Sequence Index[0] to MM_Run_Fwd</li>
+<li class="">Anim Sequence Index[1] to MM_Walk_Fwd</li>
+<li class="">Anim Sequence Index[2] to MM_Idle</li>
+</ul>
+<p>The data asset should now look like this:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_005-abdd51b3660898c39808b3fae7bb46bb.png" width="964" height="1254" class="img_ev3q"></p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-9-configuring-the-animtotexture-blueprint">Step 9: Configuring the AnimToTexture blueprint<a href="https://www.unrealcode.net/AnimationTextures/#step-9-configuring-the-animtotexture-blueprint" class="hash-link" aria-label="Direct link to Step 9: Configuring the AnimToTexture blueprint" title="Direct link to Step 9: Configuring the AnimToTexture blueprint" translate="no">​</a></h3>
+<p>The AnimToTexture blueprint contains the code which creates the animation textures
+and updates the material instance(s) to use those textures.</p>
+<p>We will be editing the AnimToTexture blueprint which comes with the AnimToTexture plugin
+so we need to make a copy of it.</p>
+<p>Copy /Engine/Plugins/AnimToTexture/Characters/Mannequin/BP_AnimToTexture to
+the /Content/ATMaterials folder and rename it "BP_ATAnimToTexture".</p>
+<p>Open BP_ATAnimToTexture and make the following changes:</p>
+<ul>
+<li class="">delete everything in the "VertexAnimation" box, we only want to do bone animation, so
+it should look like this:</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_008-288824cb1544005ec3b186b166e91966.png" width="950" height="210" class="img_ev3q"></p>
+<ul>
+<li class="">delete the VertexDataAsset variable shown:</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_009-2f827a7b100efbf953218d42debc0047.png" width="633" height="332" class="img_ev3q"></p>
+<ul>
+<li class="">click on the BoneDataAsset variable and change the default value to DA_ATBoneAnimation:</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_010-3379c4b0ad89eabf168d47a98e20ffd8.png" width="367" height="299" class="img_ev3q">
+<img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_011-e93072ce0fdf1a3877605371fa3a6930.png" width="425" height="504" class="img_ev3q"></p>
+<ul>
+<li class="">click on the first "Update Material Instance from Data Asset" and change the material instance to MI_ATManny_01</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_014-f7d7cfb0190656dae635b517aca53a43.png" width="508" height="256" class="img_ev3q"></p>
+<ul>
+<li class="">click on the second "Update Material Instance from Data Asset" and change the material instance to MI_ATManny_02</li>
+</ul>
+<p><img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_015-4dc64374780610e2742e03772ee99891.png" width="440" height="243" class="img_ev3q"></p>
+<p>Compile and save BP_ATAnimToTexture.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-10-save-everything">Step 10: Save Everything<a href="https://www.unrealcode.net/AnimationTextures/#step-10-save-everything" class="hash-link" aria-label="Direct link to Step 10: Save Everything" title="Direct link to Step 10: Save Everything" translate="no">​</a></h3>
+<p>Save everything before doing the next step.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="step-11-generating-the-animation-textures">Step 11: Generating the animation textures<a href="https://www.unrealcode.net/AnimationTextures/#step-11-generating-the-animation-textures" class="hash-link" aria-label="Direct link to Step 11: Generating the animation textures" title="Direct link to Step 11: Generating the animation textures" translate="no">​</a></h3>
+<p>Right-click the BP_ATAnimToTexture and click "Run Editor Utility Blueprint" as shown here:</p>
+<p><img decoding="async" loading="lazy" alt="offset" src="https://www.unrealcode.net/assets/images/vam_012-fe54827b38cb7d690c9132aae810e566.png" width="286" height="513" class="img_ev3q"></p>
+<p>This will take a minute or two.</p>
+<p>Check the Output Log window.  If an error occurs this will be logged, there will
+not be any sort of popup alert.  For example of one of the animations specified
+in the data asset does not have the same skeletal mesh as the specified
+static mesh you will see a warning like this:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">LogAnimToTextureEditor: Warning: Invalid AnimSequence: run_fwd for given SkeletalMesh: SKM_Manny_Simple</span><br></span></code></pre></div></div>
+<p>Once it has finished you should see the data asset, material instances, static mesh and the animation textures have all been updated and need saving.  Save everything.</p>
+<p>At this point you should have a static mesh with working bone animations.</p>
+<p>If you open the SM_ATManny_Simple static mesh you should see it executing the first animation:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_043-ed86f27aba5dedb0956bf9ac1f547fb2.gif" width="1280" height="720" class="img_ev3q"></p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="troubleshooting">Troubleshooting<a href="https://www.unrealcode.net/AnimationTextures/#troubleshooting" class="hash-link" aria-label="Direct link to Troubleshooting" title="Direct link to Troubleshooting" translate="no">​</a></h3>
+<p>If you open the data asset and expand the Info &gt; Animations section at the bottom you will see something
+like this:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_013-e6b06ee537fd6bfce87dddfbfd48acb5.png" width="1343" height="476" class="img_ev3q"></p>
+<p>This shows the animations have been processed and data such as the number of frames, the animation bounding box
+and the individual animation lengths have been added to the data asset.</p>
+<p>If you open the material instance MI_ATManny_01 and look at the Layer Parameters tab you
+will see the parameter values have been updated:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_016-48ce6da03b9ab386c71ff5d201381e91.png" width="1073" height="866" class="img_ev3q"></p>
+<p>If you see something like this:</p>
+<p><img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_047-2fa40f3be757993c7f53953939faa5aa.gif" width="1280" height="1039" class="img_ev3q"></p>
+<p>This happens when the static mesh does not have its "Number of LODs" property set to 1.  Open the static mesh SM_ATMannySimple, change "Number of LODs"
+to 1, click "Apply Changes", save the static mesh and rerun Step 11 above.</p>
+<p>At this point you should have a static mesh with working bone animations.  The next
+parts in this series will detail how to use that mesh in Niagara, blueprints and MASS.</p>
+<p>Currently available parts are:</p>
+<ul>
+<li class=""><a class="" href="https://www.unrealcode.net/AnimationTextureTests/">Using Animation Textures Characters from Blueprint</a></li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="references">References<a href="https://www.unrealcode.net/AnimationTextures/#references" class="hash-link" aria-label="Direct link to References" title="Direct link to References" translate="no">​</a></h4>
+<ul>
+<li class=""><a href="https://www.youtube.com/watch?v=vrlFozqB0jA" target="_blank" rel="noopener noreferrer" class="">Unreal Engine 5 AnimToTexture Plugin, How to Use it to make Vertex Animation Textures for crowds</a>  This is a great video by Kevin Romond based on Unreal 5.2.</li>
+<li class=""><a href="https://docs.google.com/document/d/1P2r3YzPOMZU59o2DaEBim0nmPSTdVg3MmFA3rORg6f0/edit#heading=h.mfv57e40k4rc" target="_blank" rel="noopener noreferrer" class="">UE5 AnimToTexture plug-in</a>  This
+is a translation of an article originally in Japanese</li>
+<li class=""><a href="https://dev.epicgames.com/community/learning/tutorials/daE9/unreal-engine-baking-out-vertex-animation-in-editor-with-animtotexture" target="_blank" rel="noopener noreferrer" class="">Baking Out Vertex Animation Tutorial</a></li>
+<li class=""><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/using-material-layers-in-unreal-engine?application_version=5.4" target="_blank" rel="noopener noreferrer" class="">Material Layers</a></li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="feedback">Feedback<a href="https://www.unrealcode.net/AnimationTextures/#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback" translate="no">​</a></h4>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/33">here</a></p>]]></content>
+        <category label="Animation" term="Animation"/>
+        <category label="Materials" term="Materials"/>
+        <category label="AnimationTextures" term="AnimationTextures"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Animation Textures Part 1 - Materials]]></title>
+        <id>https://www.unrealcode.net/AnimationTextureMaterials/</id>
+        <link href="https://www.unrealcode.net/AnimationTextureMaterials/"/>
+        <updated>2024-12-01T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Creating materials for use with animation textures and the AnimToTexture plugin in Unreal 5.4]]></summary>
+        <content type="html"><![CDATA[<p>Animation Textures is a technique for storing animation data in a texture
+and animating a mesh by using a special material to read and
+replay the animation data.</p>
+<p>This technique is typically used for animating large numbers of background
+characters with minimal overhead.  It's used in the Epic Games
+<a href="https://www.unrealengine.com/marketplace/en-US/product/city-sample" target="_blank" rel="noopener noreferrer" class="">City Sample</a>
+to animate the crowds walking around the city.  If you open the
+City Sample and play the MassCrowd map you will see a scene like this in which
+animation textures are used to animate the crowd members:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_001-b2d15a0e36f3805c20ce5fd92623ba24.png" width="1756" height="750" class="img_ev3q"></p>
+<p>This article describes materials which work with animation textures.  It is part of
+a set of articles about animation textures which describe how animation textures
+are created and how they can be used by MASS, PCG and Niagara.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="its-all-about-materials">It's all about materials<a href="https://www.unrealcode.net/AnimationTextureMaterials/#its-all-about-materials" class="hash-link" aria-label="Direct link to It's all about materials" title="Direct link to It's all about materials" translate="no">​</a></h2>
+<p>Unreal Engine implements vertex animation by using materials, material instances
+and material layers.  It's helpful to understand the relationship between these parts:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_017-02cc524e4e42ff08d4a2906f11224c54.png" width="1403" height="1132" class="img_ev3q"></p>
+<p>This picture shows:</p>
+<ul>
+<li class="">a skeletal mesh has material instances which are specified in its material slots.  When a static
+mesh is created from that skeletal mesh these material instances are copied to the material slots of
+the static mesh;</li>
+<li class="">a static mesh can have one or more material instances;</li>
+<li class="">these materials instances are created from a material.  This parent material
+is where the actual shader program is created, the material instance holds parameters which are used by
+the shader at runtime;</li>
+<li class="">the parent material uses the <em>material layers system</em> which allows materials
+to be composed from layers of functions and other materials in a relatively straightforward manner;</li>
+<li class="">the parent material  references  a specific material layer
+(either ML_BoneAnimation or ML_VertexAnimation) which animates the
+bones or vertices of the mesh at runtime;</li>
+<li class="">the material layer (such as ML_BoneAnimation) is <em>created</em> on the parent material but
+it is <em>used</em> on the material instance, not on the parent material;</li>
+<li class="">the material layer (such as ML_BoneAnimation) references specific textures
+which store the bone or vertex position, rotation and weight data for use
+in animating the elements of the mesh</li>
+</ul>
+<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_BuS1"><p>It's important to realise that when the animation textures are generated
+by the AnimToTexture process the associated material instance(s) are updated with
+values specific to the animations (such as the first and last frame numbers)
+so every static mesh which is animated this way needs its own
+material instance(s).</p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="creating-the-example-project">Creating the example project<a href="https://www.unrealcode.net/AnimationTextureMaterials/#creating-the-example-project" class="hash-link" aria-label="Direct link to Creating the example project" title="Direct link to Creating the example project" translate="no">​</a></h2>
+<p>For this example, from the launcher create a new Game, Third Person, Blueprint, Desktop project with starter content.  Call it "VertexAnimation".  This example was created using Unreal version 5.4.3.</p>
+<p>Go into Edit | Plugins and enabled the AnimToTexture plugin an restart.</p>
+<p>In the content browser settings make sure "Show Plugin Content" and "Show Engine Content"
+are both enabled.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="updating-an-existing-material">Updating an existing material<a href="https://www.unrealcode.net/AnimationTextureMaterials/#updating-an-existing-material" class="hash-link" aria-label="Direct link to Updating an existing material" title="Direct link to Updating an existing material" translate="no">​</a></h2>
+<p>To demonstrate how materials support animation textures we will update the materials
+and material instances associated with  the skeletal mesh
+SKM_Manny_Simple which is found in the folder /Content/Characters/Mannequins/Meshes.</p>
+<p>This skeletal mesh uses these materials and material instances:</p>
+<table><thead><tr><th style="text-align:left">Material Instance</th><th style="text-align:left">Parent Material</th><th style="text-align:left">Parent Material Instance</th></tr></thead><tbody><tr><td style="text-align:left">MI_Manny_01</td><td style="text-align:left">M_Mannequin</td><td style="text-align:left"></td></tr><tr><td style="text-align:left">MI_Manny_02</td><td style="text-align:left"></td><td style="text-align:left">MI_Manny_01</td></tr></tbody></table>
+<p>Both these material instances derived from the same material M_Mannequin.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="making-the-static-mesh-and-copying-the-material-assets">Making the static mesh and copying the material assets<a href="https://www.unrealcode.net/AnimationTextureMaterials/#making-the-static-mesh-and-copying-the-material-assets" class="hash-link" aria-label="Direct link to Making the static mesh and copying the material assets" title="Direct link to Making the static mesh and copying the material assets" translate="no">​</a></h2>
+<p>Make a new folder under the /Content folder called "ATMaterials".  We will
+put all our content there.</p>
+<p>Open the SKM_Manny_Simple skeletal mesh and use the
+"Make Static Mesh" button in the top toolbar to create a new static
+mesh in the /Content/ATMaterials folder.  Name the static mesh "SM_ATManny_Simple".</p>
+<p>Find the material instances MI_Manny_01 and MI_Manny_02 in the
+folder /Content/Characters/Mannequins/Materials/Instances/Manny
+and copy them to the /Content/ATMaterials folder.  Rename them
+MI_ATManny_01 and MI_ATManny_02, just to make it easier to check
+we are altering our own files.</p>
+<p>Find the material  M_Mannequin  in the
+folder /Content/Characters/Mannequins/Materials
+and copy it to the /Content/ATMaterials folder.  Rename it
+M_ATMannequin.</p>
+<p>Now, in the ATMaterials folder:</p>
+<ul>
+<li class="">open MI_ATManny_01 and change the parent to M_ATMannequin</li>
+<li class="">open MI_ATManny_02 and change the parent to MI_ATManny_01</li>
+<li class="">open SM_ATMannySimple and change the materials to MI_ATManny_01 and MI_ATManny_02</li>
+</ul>
+<p>This should result in the static mesh only referencing materials and
+material instances in our /Content/ATMaterials folder.  If you look
+at SM_ATMannySimple in the reference viewer you will that we
+still reference textures from the original folders, that's ok we won't
+be changing them:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_018-c850585f744c7a87d543e69204dfef9f.png" width="827" height="1046" class="img_ev3q"></p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="adding-the-material-layer">Adding the material layer<a href="https://www.unrealcode.net/AnimationTextureMaterials/#adding-the-material-layer" class="hash-link" aria-label="Direct link to Adding the material layer" title="Direct link to Adding the material layer" translate="no">​</a></h2>
+<p>We need to change the material M_ATMannequin to support material layers so it can be used
+with animation textures.</p>
+<p>Open the material M_ATMannequin.</p>
+<p>The part we want to change is on the right side:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_019-e135dcdcbb72f9911aa43e25b5ef975b.png" width="1377" height="818" class="img_ev3q"></p>
+<p>We want to change the material to use material attributes.  First we need to add a MakeMaterialAttributes node and connect all the nodes
+which are inputs into the M_ATMannequin into the MakeMaterialAttributes that way
+we don't have to remember where they where connected.</p>
+<p>Add a MakeMaterialAttributes node and connect it like this:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_021-c536c60f3a79be29d7266439d1f9a207.png" width="1141" height="807" class="img_ev3q"></p>
+<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>Note you can Ctrl-Left-Click and hold down the mouse to move a connection from the M_ATMannequin node to the same-named
+connection on the MakeMaterialAttributes node.</p></div></div>
+<p>There is a property called "Use Material Attributes" on the material itself:</p>
+<p><img decoding="async" loading="lazy" alt="width30" src="https://www.unrealcode.net/assets/images/vam_020-27cb7ea329c51caead1cb19422ee5ece.png" width="454" height="628" class="img_ev3q"></p>
+<p>Check the "Use Material Attributes" property.  This will delete the
+big M_ATMannequin and replace it with a small one. This should leave
+you with this:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_022-935c915e69a47b87ebac87c73dfae4c4.png" width="1294" height="732" class="img_ev3q"></p>
+<p>The above nodes create the visual appearance, now we have to add the nodes which
+do the actual bone or vertex animation. Here we will do bone animation, the
+vertex animation process is similar.</p>
+<p>We want to end up with these nodes and connections:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_023-85899fa31be2ee0dbe6963b1263860fe.png" width="1592" height="681" class="img_ev3q"></p>
+<p>To do this add these nodes:</p>
+<table><thead><tr><th style="text-align:left">Node</th><th style="text-align:left">Notes</th></tr></thead><tbody><tr><td style="text-align:left">GetMaterialAttributes<br>(the top one)</td><td style="text-align:left">In order to get the pins shown on the picture above edit the node details and add these elements to the "Attribute Get Types" property <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_025-e78ef89057d3b59198df2f98457cc876.png" width="620" height="212" class="img_ev3q"></td></tr><tr><td style="text-align:left">MaterialAttributeLayers</td><td style="text-align:left">Edit the node details and set these properties:<img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_026-10c56ccdc9ba0b41bc4aa35172e6a84a.png" width="605" height="276" class="img_ev3q">If the ML_BoneAnimation is missing click the settings button and enable Show Plugin Content: <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_048-4947787a6a848f67e7a25c1a33d9bc1b.png" width="928" height="743" class="img_ev3q"></td></tr><tr><td style="text-align:left">GetMaterialAttributes<br>(the bottom one)</td><td style="text-align:left">In order to get the pins shown on the picture above edit the node details and add these elements to the "Attribute Get Types" property <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_024-4c6942e0ef8be6e2f6a08a744544ced9.png" width="462" height="243" class="img_ev3q"></td></tr><tr><td style="text-align:left">BlendAngleCorrectedNormals</td><td style="text-align:left"></td></tr><tr><td style="text-align:left">SetMaterialAttributes</td><td style="text-align:left">In order to get the pins shown on the picture above edit the node details and add these elements to the "Attribute Set Types" property <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_042-75fad2e86a28b42ef02547e552b9cfe4.png" width="444" height="227" class="img_ev3q"></td></tr></tbody></table>
+<p>Then make connections shown in the diagram above.</p>
+<p>Save the M_ATMannequin material node.</p>
+<p>We can't set the  properties of the ML_BoneAnimation
+here in the material, but if you open a material instance
+derived from this material (such as MI_ATManny_01),
+in the Layer Parameters tab you will see parameters from the
+ML_BoneAnimation. These parameters will be assigned values when the
+AnimToTexture process is run:</p>
+<p><img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_028-665cfb4436407e2191ec2013adf93fb0.png" width="1277" height="1235" class="img_ev3q"></p>
+<p>If you don't see the Layer Parameters tab you can open it using the Window | Layer Parameters
+menu option.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="other-approaches-to-materials---layer-blend-nodes">Other approaches to materials - layer blend nodes<a href="https://www.unrealcode.net/AnimationTextureMaterials/#other-approaches-to-materials---layer-blend-nodes" class="hash-link" aria-label="Direct link to Other approaches to materials - layer blend nodes" title="Direct link to Other approaches to materials - layer blend nodes" translate="no">​</a></h2>
+<p>We modified the material above by adding a MakeMaterialAttributes node, but
+is only one way of modifying a material.  We took this approach because it suited the material we were modifying, enabling us to simply replace the M_ATMannequin node with a MakeMaterialAttributes and use
+all of the same connections.</p>
+<p>The AnimToTexture plugin in Unreal Engine 5.4 has materials constructed
+using layer blend nodes like this:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_030-f7eef8d8b279f222731caad4d64cc691.png" width="1662" height="1058" class="img_ev3q"></p>
+<p>To extended this material to support animation textures we would add the same set of
+modes we added to the M_ATMannequin material but without having to use a MakeMaterialAttributes node:</p>
+<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_029-6bffee38b674f2e5fcb1d72ab66f6cdc.png" width="1361" height="614" class="img_ev3q"></p>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="reference">Reference<a href="https://www.unrealcode.net/AnimationTextureMaterials/#reference" class="hash-link" aria-label="Direct link to Reference" title="Direct link to Reference" translate="no">​</a></h4>
+<ul>
+<li class=""><a href="https://www.youtube.com/watch?v=vrlFozqB0jA" target="_blank" rel="noopener noreferrer" class="">Unreal Engine 5 AnimToTexture Plugin, How to Use it to make Vertex Animation Textures for crowds</a>  This is a great video by Kevin Romond based on Unreal 5.2.</li>
+<li class=""><a href="https://docs.google.com/document/d/1P2r3YzPOMZU59o2DaEBim0nmPSTdVg3MmFA3rORg6f0/edit#heading=h.mfv57e40k4rc" target="_blank" rel="noopener noreferrer" class="">UE5 AnimToTexture plug-in</a>  This
+is a translation of an article originally in Japanese</li>
+<li class=""><a href="https://dev.epicgames.com/community/learning/tutorials/daE9/unreal-engine-baking-out-vertex-animation-in-editor-with-animtotexture" target="_blank" rel="noopener noreferrer" class="">Baking Out Vertex Animation Tutorial</a></li>
+<li class=""><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/using-material-layers-in-unreal-engine?application_version=5.4" target="_blank" rel="noopener noreferrer" class="">Material Layers</a></li>
+<li class=""><a href="https://www.youtube.com/watch?v=edZo8PC5SYc&amp;t=310s" target="_blank" rel="noopener noreferrer" class="">Mastering Material Instances</a></li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="feedback">Feedback<a href="https://www.unrealcode.net/AnimationTextureMaterials/#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback" translate="no">​</a></h4>
+<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/32">here</a></p>]]></content>
         <category label="Animation" term="Animation"/>
         <category label="Materials" term="Materials"/>
         <category label="AnimationTextures" term="AnimationTextures"/>

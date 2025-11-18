@@ -76,6 +76,90 @@ have the same problems.</p>]]></content:encoded>
             <category>C++</category>
         </item>
         <item>
+            <title><![CDATA[Creating a Pull Request]]></title>
+            <link>https://www.unrealcode.net/PullRequest/</link>
+            <guid>https://www.unrealcode.net/PullRequest/</guid>
+            <pubDate>Wed, 12 Nov 2025 00:00:00 GMT</pubDate>
+            <description><![CDATA[How to create a pull request and get it merged by Epic]]></description>
+            <content:encoded><![CDATA[<p>How to create a pull request and get it merged by Epic</p>
+<p>Assuming you have a code change which you
+want to make to the Unreal Engine source code, this is  the process for creating a pull request on the Epic Games Unreal
+git repository and getting it merged.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="forking">Forking<a href="https://www.unrealcode.net/PullRequest/#forking" class="hash-link" aria-label="Direct link to Forking" title="Direct link to Forking" translate="no">​</a></h2>
+<p>You need a fork of the Unreal repository
+so follow the instructions <a href="https://github.com/EpicGames/UnrealEngine" target="_blank" rel="noopener noreferrer" class="">here</a>  to fork the Unreal repository
+and then  clone the fork to your local machine.</p>
+<p>You need to clone your fork, not the Epic Game
+repo.</p>
+<p>I have forked <a href="https://github.com/EpicGames/UnrealEngine" target="_blank" rel="noopener noreferrer" class="">https://github.com/EpicGames/UnrealEngine</a>
+to <a href="https://github.com/JohnJFarrow/UnrealEngine" target="_blank" rel="noopener noreferrer" class="">https://github.com/JohnJFarrow/UnrealEngine</a>
+and then cloned <a href="https://github.com/JohnJFarrow/UnrealEngine" target="_blank" rel="noopener noreferrer" class="">https://github.com/JohnJFarrow/UnrealEngine</a>
+into the directory d:\EpicSource\myfork\UnrealEngine.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="updating-the-fork">Updating the Fork<a href="https://www.unrealcode.net/PullRequest/#updating-the-fork" class="hash-link" aria-label="Direct link to Updating the Fork" title="Direct link to Updating the Fork" translate="no">​</a></h2>
+<p>The most current branch of the git repository
+is ue5-main.  Assuming you want to create a pull
+request against the latest code, you need to
+keep your repository up to date with changes
+made in the Epic Games repository.</p>
+<p>These commands will fetch changes in the Epic Games
+repository then merge them into your repository:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">git fetch upstream</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">git checkout ue5-main</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">git merge upstream/ue5-main</span><br></span></code></pre></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="making-a-branch">Making a branch<a href="https://www.unrealcode.net/PullRequest/#making-a-branch" class="hash-link" aria-label="Direct link to Making a branch" title="Direct link to Making a branch" translate="no">​</a></h2>
+<p>A pull request needs its own branch to make it easy
+to identify and isolate changes.</p>
+<p>Make a  branch with name relating to the problem
+you are fixing or the enchancement you are making.</p>
+<p>In one case I fixed a null pointer in PCG, so the
+branch is called "NullPtrPCG".  It contains
+one commit and looks like this:</p>
+<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/pull_001-14764a621d72698ce0bd06cf4ae5e087.png" width="1682" height="840" class="img_ev3q"></p>
+<p>This is a commit on my repository, not the Epic Games
+once.  Creating a pull request is the mechanism to (or attempt to) merge
+this commit into the Epic Games repository.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="pushing-changes">Pushing changes<a href="https://www.unrealcode.net/PullRequest/#pushing-changes" class="hash-link" aria-label="Direct link to Pushing changes" title="Direct link to Pushing changes" translate="no">​</a></h2>
+<p>Once you have committed your changes to your branch
+pull the latest version of ue5-main and make sure
+everything still builds</p>
+<p>Push your changes to your repository.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="making-a-pull-request">Making a pull request<a href="https://www.unrealcode.net/PullRequest/#making-a-pull-request" class="hash-link" aria-label="Direct link to Making a pull request" title="Direct link to Making a pull request" translate="no">​</a></h2>
+<p>Look at your repository in github.com and
+select your branch.</p>
+<p>If you have just pushed your branch, you should see
+a "Compare &amp; pull request" button like this:</p>
+<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/pull_002-a6a9cb9a5050c90da15a73c24957d07f.png" width="1210" height="380" class="img_ev3q"></p>
+<p>Click the button to move to this screen where
+you complete some details:</p>
+<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/pull_003-3cd18fb559fdb2c306d7535dd6467791.png" width="1400" height="974" class="img_ev3q"></p>
+<p>In the "Add a description" box
+replace these things with actual descriptions:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">&lt;\!--- Provide a general summary of your change in the Pull Request title above --&gt;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">&lt;\!--- Please fill out this form, failure to do so may result in the Pull Request being automatically closed --&gt;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">&lt;\!--- Describe your change in detail here. --&gt;</span><br></span></code></pre></div></div>
+<p>In this part add a X inside the [] on the two lines:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">## Checklist:</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">&lt;!--- Go over all the following points, and put an `X` in all the boxes that apply like this: [X] --&gt;</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">- [ ] My code adheres to the **[Epic coding standards](https://docs.unrealengine.com/latest/INT/Programming/Development/CodingStandard/)**</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">- [ ] This change does not include source code created by Generative AI</span><br></span></code></pre></div></div>
+<p>If you don't put the X where requested a bot will automatically
+reject the pull request.</p>
+<p>Complete the details and click the "Create Pull Request"
+button to create the pull request.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="getting-epic-to-notice">Getting Epic to Notice<a href="https://www.unrealcode.net/PullRequest/#getting-epic-to-notice" class="hash-link" aria-label="Direct link to Getting Epic to Notice" title="Direct link to Getting Epic to Notice" translate="no">​</a></h2>
+<p>Someone at Epic Games needs to accept the pull request, or at least
+notice it and give you some feedback.  Without
+someone doing this is just sits there.</p>
+<p>Sometimes this is the hard part.  You need to know who to tell to get
+some attention.</p>
+<p><a href="https://github.com/EpicGames/UnrealEngine/pull/13489" target="_blank" rel="noopener noreferrer" class="">PR 13489</a> is a PR where
+I talked to an Epic PCG developer on Discord after I had created the PR, and he accepted and committed
+the PR.</p>
+<p>A counter-example is <a href="https://github.com/EpicGames/UnrealEngine/pull/11689" target="_blank" rel="noopener noreferrer" class="">PR 11689</a>
+which has existed since March 2024 without being noticed.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="world-fame">World Fame<a href="https://www.unrealcode.net/PullRequest/#world-fame" class="hash-link" aria-label="Direct link to World Fame" title="Direct link to World Fame" translate="no">​</a></h2>
+<p>Once you have had a PR accepted eventually you will be mentioned in the
+next version release notes:</p>
+<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/pull_004-e8cbebde1fe33c34dec8e616f92e1669.png" width="955" height="518" class="img_ev3q"></p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="references">References<a href="https://www.unrealcode.net/PullRequest/#references" class="hash-link" aria-label="Direct link to References" title="Direct link to References" translate="no">​</a></h2>
+<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="epic">Epic<a href="https://www.unrealcode.net/PullRequest/#epic" class="hash-link" aria-label="Direct link to Epic" title="Direct link to Epic" translate="no">​</a></h4>
+<p><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/contributing-to-the-unreal-engine" target="_blank" rel="noopener noreferrer" class="">Contributing to Unreal Engine</a></p>]]></content:encoded>
+            <category>Tools</category>
+        </item>
+        <item>
             <title><![CDATA[What Causes a Complete Engine Rebuild When Building From Source]]></title>
             <link>https://www.unrealcode.net/CompleteRebuild/</link>
             <guid>https://www.unrealcode.net/CompleteRebuild/</guid>
@@ -2679,155 +2763,6 @@ is a translation of an article originally in Japanese</li>
 </ul>
 <h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="feedback">Feedback<a href="https://www.unrealcode.net/AnimationTextures/#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback" translate="no">​</a></h4>
 <p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/33">here</a></p>]]></content:encoded>
-            <category>Animation</category>
-            <category>Materials</category>
-            <category>AnimationTextures</category>
-        </item>
-        <item>
-            <title><![CDATA[Animation Textures Part 1 - Materials]]></title>
-            <link>https://www.unrealcode.net/AnimationTextureMaterials/</link>
-            <guid>https://www.unrealcode.net/AnimationTextureMaterials/</guid>
-            <pubDate>Sun, 01 Dec 2024 00:00:00 GMT</pubDate>
-            <description><![CDATA[Creating materials for use with animation textures and the AnimToTexture plugin in Unreal 5.4]]></description>
-            <content:encoded><![CDATA[<p>Animation Textures is a technique for storing animation data in a texture
-and animating a mesh by using a special material to read and
-replay the animation data.</p>
-<p>This technique is typically used for animating large numbers of background
-characters with minimal overhead.  It's used in the Epic Games
-<a href="https://www.unrealengine.com/marketplace/en-US/product/city-sample" target="_blank" rel="noopener noreferrer" class="">City Sample</a>
-to animate the crowds walking around the city.  If you open the
-City Sample and play the MassCrowd map you will see a scene like this in which
-animation textures are used to animate the crowd members:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_001-b2d15a0e36f3805c20ce5fd92623ba24.png" width="1756" height="750" class="img_ev3q"></p>
-<p>This article describes materials which work with animation textures.  It is part of
-a set of articles about animation textures which describe how animation textures
-are created and how they can be used by MASS, PCG and Niagara.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="its-all-about-materials">It's all about materials<a href="https://www.unrealcode.net/AnimationTextureMaterials/#its-all-about-materials" class="hash-link" aria-label="Direct link to It's all about materials" title="Direct link to It's all about materials" translate="no">​</a></h2>
-<p>Unreal Engine implements vertex animation by using materials, material instances
-and material layers.  It's helpful to understand the relationship between these parts:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_017-02cc524e4e42ff08d4a2906f11224c54.png" width="1403" height="1132" class="img_ev3q"></p>
-<p>This picture shows:</p>
-<ul>
-<li class="">a skeletal mesh has material instances which are specified in its material slots.  When a static
-mesh is created from that skeletal mesh these material instances are copied to the material slots of
-the static mesh;</li>
-<li class="">a static mesh can have one or more material instances;</li>
-<li class="">these materials instances are created from a material.  This parent material
-is where the actual shader program is created, the material instance holds parameters which are used by
-the shader at runtime;</li>
-<li class="">the parent material uses the <em>material layers system</em> which allows materials
-to be composed from layers of functions and other materials in a relatively straightforward manner;</li>
-<li class="">the parent material  references  a specific material layer
-(either ML_BoneAnimation or ML_VertexAnimation) which animates the
-bones or vertices of the mesh at runtime;</li>
-<li class="">the material layer (such as ML_BoneAnimation) is <em>created</em> on the parent material but
-it is <em>used</em> on the material instance, not on the parent material;</li>
-<li class="">the material layer (such as ML_BoneAnimation) references specific textures
-which store the bone or vertex position, rotation and weight data for use
-in animating the elements of the mesh</li>
-</ul>
-<div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_BuS1"><p>It's important to realise that when the animation textures are generated
-by the AnimToTexture process the associated material instance(s) are updated with
-values specific to the animations (such as the first and last frame numbers)
-so every static mesh which is animated this way needs its own
-material instance(s).</p></div></div>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="creating-the-example-project">Creating the example project<a href="https://www.unrealcode.net/AnimationTextureMaterials/#creating-the-example-project" class="hash-link" aria-label="Direct link to Creating the example project" title="Direct link to Creating the example project" translate="no">​</a></h2>
-<p>For this example, from the launcher create a new Game, Third Person, Blueprint, Desktop project with starter content.  Call it "VertexAnimation".  This example was created using Unreal version 5.4.3.</p>
-<p>Go into Edit | Plugins and enabled the AnimToTexture plugin an restart.</p>
-<p>In the content browser settings make sure "Show Plugin Content" and "Show Engine Content"
-are both enabled.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="updating-an-existing-material">Updating an existing material<a href="https://www.unrealcode.net/AnimationTextureMaterials/#updating-an-existing-material" class="hash-link" aria-label="Direct link to Updating an existing material" title="Direct link to Updating an existing material" translate="no">​</a></h2>
-<p>To demonstrate how materials support animation textures we will update the materials
-and material instances associated with  the skeletal mesh
-SKM_Manny_Simple which is found in the folder /Content/Characters/Mannequins/Meshes.</p>
-<p>This skeletal mesh uses these materials and material instances:</p>
-<table><thead><tr><th style="text-align:left">Material Instance</th><th style="text-align:left">Parent Material</th><th style="text-align:left">Parent Material Instance</th></tr></thead><tbody><tr><td style="text-align:left">MI_Manny_01</td><td style="text-align:left">M_Mannequin</td><td style="text-align:left"></td></tr><tr><td style="text-align:left">MI_Manny_02</td><td style="text-align:left"></td><td style="text-align:left">MI_Manny_01</td></tr></tbody></table>
-<p>Both these material instances derived from the same material M_Mannequin.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="making-the-static-mesh-and-copying-the-material-assets">Making the static mesh and copying the material assets<a href="https://www.unrealcode.net/AnimationTextureMaterials/#making-the-static-mesh-and-copying-the-material-assets" class="hash-link" aria-label="Direct link to Making the static mesh and copying the material assets" title="Direct link to Making the static mesh and copying the material assets" translate="no">​</a></h2>
-<p>Make a new folder under the /Content folder called "ATMaterials".  We will
-put all our content there.</p>
-<p>Open the SKM_Manny_Simple skeletal mesh and use the
-"Make Static Mesh" button in the top toolbar to create a new static
-mesh in the /Content/ATMaterials folder.  Name the static mesh "SM_ATManny_Simple".</p>
-<p>Find the material instances MI_Manny_01 and MI_Manny_02 in the
-folder /Content/Characters/Mannequins/Materials/Instances/Manny
-and copy them to the /Content/ATMaterials folder.  Rename them
-MI_ATManny_01 and MI_ATManny_02, just to make it easier to check
-we are altering our own files.</p>
-<p>Find the material  M_Mannequin  in the
-folder /Content/Characters/Mannequins/Materials
-and copy it to the /Content/ATMaterials folder.  Rename it
-M_ATMannequin.</p>
-<p>Now, in the ATMaterials folder:</p>
-<ul>
-<li class="">open MI_ATManny_01 and change the parent to M_ATMannequin</li>
-<li class="">open MI_ATManny_02 and change the parent to MI_ATManny_01</li>
-<li class="">open SM_ATMannySimple and change the materials to MI_ATManny_01 and MI_ATManny_02</li>
-</ul>
-<p>This should result in the static mesh only referencing materials and
-material instances in our /Content/ATMaterials folder.  If you look
-at SM_ATMannySimple in the reference viewer you will that we
-still reference textures from the original folders, that's ok we won't
-be changing them:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_018-c850585f744c7a87d543e69204dfef9f.png" width="827" height="1046" class="img_ev3q"></p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="adding-the-material-layer">Adding the material layer<a href="https://www.unrealcode.net/AnimationTextureMaterials/#adding-the-material-layer" class="hash-link" aria-label="Direct link to Adding the material layer" title="Direct link to Adding the material layer" translate="no">​</a></h2>
-<p>We need to change the material M_ATMannequin to support material layers so it can be used
-with animation textures.</p>
-<p>Open the material M_ATMannequin.</p>
-<p>The part we want to change is on the right side:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_019-e135dcdcbb72f9911aa43e25b5ef975b.png" width="1377" height="818" class="img_ev3q"></p>
-<p>We want to change the material to use material attributes.  First we need to add a MakeMaterialAttributes node and connect all the nodes
-which are inputs into the M_ATMannequin into the MakeMaterialAttributes that way
-we don't have to remember where they where connected.</p>
-<p>Add a MakeMaterialAttributes node and connect it like this:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_021-c536c60f3a79be29d7266439d1f9a207.png" width="1141" height="807" class="img_ev3q"></p>
-<div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>Note you can Ctrl-Left-Click and hold down the mouse to move a connection from the M_ATMannequin node to the same-named
-connection on the MakeMaterialAttributes node.</p></div></div>
-<p>There is a property called "Use Material Attributes" on the material itself:</p>
-<p><img decoding="async" loading="lazy" alt="width30" src="https://www.unrealcode.net/assets/images/vam_020-27cb7ea329c51caead1cb19422ee5ece.png" width="454" height="628" class="img_ev3q"></p>
-<p>Check the "Use Material Attributes" property.  This will delete the
-big M_ATMannequin and replace it with a small one. This should leave
-you with this:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_022-935c915e69a47b87ebac87c73dfae4c4.png" width="1294" height="732" class="img_ev3q"></p>
-<p>The above nodes create the visual appearance, now we have to add the nodes which
-do the actual bone or vertex animation. Here we will do bone animation, the
-vertex animation process is similar.</p>
-<p>We want to end up with these nodes and connections:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_023-85899fa31be2ee0dbe6963b1263860fe.png" width="1592" height="681" class="img_ev3q"></p>
-<p>To do this add these nodes:</p>
-<table><thead><tr><th style="text-align:left">Node</th><th style="text-align:left">Notes</th></tr></thead><tbody><tr><td style="text-align:left">GetMaterialAttributes<br>(the top one)</td><td style="text-align:left">In order to get the pins shown on the picture above edit the node details and add these elements to the "Attribute Get Types" property <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_025-e78ef89057d3b59198df2f98457cc876.png" width="620" height="212" class="img_ev3q"></td></tr><tr><td style="text-align:left">MaterialAttributeLayers</td><td style="text-align:left">Edit the node details and set these properties:<img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_026-10c56ccdc9ba0b41bc4aa35172e6a84a.png" width="605" height="276" class="img_ev3q">If the ML_BoneAnimation is missing click the settings button and enable Show Plugin Content: <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_048-4947787a6a848f67e7a25c1a33d9bc1b.png" width="928" height="743" class="img_ev3q"></td></tr><tr><td style="text-align:left">GetMaterialAttributes<br>(the bottom one)</td><td style="text-align:left">In order to get the pins shown on the picture above edit the node details and add these elements to the "Attribute Get Types" property <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_024-4c6942e0ef8be6e2f6a08a744544ced9.png" width="462" height="243" class="img_ev3q"></td></tr><tr><td style="text-align:left">BlendAngleCorrectedNormals</td><td style="text-align:left"></td></tr><tr><td style="text-align:left">SetMaterialAttributes</td><td style="text-align:left">In order to get the pins shown on the picture above edit the node details and add these elements to the "Attribute Set Types" property <img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_042-75fad2e86a28b42ef02547e552b9cfe4.png" width="444" height="227" class="img_ev3q"></td></tr></tbody></table>
-<p>Then make connections shown in the diagram above.</p>
-<p>Save the M_ATMannequin material node.</p>
-<p>We can't set the  properties of the ML_BoneAnimation
-here in the material, but if you open a material instance
-derived from this material (such as MI_ATManny_01),
-in the Layer Parameters tab you will see parameters from the
-ML_BoneAnimation. These parameters will be assigned values when the
-AnimToTexture process is run:</p>
-<p><img decoding="async" loading="lazy" alt="width50" src="https://www.unrealcode.net/assets/images/vam_028-665cfb4436407e2191ec2013adf93fb0.png" width="1277" height="1235" class="img_ev3q"></p>
-<p>If you don't see the Layer Parameters tab you can open it using the Window | Layer Parameters
-menu option.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="other-approaches-to-materials---layer-blend-nodes">Other approaches to materials - layer blend nodes<a href="https://www.unrealcode.net/AnimationTextureMaterials/#other-approaches-to-materials---layer-blend-nodes" class="hash-link" aria-label="Direct link to Other approaches to materials - layer blend nodes" title="Direct link to Other approaches to materials - layer blend nodes" translate="no">​</a></h2>
-<p>We modified the material above by adding a MakeMaterialAttributes node, but
-is only one way of modifying a material.  We took this approach because it suited the material we were modifying, enabling us to simply replace the M_ATMannequin node with a MakeMaterialAttributes and use
-all of the same connections.</p>
-<p>The AnimToTexture plugin in Unreal Engine 5.4 has materials constructed
-using layer blend nodes like this:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_030-f7eef8d8b279f222731caad4d64cc691.png" width="1662" height="1058" class="img_ev3q"></p>
-<p>To extended this material to support animation textures we would add the same set of
-modes we added to the M_ATMannequin material but without having to use a MakeMaterialAttributes node:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/vam_029-6bffee38b674f2e5fcb1d72ab66f6cdc.png" width="1361" height="614" class="img_ev3q"></p>
-<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="reference">Reference<a href="https://www.unrealcode.net/AnimationTextureMaterials/#reference" class="hash-link" aria-label="Direct link to Reference" title="Direct link to Reference" translate="no">​</a></h4>
-<ul>
-<li class=""><a href="https://www.youtube.com/watch?v=vrlFozqB0jA" target="_blank" rel="noopener noreferrer" class="">Unreal Engine 5 AnimToTexture Plugin, How to Use it to make Vertex Animation Textures for crowds</a>  This is a great video by Kevin Romond based on Unreal 5.2.</li>
-<li class=""><a href="https://docs.google.com/document/d/1P2r3YzPOMZU59o2DaEBim0nmPSTdVg3MmFA3rORg6f0/edit#heading=h.mfv57e40k4rc" target="_blank" rel="noopener noreferrer" class="">UE5 AnimToTexture plug-in</a>  This
-is a translation of an article originally in Japanese</li>
-<li class=""><a href="https://dev.epicgames.com/community/learning/tutorials/daE9/unreal-engine-baking-out-vertex-animation-in-editor-with-animtotexture" target="_blank" rel="noopener noreferrer" class="">Baking Out Vertex Animation Tutorial</a></li>
-<li class=""><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/using-material-layers-in-unreal-engine?application_version=5.4" target="_blank" rel="noopener noreferrer" class="">Material Layers</a></li>
-<li class=""><a href="https://www.youtube.com/watch?v=edZo8PC5SYc&amp;t=310s" target="_blank" rel="noopener noreferrer" class="">Mastering Material Instances</a></li>
-</ul>
-<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="feedback">Feedback<a href="https://www.unrealcode.net/AnimationTextureMaterials/#feedback" class="hash-link" aria-label="Direct link to Feedback" title="Direct link to Feedback" translate="no">​</a></h4>
-<p>Please leave any feedback about this article <a href="https://github.com/JohnJFarrow/UnrealcodeIssues/issues/32">here</a></p>]]></content:encoded>
             <category>Animation</category>
             <category>Materials</category>
             <category>AnimationTextures</category>

@@ -252,11 +252,11 @@ you should be able to see the members of the struct:</p>
         <category label="C++" term="C++"/>
     </entry>
     <entry>
-        <title type="html"><![CDATA[HUD Basics]]></title>
+        <title type="html"><![CDATA[HUD Basics and the Gameplay Message Router]]></title>
         <id>https://www.unrealcode.net/HUD/</id>
         <link href="https://www.unrealcode.net/HUD/"/>
         <updated>2025-08-26T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[What goes where using a HUD]]></summary>
+        <summary type="html"><![CDATA[What goes where using a HUD and the Gameplay Message Router]]></summary>
         <content type="html"><![CDATA[<p>A HUD consists to two main parts, the user widget which draws on the screen
 and the HUD class which loads and displays that widget.</p>
 <p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/hud_008-2bc54fd5f757471b73a846ba717ee89b.png" width="1275" height="640" class="img_ev3q"></p>
@@ -264,6 +264,7 @@ and the HUD class which loads and displays that widget.</p>
 <p>We create a user widget using right-click | User Interface | Widget Blueprint
 and deriving from User Widget:</p>
 <p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/hud_001-374b79f42c30a1f029dee82bc8ede569.png" width="620" height="474" class="img_ev3q"></p>
+<p>The recommended naming convention for a widget blueprint is WBP_XXX</p>
 <p>In this example we want to display the players speed on the HUD.</p>
 <p>Open the HUD widget and add:</p>
 <ul>
@@ -272,6 +273,7 @@ and deriving from User Widget:</p>
 <li class="">a Text element called "SpeedValue" with the text "9999"</li>
 </ul>
 <p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/hud_004-fcfd452ecd168537b028c418bc660c68.png" width="2106" height="821" class="img_ev3q"></p>
+<p>Compile and save this blueprint.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="hud-class">HUD Class<a href="https://www.unrealcode.net/HUD/#hud-class" class="hash-link" aria-label="Direct link to HUD Class" title="Direct link to HUD Class" translate="no">​</a></h2>
 <p>We create a new HUD which is a C++ class or blueprint deriving from AHUD.  It is set
 as the HUD Class property on the game mode:</p>
@@ -299,9 +301,9 @@ are independent of each other.</p>
 copy the code directly from the Epic source code.</p>
 <p>Assuming you have the engine source downloaded
 you copy just the plugin:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">robocopy Samples\Games\Lyra\Plugins\GameplayMessageRouter [YourGame]\Plugins\GameplayMessageRouter /MIR</span><br></span></code></pre></div></div>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">robocopy d:\EpicSamples\LyraStarterGame57\Plugins\GameplayMessageRouter [YourGame]\Plugins\GameplayMessageRouter /MIR</span><br></span></code></pre></div></div>
 <p>If you don't have the source you can find it on github <a href="https://github.com/EpicGames/UnrealEngine/tree/release/Samples/Games/Lyra/Plugins/GameplayMessageRouter" target="_blank" rel="noopener noreferrer" class="">here</a></p>
-<p>To activate the plugin, you need to add it to your project.build.cs file:</p>
+<p>To activate the plugin, you need to add it to your project's .build.cs file:</p>
 <div class="language-cs codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cs codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">PublicDependencyModuleNames</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token function" style="color:rgb(80, 250, 123)">AddRange</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">new</span><span class="token plain"> </span><span class="token constructor-invocation class-name keyword" style="color:rgb(189, 147, 249);font-style:italic">string</span><span class="token constructor-invocation class-name punctuation" style="color:rgb(248, 248, 242)">[</span><span class="token constructor-invocation class-name punctuation" style="color:rgb(248, 248, 242)">]</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">	</span><span class="token string" style="color:rgb(255, 121, 198)">"Core"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">	</span><span class="token string" style="color:rgb(255, 121, 198)">"CoreUObject"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">	</span><span class="token range operator">..</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">	</span><span class="token string" style="color:rgb(255, 121, 198)">"GameplayMessageRuntime"</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><br></span></code></pre></div></div>
 <p>After this you need to regenerate the .sln file.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="broadcasting-values">Broadcasting Values<a href="https://www.unrealcode.net/HUD/#broadcasting-values" class="hash-link" aria-label="Direct link to Broadcasting Values" title="Direct link to Broadcasting Values" translate="no">​</a></h2>

@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="195.0406mm"
+   height="50.916725mm"
+   viewBox="0 0 195.0406 50.916725"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="lyra_002_100.svg"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#444654"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="false"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="4.1513749"
+     inkscape:cx="92.379034"
+     inkscape:cy="126.34369"
+     inkscape:window-width="2372"
+     inkscape:window-height="1361"
+     inkscape:window-x="3150"
+     inkscape:window-y="41"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     showborder="true"
+     labelstyle="default"
+     shape-rendering="auto">
+    <inkscape:grid
+       id="grid1"
+       units="mm"
+       originx="-20.880934"
+       originy="-47.330281"
+       spacingx="0.99999998"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <rect
+       x="90.572403"
+       y="156.09286"
+       width="105.98898"
+       height="29.869623"
+       id="rect2" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-5.5247472,-12.522803)">
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,26.513305,-2.2944206)"
+       id="text2"
+       style="white-space:pre;shape-inside:url(#rect2);display:inline;fill:#00dc00;fill-opacity:1;stroke-width:1.37953;stroke-dasharray:none" />
+    <g
+       id="g3"
+       transform="matrix(1.0870687,0,0,0.85657142,-9.2907434,-0.50068757)">
+      <rect
+         style="fill:#00dc00;fill-opacity:1;stroke-width:0.314977;stroke-dasharray:none"
+         id="rect1"
+         width="52.006866"
+         height="17.845493"
+         x="13.511587"
+         y="30.84721" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67609px;line-height:normal;font-family:'Trebuchet MS';-inkscape-font-specification:'Trebuchet MS, Normal';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.537811;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+         x="28.49371"
+         y="28.381411"
+         id="text3"
+         transform="scale(0.68369008,1.462651)"><tspan
+           sodipodi:role="line"
+           id="tspan3"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67609px;line-height:normal;font-family:'Trebuchet MS';-inkscape-font-specification:'Trebuchet MS, Normal';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.537811;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+           x="28.49371"
+           y="28.381411">LyraAbilitySystemComponent</tspan></text>
+    </g>
+    <g
+       id="g3-6"
+       transform="matrix(1.728,0,0,1.728,-44.409714,28.009371)">
+      <g
+         id="g5"
+         transform="translate(28.662406,-3.064534)">
+        <g
+           id="g4">
+          <g
+             id="g8"
+             transform="translate(61.011621,-41.551476)">
+            <g
+               id="g6"
+               transform="matrix(0.84110966,0,0,1.0037114,12.938193,0.0783212)">
+              <rect
+                 style="fill:#00dc00;fill-opacity:1;stroke-width:0.133712;stroke-dasharray:none"
+                 id="rect1-7"
+                 width="31.456461"
+                 height="5.316957"
+                 x="13.511587"
+                 y="35.444008" />
+              <text
+                 xml:space="preserve"
+                 style="font-size:3.15976px;fill:#ffffff;fill-opacity:1;stroke-width:0.363413;stroke-dasharray:none;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;opacity:1;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                 x="14.904412"
+                 y="43.082153"
+                 id="text3-8"
+                 transform="scale(1.0989774,0.90993686)"><tspan
+                   sodipodi:role="line"
+                   id="tspan3-9"
+                   style="fill:#ffffff;fill-opacity:1;stroke-width:0.36341328;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.15976125px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                   x="14.904412"
+                   y="43.082153">GameplayAbility</tspan></text>
+            </g>
+            <g
+               id="g7"
+               transform="matrix(0.9720112,0,0,1.0389356,6.0124075,-1.0269848)">
+              <rect
+                 style="fill:#00dcae;fill-opacity:1;stroke-width:0.122257;stroke-dasharray:none"
+                 id="rect1-7-1"
+                 width="27.220194"
+                 height="5.1366901"
+                 x="-14.557876"
+                 y="35.411942" />
+              <text
+                 xml:space="preserve"
+                 style="font-size:2.88905px;fill:#ffffff;fill-opacity:1;stroke-width:0.332278;stroke-dasharray:none;stroke:#ffffff;stroke-opacity:0;-inkscape-font-specification:'Trebuchet MS, Normal';font-family:'Trebuchet MS';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+                 x="-10.472994"
+                 y="42.947861"
+                 id="text3-8-2"
+                 transform="scale(1.0989774,0.90993682)"><tspan
+                   sodipodi:role="line"
+                   id="tspan3-9-6"
+                   style="fill:#ffffff;fill-opacity:1;stroke-width:0.33227841;stroke-dasharray:none;stroke:#ffffff;stroke-opacity:0;-inkscape-font-specification:'Trebuchet MS, Normal';font-family:'Trebuchet MS';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-size:2.88905007px;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+                   x="-10.472994"
+                   y="42.947861">GameplayTag</tspan></text>
+            </g>
+            <path
+               style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               id="path6"
+               inkscape:connector-type="orthogonal"
+               inkscape:connector-curvature="0"
+               d="m 18.320323,38.432087 h 5.982596"
+               inkscape:connection-start="#rect1-7-1"
+               inkscape:connection-end="#g6" />
+          </g>
+          <g
+             id="g8-6"
+             transform="translate(61.011621,-34.896794)">
+            <g
+               id="g6-9"
+               transform="matrix(0.84110966,0,0,1.0037114,12.938193,0.0783212)">
+              <rect
+                 style="fill:#00dc00;fill-opacity:1;stroke-width:0.133712;stroke-dasharray:none"
+                 id="rect1-7-19"
+                 width="31.456461"
+                 height="5.316957"
+                 x="13.511587"
+                 y="35.444008" />
+              <text
+                 xml:space="preserve"
+                 style="font-size:3.15976px;fill:#ffffff;fill-opacity:1;stroke-width:0.363413;stroke-dasharray:none;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;opacity:1;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                 x="14.904412"
+                 y="43.082153"
+                 id="text3-8-8"
+                 transform="scale(1.0989774,0.90993686)"><tspan
+                   sodipodi:role="line"
+                   id="tspan3-9-0"
+                   style="fill:#ffffff;fill-opacity:1;stroke-width:0.36341328;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.15976125px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                   x="14.904412"
+                   y="43.082153">GameplayAbility</tspan></text>
+            </g>
+            <g
+               id="g7-1"
+               transform="matrix(0.9720112,0,0,1.0389356,6.0124075,-1.0269848)">
+              <rect
+                 style="fill:#00dcae;fill-opacity:1;stroke-width:0.122257;stroke-dasharray:none"
+                 id="rect1-7-1-3"
+                 width="27.220194"
+                 height="5.1366901"
+                 x="-14.557876"
+                 y="35.411942" />
+              <text
+                 xml:space="preserve"
+                 style="font-size:2.88905px;fill:#ffffff;fill-opacity:1;stroke-width:0.332278;stroke-dasharray:none;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;opacity:1;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                 x="-10.472994"
+                 y="42.947861"
+                 id="text3-8-2-6"
+                 transform="scale(1.0989774,0.90993682)"><tspan
+                   sodipodi:role="line"
+                   id="tspan3-9-6-5"
+                   style="fill:#ffffff;fill-opacity:1;stroke-width:0.332278;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.88905007px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                   x="-10.472994"
+                   y="42.947861">GameplayTag</tspan></text>
+            </g>
+            <path
+               style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               id="path6-9"
+               inkscape:connector-type="orthogonal"
+               inkscape:connector-curvature="0"
+               d="m 18.320323,38.432087 h 5.982596"
+               inkscape:connection-start="#rect1-7-1-3"
+               inkscape:connection-end="#g6-9" />
+          </g>
+          <g
+             id="g8-0"
+             transform="translate(61.011621,-28.186208)">
+            <g
+               id="g6-98"
+               transform="matrix(0.84110966,0,0,1.0037114,12.938193,0.0783212)">
+              <rect
+                 style="fill:#00dc00;fill-opacity:1;stroke-width:0.133712;stroke-dasharray:none"
+                 id="rect1-7-2"
+                 width="31.456461"
+                 height="5.316957"
+                 x="13.511587"
+                 y="35.444008" />
+              <text
+                 xml:space="preserve"
+                 style="font-size:3.15976px;fill:#ffffff;fill-opacity:1;stroke-width:0.363413;stroke-dasharray:none;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;opacity:1;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                 x="14.904412"
+                 y="43.082153"
+                 id="text3-8-3"
+                 transform="scale(1.0989774,0.90993686)"><tspan
+                   sodipodi:role="line"
+                   id="tspan3-9-3"
+                   style="fill:#ffffff;fill-opacity:1;stroke-width:0.36341328;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.15976125px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                   x="14.904412"
+                   y="43.082153">GameplayAbility</tspan></text>
+            </g>
+            <g
+               id="g7-14"
+               transform="matrix(0.9720112,0,0,1.0389356,6.0124075,-1.0269848)">
+              <rect
+                 style="fill:#00dcae;fill-opacity:1;stroke-width:0.122257;stroke-dasharray:none"
+                 id="rect1-7-1-5"
+                 width="27.220194"
+                 height="5.1366901"
+                 x="-14.557876"
+                 y="35.411942" />
+              <text
+                 xml:space="preserve"
+                 style="font-size:2.88905px;fill:#ffffff;fill-opacity:1;stroke-width:0.332278;stroke-dasharray:none;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;opacity:1;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                 x="-10.472994"
+                 y="42.947861"
+                 id="text3-8-2-1"
+                 transform="scale(1.0989774,0.90993682)"><tspan
+                   sodipodi:role="line"
+                   id="tspan3-9-6-0"
+                   style="fill:#ffffff;fill-opacity:1;stroke-width:0.332278;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.88905007px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                   x="-10.472994"
+                   y="42.947861">GameplayTag</tspan></text>
+            </g>
+            <path
+               style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               id="path6-92"
+               inkscape:connector-type="orthogonal"
+               inkscape:connector-curvature="0"
+               d="m 18.320323,38.432087 h 5.982596"
+               inkscape:connection-start="#rect1-7-1-5"
+               inkscape:connection-end="#g6-98" />
+          </g>
+          <g
+             id="g8-2"
+             transform="translate(61.011621,-22.004842)">
+            <g
+               id="g6-8"
+               transform="matrix(0.84110966,0,0,1.0037114,12.938193,0.0783212)">
+              <rect
+                 style="fill:#00dc00;fill-opacity:1;stroke-width:0.133712;stroke-dasharray:none"
+                 id="rect1-7-25"
+                 width="31.456461"
+                 height="5.316957"
+                 x="13.511587"
+                 y="35.444008" />
+              <text
+                 xml:space="preserve"
+                 style="font-size:3.15976px;fill:#ffffff;fill-opacity:1;stroke-width:0.363413;stroke-dasharray:none;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;opacity:1;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                 x="14.904412"
+                 y="43.082153"
+                 id="text3-8-0"
+                 transform="scale(1.0989774,0.90993686)"><tspan
+                   sodipodi:role="line"
+                   id="tspan3-9-1"
+                   style="fill:#ffffff;fill-opacity:1;stroke-width:0.36341328;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.15976125px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                   x="14.904412"
+                   y="43.082153">GameplayAbility</tspan></text>
+            </g>
+            <g
+               id="g7-7"
+               transform="matrix(0.9720112,0,0,1.0389356,6.0124075,-1.0269848)">
+              <rect
+                 style="fill:#00dcae;fill-opacity:1;stroke-width:0.122257;stroke-dasharray:none"
+                 id="rect1-7-1-2"
+                 width="27.220194"
+                 height="5.1366901"
+                 x="-14.557876"
+                 y="35.411942" />
+              <text
+                 xml:space="preserve"
+                 style="font-size:2.88905px;fill:#ffffff;fill-opacity:1;stroke-width:0.332278;stroke-dasharray:none;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;opacity:1;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                 x="-10.472994"
+                 y="42.947861"
+                 id="text3-8-2-9"
+                 transform="scale(1.0989774,0.90993682)"><tspan
+                   sodipodi:role="line"
+                   id="tspan3-9-6-2"
+                   style="fill:#ffffff;fill-opacity:1;stroke-width:0.332278;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.88905007px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+                   x="-10.472994"
+                   y="42.947861">GameplayTag</tspan></text>
+            </g>
+            <path
+               style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+               id="path6-6"
+               inkscape:connector-type="orthogonal"
+               inkscape:connector-curvature="0"
+               d="m 18.320323,38.432087 h 5.982596"
+               inkscape:connection-start="#rect1-7-1-2"
+               inkscape:connection-end="#g6-8" />
+          </g>
+          <path
+             style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.365001;stroke-dasharray:none;stroke-opacity:1"
+             d="m 51.446199,17.952739 -0.09013,2.163199 61.561071,-0.5408 -0.0901,-2.794132"
+             id="path13" />
+        </g>
+        <text
+           xml:space="preserve"
+           style="font-size:2.90325px;display:inline;fill:#ffffff;fill-opacity:1;stroke-width:0.333912;stroke-dasharray:none;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;opacity:1;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+           x="41.971558"
+           y="4.6154146"
+           id="text8"
+           transform="scale(0.83729871,1.1943169)"><tspan
+             sodipodi:role="line"
+             style="fill:#ffffff;fill-opacity:1;stroke-width:0.33391162;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.9032539px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+             x="41.971558"
+             y="4.6154146"
+             id="tspan9">Activateable</tspan><tspan
+             sodipodi:role="line"
+             style="fill:#ffffff;fill-opacity:1;stroke-width:0.33391162;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.9032539px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;stroke:#ffffff;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+             x="41.971558"
+             y="8.1583891"
+             id="tspan13"> Abilities</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.90325px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.333912;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+           x="67.545738"
+           y="23.216444"
+           id="text8-6"><tspan
+             sodipodi:role="line"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.9032501px;line-height:normal;font-family:'Trebuchet MS';font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;white-space:normal;vector-effect:none;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.333912;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1;-inkscape-font-specification:'Trebuchet MS, Normal'"
+             x="67.545738"
+             y="23.216444"
+             id="tspan9-9">FGameplayAbilitySpec </tspan></text>
+      </g>
+    </g>
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.846286;stroke-dasharray:none;stroke-opacity:1"
+       d="m 62.062787,33.938586 c 30.109285,0.09284 30.579754,0 30.579754,0"
+       id="path14" />
+  </g>
+</svg>

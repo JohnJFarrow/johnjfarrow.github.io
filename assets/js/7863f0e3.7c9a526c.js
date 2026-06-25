@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7041],{93847:a=>{a.exports=JSON.parse('{"tag":{"label":"Landscape","permalink":"/tags/landscape","allTagsPath":"/tags","count":4,"unlisted":false},"listMetadata":{"permalink":"/tags/landscape","page":1,"postsPerPage":4,"totalPages":1,"totalCount":4,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8940],{50935:a=>{a.exports=JSON.parse('{"tag":{"label":"PCG","permalink":"/tags/pcg","allTagsPath":"/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/tags/pcg","page":1,"postsPerPage":1,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);

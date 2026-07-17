@@ -10,7 +10,7 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="Unrealcode.net" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.92025677.css">
-<script src="/assets/js/runtime~main.1be085f3.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.3379f2e6.js" defer="defer"></script>
 <script src="/assets/js/main.c0c1ebdb.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -59,6 +59,12 @@ run</p>
 <div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">PackagedShipping\Windows\PCGCookbook.exe -trace=default,task,counters,stats -StatNamedEvents -ExecCmds=&quot;stat unitgraph, stat fps&quot; -NoVerifyGC -DPCvars=&quot;gc.VerifyAssumptionsOnFullPurge=0&quot; -LogCmds=&quot;LogGarbage verbose&quot; -HandleEnsurePercent=0 -CoreLimit=14</span><br></span></code></pre></div></div>
 <p>or</p>
 <div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">PackagedDevelopment\Windows\PCGCookbook.exe -trace=default,task,counters,stats -StatNamedEvents -ExecCmds=&quot;stat unitgraph, stat fps&quot; -NoVerifyGC -DPCvars=&quot;gc.VerifyAssumptionsOnFullPurge=0&quot; -LogCmds=&quot;LogGarbage verbose&quot; -HandleEnsurePercent=0 -CoreLimit=14</span><br></span></code></pre></div></div>
+<p>If Insights is running <em>already</em> running the -trace option will automatically connect
+to Insights.  Depending on your installation, Insights is located somewhere
+like:</p>
+<blockquote>
+<p>C:\EpicGames\UE_5.8\Engine\Binaries\Win64\UnrealInsights.exe</p>
+</blockquote>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="analysing-traces">Analysing traces<a href="#analysing-traces" class="hash-link" aria-label="Direct link to Analysing traces" title="Direct link to Analysing traces" translate="no">​</a></h2>
 <p>If we want to capture data for an entire game session from the start, we can use the following steps:</p>
 <ul>

@@ -2,11 +2,86 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://www.unrealcode.net/</id>
     <title>Unrealcode.net Blog</title>
-    <updated>2026-07-02T00:00:00.000Z</updated>
+    <updated>2026-07-17T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://www.unrealcode.net/"/>
     <subtitle>Unrealcode.net Blog</subtitle>
     <icon>https://www.unrealcode.net/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Diagnosing Packaged Build Start Problems]]></title>
+        <id>https://www.unrealcode.net/PackageBuilds/</id>
+        <link href="https://www.unrealcode.net/PackageBuilds/"/>
+        <updated>2026-07-17T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[How to find diagnose problems with a packaged build which won't start when run from the command line]]></summary>
+        <content type="html"><![CDATA[<p>How to find the problem when a packaged build won't start when run from the command line.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="intro">Intro<a href="https://www.unrealcode.net/PackageBuilds/#intro" class="hash-link" aria-label="Direct link to Intro" title="Direct link to Intro" translate="no">​</a></h2>
+<p>Packaging  a project from the Unreal Editor creates executable files in the packaged directory.  If we package
+the project the directory "PackagedDebug" we get these file (and others):</p>
+<blockquote>
+<p>PackagedDebug\Windows\PROJECT_NAME
+PackagedDebug\Windows\PROJECT_NAME.exe
+PackagedDebug\Windows\PROJECT_NAME\Binaries\Win64\PROJECT_NAME-Win64-DebugGame.exe
+PackagedDebug\Windows\PROJECT_NAME\Binaries\Win64\tbb12.dll
+PackagedDebug\Windows\PROJECT_NAME\Binaries\Win64\tbbmalloc.dll</p>
+</blockquote>
+<p>The executable PackagedDebug\Windows\PROJECT_NAME.exe is just a small file which loads the real executable in PackagedDebug\Windows\PROJECT_NAME\Binaries\Win64\PCPROJECT_NAME-Win64-DebugGame.exe</p>
+<p>To avoid problems with not finding .dll files, we change into the directory  PackagedDebug\Windows\PROJECT_NAME\Binaries\Win64
+and run the file PROJECT_NAME-Win64-DebugGame.exe:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">cd PackagedDebug\Windows\PROJECT_NAME\Binaries\Win64</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">PROJECT_NAME-Win64-DebugGame.exe</span><br></span></code></pre></div></div>
+<p>If everything works, the game starts and there is no problem.  If the game does
+not start, we need to delve into why.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="logs">Logs<a href="https://www.unrealcode.net/PackageBuilds/#logs" class="hash-link" aria-label="Direct link to Logs" title="Direct link to Logs" translate="no">​</a></h2>
+<p>Ideally when the executable runs it creates a log file.</p>
+<p>This appears in</p>
+<blockquote>
+<p>PackagedDebug\Windows\PROJECT_NAME\Saved\Logs\PROJECT_NAME.log</p>
+</blockquote>
+<p>If this file exists, you can open it and hopefully find the reason for  the start failure.</p>
+<p>You can also add the "-log" command line option to show the log file in a window as the process runs:</p>
+<blockquote>
+<p>PROJECT_NAME-Win64-DebugGame.exe -log</p>
+</blockquote>
+<p>The window will open  like this:</p>
+<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/startup_001-f4af7af27f3e8ab56b6dbc127bdf34af.png" width="1299" height="512" class="img_ev3q"></p>
+<p>The log file will still be created in the PackagedDebug\Windows\PROJECT_NAME\Saved\Logs directory.</p>
+<p>As you run the program multiple times, the most recent log  file is always called PROJECT_NAME.log
+and the old versions are renamed to something like PROJECT_NAME-backup-2026.07.16-23.30.07.log</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-if-there-are-no-logs">What if there are no logs<a href="https://www.unrealcode.net/PackageBuilds/#what-if-there-are-no-logs" class="hash-link" aria-label="Direct link to What if there are no logs" title="Direct link to What if there are no logs" translate="no">​</a></h2>
+<p>The executable needs to reach a certain stage before logging starts.  If the program crashes before
+Unreal has setup logging, no log file will be created, the main game window won't open
+and the command will appear to do nothing.</p>
+<p>You can run the executable with the "-waitforattach" option and then connect the debugger.  The
+command is:</p>
+<blockquote>
+<p>cd PackagedDebug\Windows\PROJECT_NAME\Binaries\Win64<br>
+<!-- -->PROJECT_NAME-Win64-DebugGame.exe -waitforattach</p>
+</blockquote>
+<p>If the program does not crash before WinMain() is called, this will halt the program
+until you connect the debugger.</p>
+<p>To  connect from Visual Studio, use the Debug | Attach to Process... menu option and connect to the
+PROJECT_NAME-Win64-DebugGame.exe executable.  Then use F5 to continue and debug as usual.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-if-the-process-crashes-before-winmain">What if the process crashes before WinMain()<a href="https://www.unrealcode.net/PackageBuilds/#what-if-the-process-crashes-before-winmain" class="hash-link" aria-label="Direct link to What if the process crashes before WinMain()" title="Direct link to What if the process crashes before WinMain()" translate="no">​</a></h2>
+<p>In this case -waitforattach will not work.  "-waitforattach" is implemented inside the call to WinMain(),
+so if WinMain() is never reached this option will not work.</p>
+<p>Now you need to configured Visual Studio to execute the packaged command line.  Use the Project | Properties
+menu, select the "Debugging" option on the left, and change the Command property to the
+PackagedDebug\Windows\PROJECT_NAME\Binaries\Win64\PROJECT_NAME-Win64-DebugGame.exe path.  Clear
+the command arguments so it looks like this:</p>
+<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/startup_002-1bb81bf12f53ca00bc3fbca0a18acfbc.png" width="1134" height="543" class="img_ev3q"></p>
+<p>Press F5, the program should run.  If it stops at the crash point, debug from there.  If it
+does not stop and just exits, restart using F10 to step through the code till it crashes.</p>
+<p>To restore the project properties to what they were, either note them down first, or delete the Intermediate\ProjectFiles
+directory and regenerate the Visual Studio project files from the .uproject file.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-crashes-a-process-before-winmain-is-called">What crashes a process before WinMain() is called<a href="https://www.unrealcode.net/PackageBuilds/#what-crashes-a-process-before-winmain-is-called" class="hash-link" aria-label="Direct link to What crashes a process before WinMain() is called" title="Direct link to What crashes a process before WinMain() is called" translate="no">​</a></h2>
+<p>For one, initialization of statics.  This code will <em>sometimes</em> crash:</p>
+<div class="language-cpp codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-cpp codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">namespace</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> FName </span><span class="token function" style="color:rgb(80, 250, 123)">NodeName</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"Add Components"</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> FText NodeTitle </span><span class="token operator">=</span><span class="token plain"> </span><span class="token class-name">FText</span><span class="token double-colon punctuation" style="color:rgb(248, 248, 242)">::</span><span class="token function" style="color:rgb(80, 250, 123)">Format</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">LOCTEXT</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"NodeTitle"</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token string" style="color:rgb(255, 121, 198)">"PCG | {0}"</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token class-name">FText</span><span class="token double-colon punctuation" style="color:rgb(248, 248, 242)">::</span><span class="token function" style="color:rgb(80, 250, 123)">FromName</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain"> NodeName </span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><br></span></code></pre></div></div>
+<p>The call stack when it crashes looks like this:</p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">FDebug::ProcessFatalError(void *)	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">UE::Logging::Private::BasicFatalLog&lt;char&gt;(struct UE::Logging::Private::TStaticBasicLogRecord&lt;char&gt; const &amp;,struct FLogCategoryBase const *,...)	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">FICUInternationalization::Initialize(void)	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">FLazySingleton::Construct&lt;class FInternationalization&gt;(void *)	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">FInternationalization::Get(void)	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">FTextFormatter::FormatStr(class FTextFormat const &amp;,class TArray&lt;class FFormatArgumentValue,class TSizedDefaultAllocator&lt;32&gt; &gt; const &amp;,bool,bool)	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">FTextFormatter::Format(class FTextFormat &amp;&amp;,class TArray&lt;class FFormatArgumentValue,class TSizedDefaultAllocator&lt;32&gt; &gt; &amp;&amp;,bool,bool)	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">FText::Format(class FTextFormat,class TArray&lt;class FFormatArgumentValue,class TSizedDefaultAllocator&lt;32&gt; &gt; &amp;&amp;)	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">FText::Format&lt;class FText&gt;(class FTextFormat,class FText)	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">`anonymous namespace'::`dynamic initializer for 'NodeTitle''() Line 41	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">ucrtbase.dll!00007ffa9259e473()	Unknown</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">__scrt_common_main_seh() Line 258	C++</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">kernel32.dll!00007ffa932f7374()	Unknown</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">ntdll.dll!00007ffa94abcc91()	Unknown</span><br></span></code></pre></div></div>
+<p>It looks as though the FTextFormatter is calling FInternationalization::Get() before the FICUInternationalization
+has been initialized.  The reason it only crashes sometimes, and never when running in the editor, it that it
+depends on  the sequence in which  dlls are loaded and statics are initialized.</p>]]></content>
+        <category label="C++" term="C++"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Super Basic Transforms]]></title>
         <id>https://www.unrealcode.net/SuperBasicTransforms/</id>
@@ -2054,416 +2129,5 @@ tessellation process:</p>
         <category label="Materials" term="Materials"/>
         <category label="Nanite" term="Nanite"/>
         <category label="Landscape" term="Landscape"/>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Landscapes - Material Concepts]]></title>
-        <id>https://www.unrealcode.net/NaniteLandscapeMaterials/</id>
-        <link href="https://www.unrealcode.net/NaniteLandscapeMaterials/"/>
-        <updated>2025-01-13T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Landscape materials]]></summary>
-        <content type="html"><![CDATA[<p>A landscape material is one which is applied to an Unreal Engine landscape object.  It is created similarly to
-any other material in Unreal but can use some special nodes (such as the Landscape Layer Blend node) which only work inside
-landscapes materials.</p>
-<p>While this page is about landscape materials in Unreal Engine,  it does not tell you how to make one, it
-describes how they are made, how important features work, and looks at alternative approaches used in commonly
-available examples.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="background">Background<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#background" class="hash-link" aria-label="Direct link to Background" title="Direct link to Background" translate="no">​</a></h2>
-<p>This is part of a series of articles about Landscapes, these articles include:</p>
-<p><a class="" href="https://www.unrealcode.net/NaniteLandscapeMaterials3/">Landscapes - Building GDAL</a><br>
-<a class="" href="https://www.unrealcode.net/NaniteLandscapeMaterials/">Landscapes - Material Concepts</a><br>
-<a class="" href="https://www.unrealcode.net/NaniteLandscapeMaterials2/">Landscapes - Nanite Tessellation</a><br>
-<a class="" href="https://www.unrealcode.net/NaniteLandscapeMaterials4/">Landscapes - Using Real Location Data</a><br>
-<a class="" href="https://www.unrealcode.net/NaniteLandscapeMaterials5/">Landscapes - World Partition and Tiling</a></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="landscape-painting">Landscape Painting<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#landscape-painting" class="hash-link" aria-label="Direct link to Landscape Painting" title="Direct link to Landscape Painting" translate="no">​</a></h3>
-<p>Conceptually a landscape material draws textures on the landscape.  Each type of texture, for example
-rocks, grass and snow, is usually added in a separate group, and these groups  are usually referred to as "layers",
-as an the "grass layer" or  the "rock layer".</p>
-<p>In addition, Unreal uses the term "layers" to describe paintable layers which can be manually painted
-onto a landscape using the editor.</p>
-<p>If the landscape material contains a Landscape Layer Blend node, then the material creates paintable layers which
-can be used to manually paint the landscape.  This is not always the case; some landscape materials do not
-contain a Landscape Layer Blend node.</p>
-<p>The names of the paintable layers are defined in the properties
-of the Landscape Layer Blend node, for example this node defines two paintable layers
-called "Grass" and "Rock":</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/nanite_land_007-f781f0a97a0f37172e93f865b7f44735.png" width="692" height="395" class="img_ev3q"></p>
-<p>When the landscape material has paintable layers defined in a Landscape Layer Blend node then the
-paintable layers appear on the Landscape Mode Paint tab:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/nanite_land_008-0c1e76b1943f73a614fed5fb3bb2bee9.png" width="619" height="712" class="img_ev3q"></p>
-<p>The highlighted button can be used to refresh these layers if they don't appear or as you change  the material
-to add or delete paintable layers.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="auto-materials">Auto Materials<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#auto-materials" class="hash-link" aria-label="Direct link to Auto Materials" title="Direct link to Auto Materials" translate="no">​</a></h3>
-<p>A landscape auto material is one which applies different textures to the different parts of the landscape without requiring
-manual painting.  It usually defines various layers such as rock, soil, grass, snow etc.
-and usually contains:</p>
-<ul>
-<li class="">rules which define which layer(s) to apply depending on the height or slope of the terrain</li>
-<li class="">rules for blending layers together when they overlap</li>
-<li class="">rules controlling transitioning from one layer to another</li>
-<li class="">parameters which control all of the above</li>
-<li class="">parameters which control texture tiling</li>
-</ul>
-<p>A single landscape material can be both an auto material and create paintable layers for manual painting.</p>
-<p>Depending on how they are written, there is a performance impact associated with using auto textures.  Sampling the slope
-of the landscape has an overhead, which could be reduced by having a texture which contains this data and
-sampling that instead.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="manually-painting-a-landscape">Manually Painting a Landscape<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#manually-painting-a-landscape" class="hash-link" aria-label="Direct link to Manually Painting a Landscape" title="Direct link to Manually Painting a Landscape" translate="no">​</a></h3>
-<p>As described above, if the landscape material contains a Landscape Layer Blend node, then the material creates paintable layers which
-can be used to manually paint the landscape.  Before it can be used for painting each paintable layer needs a
-LayerInfo object, like the one for the grass layer shown here:</p>
-<p><img decoding="async" loading="lazy" alt="width80" src="https://www.unrealcode.net/assets/images/nanite_land_009-c4834ba4ac1ede4170dd01c911136812.png" width="620" height="592" class="img_ev3q"></p>
-<p>These LayerInfo objects store the details of where the layer is painted on the landscape.</p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="material-construction">Material Construction<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#material-construction" class="hash-link" aria-label="Direct link to Material Construction" title="Direct link to Material Construction" translate="no">​</a></h2>
-<p>This section highlights some approaches used in constructing a landscape master material.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="material-attributes">Material Attributes<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#material-attributes" class="hash-link" aria-label="Direct link to Material Attributes" title="Direct link to Material Attributes" translate="no">​</a></h3>
-<p>When the material is first created there will be a New Material node created for the output of  the material.  Select the
-node  and check the "Use Material Attributes" checkbox to change the node to a material attributes node:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_011-aa26380bed3e233b30e22b67f2ef4443.png" width="1114" height="846" class="img_ev3q"></p>
-<p>This means that what is passed from node to node in the material graph is a set of material attributes, and we can use special
-nodes which operate on all the attributes at the same time, for example blending all the attributes from two attribute sets.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="materials-or-functions">Materials or Functions<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#materials-or-functions" class="hash-link" aria-label="Direct link to Materials or Functions" title="Direct link to Materials or Functions" translate="no">​</a></h3>
-<p>If we have two layers and use nodes directly, we get a graph like the one shown below, where each material has a texture, a normal texture, and
-other textures such as ambient occlusion, roughness, displacement etc. depending on what channels are provided in the texture set.  Each layer
-is connected to its own Make Material Attributes node, and then these layers are blended:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_012-5596f9d2b3adcd8c547ea27b91720ab7.png" width="1141" height="1207" class="img_ev3q">
-This is manageable enough but we might need to add:</p>
-<ul>
-<li class="">constant scalar nodes for metallic, specular and roughness</li>
-<li class="">different tiling multipliers to make each texture tile differently close up and far away</li>
-<li class="">color tints</li>
-<li class="">normal intensity scaling</li>
-</ul>
-<p>Each of these things will need to be added for every layer, so instead of duplicating the nodes we can move most of the
-complexity into a function which looks something like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_014-577d1017e4c0e1a9e5d5650b48ee5341.png" width="1863" height="890" class="img_ev3q"></p>
-<p>and then call the function for each layer like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_015-09c69c8baf5309e68fed238ed56d832d.png" width="1672" height="969" class="img_ev3q"></p>
-<p>Using a function like this makes the material easier to maintain and makes it quicker to add more layers. (Not all
-function inputs are connected, but it's enough to illustrate the point).</p>
-<p>Another approach (used in the Epic Project Titan sample) is to have each layer define its own function
-which contains all the textures:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_025-82a79e7306fb406d3e8d99b495e5e47c.png" width="1767" height="1235" class="img_ev3q"></p>
-<p>This still centralizes common code (in the MF_BaseLandscapeLayer material function) but means that each layer
-is a separate object which helps with sharing and source control when you have a large number of people
-working on the project.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="texture-sizes">Texture Sizes<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#texture-sizes" class="hash-link" aria-label="Direct link to Texture Sizes" title="Direct link to Texture Sizes" translate="no">​</a></h3>
-<p>Most landscape materials provide a parameter for each layer which is used to change the tiling of  each texture.  This might
-be done with one parameter for all textures:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_016-f7e3e3001d86fd8224b821e0ab1269b0.png" width="758" height="366" class="img_ev3q"></p>
-<p>Or with different values for near and far textures, known as Distance Tiling:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_017-843391733328856f08331b86cc336676.png" width="556" height="432" class="img_ev3q"></p>
-<p>If there are two tiling sizes, then the material function which creates the layer needs to sample the texture twice
-at different UVs and blend the results:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_017-843391733328856f08331b86cc336676.png" width="556" height="432" class="img_ev3q"></p>
-<p>As shown above there also needs to be a parameter controlling the distance at which the blending occurs, i.e. where
-does near change to far.  Having two tiling sizes make the landscape look better but sampling the textures twice
-has a performance overhead.</p>
-<p>Ideally a material will have:</p>
-<ul>
-<li class="">different tile sizes for each layer</li>
-<li class="">properties which recognise that textures are not all the same size.  This <a href="https://www.fab.com/listings/b69e9202-0c4a-45eb-9b67-2a86989bb04c" target="_blank" rel="noopener noreferrer" class="">sand texture</a> is a scan of a 4 x 4 m area, whereas this <a href="https://www.fab.com/listings/6a71ac3c-759c-4ea6-8514-22083edd70b6" target="_blank" rel="noopener noreferrer" class="">windswept sand texture</a> is a 4 x 2 m area.  If they are to be presented in-game at their real-life dimensions
-the scaling will be different for each texture and needs to consider that not all  textures are square.</li>
-</ul>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="blending">Blending<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#blending" class="hash-link" aria-label="Direct link to Blending" title="Direct link to Blending" translate="no">​</a></h3>
-<p>Layers are typically organised in a layered approach, with, say, a base dirt layer, then grass on top of the dirt,
-then rocks on top of the grass and dirt, then snow on top of the rocks and grass and dirt.</p>
-<p>These layers are blended using a Blend Material Attributes node as shown here:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_019-d96937ec392ab415c3d1735860c73966.png" width="1255" height="978" class="img_ev3q"></p>
-<p>The Blend Material Attributes node takes two sets of material attributes (A and B) and an alpha
-value, which is a single float.  The  node blends the two sets of material attributes depending
-on the alpha value.  It <strong>outputs the A input when  alpha is 0,
-the B input when  alpha is 1, and a mixture of A and B for values between 0 and 1</strong>.  This is calculated on a per-pixel basis.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="height-blending">Height Blending<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#height-blending" class="hash-link" aria-label="Direct link to Height Blending" title="Direct link to Height Blending" translate="no">​</a></h3>
-<p>For some layers such as snow it makes sense to consider the landscape height, so that for example snow only
-appears above 1000m.  This is approached by creating a parameter which specifies what the height is where
-we start blending between snow and the lower layers, and using an Absolute World Position node
-to get the Z position (which is the height) of the landscape.  This can be done like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_020-85a9a382726ad461936d07f5912c5215.png" width="694" height="314" class="img_ev3q"></p>
-<p>Note  the Snow Transition parameter which defines the vertical distance over which the snow will
-start.  If this is zero then we would get a sharp horizontal line whereas non-zero values blur this line.</p>
-<p>This shows the sharp line when Snow Transition is 0:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_021-42d9c4f9163737f1c5223620b11022bc.png" width="679" height="624" class="img_ev3q"></p>
-<p>and a  gentler blending when the Snow Transition is 40:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_022-bf8fc3fffc22d9f7424619011d10427e.png" width="689" height="627" class="img_ev3q"></p>
-<p>Also note the use of the Saturate node.  This is equivalent to clamping between 0 and 1 but on some GPUs is less
-expensive or even free.  This is used because the Blend Material Attributes node expects inputs between 0 and 1, values outside
-this range can have odd results such as turning the landscape black.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="slope-blending">Slope Blending<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#slope-blending" class="hash-link" aria-label="Direct link to Slope Blending" title="Direct link to Slope Blending" translate="no">​</a></h3>
-<p>Here the idea is that grass does not grow on vertical cliff faces, so we want the slope of the terrain to influence
-which layer appears on the terrain.</p>
-<p>There seem to be many ways of doing this.  This image shows a material which calculates the slope:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_010-93d32861787662a9e0a0b73e717e6b1b.png" width="1606" height="812" class="img_ev3q"></p>
-<p>An alternative is to use  the World Aligned Blend node like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_023-9b92a355670c3573c1c3eb539dabb4a2.png" width="616" height="404" class="img_ev3q"></p>
-<p>Another alternative is to use  the SlopeMask node like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_024-dfe7cd9812ba47d5cbe270d65d9ed096.png" width="572" height="234" class="img_ev3q"></p>
-<p>Here is another alternative from the Project Titan example which writes materials into a runtime
-virtual texture and later samples those textures to do the actual display:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_002-5341ba57d0fcffae0a6299e9f8d85403.png" width="912" height="474" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="distance-tiling">Distance Tiling<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#distance-tiling" class="hash-link" aria-label="Direct link to Distance Tiling" title="Direct link to Distance Tiling" translate="no">​</a></h3>
-<p>Distance tiling attempts to make texture tiling less obvious.  It samples the
-base color texture (and other textures such as normals) twice, once with a small tile size for points near the player
-and again with a larger tile size for points distance from the player.  The two
-samples are then blended.</p>
-<p>This simple material has one parameter, the tiling size:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_031-355337a791eea5b851f6ee508acbe998.png" width="1260" height="689" class="img_ev3q"></p>
-<p>Small tiling sizes are good for near areas but bad for distant areas and vice versa.
-With tiling size 2 the landscape looks like this, showing tiling patterns in the distant highlighted areas:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_032-1954db58f0d81d3fd2367e7118a5aa3f.png" width="2734" height="807" class="img_ev3q"></p>
-<p>Implementing the distance tiling technique we have two samplers (sampling the same texture) using two different
-tile sizes and then blend the two samples together using a lerp node:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_033-de9c95e073c9070ef260fbd2f0f12a7d.png" width="1747" height="920" class="img_ev3q"></p>
-<p>The distance sampling is controlled by two inputs to a Camera Depth Fade node.  This node takes a fade offset
-parameter which determines where the transition between the two samples starts (relative to the camera)
-and a fade offset which determines over what distance  the two samples a blended.  Bear in mind
-the offset parameter is from the camera position not the third-party player position so  with a short distance
-like 200 (i.e. 2m) the offset line might be behind the player.</p>
-<p>If the fade offset is 0, we get a hard transition line like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_034-50d7fcf3fc61035f6b1ed16299d906b5.png" width="2456" height="749" class="img_ev3q"></p>
-<p>and with a fade offset of 200 (i.e. blending the samples together over a 2m distance) we get this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_035-c533ee0375c7bb09f91555b9e9106ad0.png" width="1645" height="688" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="macro-variation">Macro Variation<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#macro-variation" class="hash-link" aria-label="Direct link to Macro Variation" title="Direct link to Macro Variation" translate="no">​</a></h3>
-<p>When textures are tiled often the repeated tiling is visible, macro variation attempts to introduce
-variety to hide the tiling.</p>
-<p>This is a very simple material:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_027-d4b933a3b6e77ae48b7bd01253711f1a.png" width="1249" height="718" class="img_ev3q"></p>
-<p>You can see clearly the tiling pattern here:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_028-bce4d67596b330b95f3520582ed6f96f.png" width="945" height="817" class="img_ev3q"></p>
-<p>This figure shows one way of implementing macro variation.  Here we sample a specific macro variation texture
-(called T_Default_MacroVariation) which ships as part of Unreal Engine.</p>
-<p>The texture is sampled 3 times at 3 different coordinates, found by multiplying the incoming UV value by
-3 different constant values. The 3 samples are then multiplied together:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_026-08315910dc2c546aa5f71dbbd2cf14c2.png" width="1799" height="735" class="img_ev3q"></p>
-<p>Now the output of the macro variation calculation is included in the material like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_029-89edf74692d901e237deb53ecdba2947.png" width="1280" height="920" class="img_ev3q"></p>
-<p>With macro variation enabled the texture tiling is no longer so obvious:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_030-b181ccc297fa46423b662d8a825834eb.png" width="925" height="575" class="img_ev3q"></p>
-<p>This technique can be combined with others such as distance tiling.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="texture-variation">Texture Variation<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#texture-variation" class="hash-link" aria-label="Direct link to Texture Variation" title="Direct link to Texture Variation" translate="no">​</a></h3>
-<p>The Texture Variation node takes incoming UV values and shifts them to break up repetitive textures.  A material using it is shown here:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_040-24da7b989d6ae13e520f90e06b16e082.png" width="1727" height="757" class="img_ev3q"></p>
-<p>The Texture Variation node can use a heightmap - in this case it uses the heightmap from which the landscape
-was originally created. The shifted UVs generated by the Texture Variation node are fed into texture samplers.</p>
-<p>Without the Texture Variation node the landscape looks like this, with clear tiling patterns:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_038-0da657ef68d3057848beccfd721deb0d.png" width="2740" height="820" class="img_ev3q"></p>
-<p>and with Texture Variation node it looks like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_039-da8125dbf22ff5902b65f5803070df45.png" width="2738" height="815" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="texture-bombing">Texture Bombing<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#texture-bombing" class="hash-link" aria-label="Direct link to Texture Bombing" title="Direct link to Texture Bombing" translate="no">​</a></h3>
-<p>The Texture Bombing node generates pseudo-random numbers to offset the texture sample position
-and takes multiple samples and blends them together.</p>
-<p>The node is used like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_041-dfa2aef42e37629e1dfbbef0053cea59.png" width="1893" height="846" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="sampler-count">Sampler Count<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#sampler-count" class="hash-link" aria-label="Direct link to Sampler Count" title="Direct link to Sampler Count" translate="no">​</a></h3>
-<p>A material compiles to a shader, and shaders have a limited number of samplers they can use at once.  If a texture
-is being sampled by more than one Texture Sample node, for example when using Distance Tiling, then the Sampler Source
-property on each Texture Sample node should be set to "Shared: Wrap" to share one texture sampler:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_036-e07c8e99b3ff7bfcc21dedd8e6b6d67a.png" width="834" height="431" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="filtering">Filtering<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#filtering" class="hash-link" aria-label="Direct link to Filtering" title="Direct link to Filtering" translate="no">​</a></h3>
-<p>Textures have a filtering property which can be viewed by opening the texture:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_037-a5a7a8773e5e71f95c6332afb041b3ca.png" width="1466" height="492" class="img_ev3q"></p>
-<p>When the texture is read using a default Texture Sample node this filter property is used.  However
-when  "Shared: Wrap" is used the filter is changed to "Default(from Texture Group)" which might
-change the appearance of the landscape.  To change using another filter it is necessary
-to change the  the DefaultDeviceProfiles.ini file here:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">[/Script/Engine.TextureLODSettings]</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">; NOTE THAT ANY ITEMS IN THIS SECTION WILL AFFECT ALL PLATFORMS!!!</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">@TextureLODGroups=Group</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">TextureLODGroups=(Group=TEXTUREGROUP_World,MinLODSize=1,MaxLODSize=4096,LODBias=0,MinMagFilter=point,MipFilter=point,MipGenSettings=TMGS_SimpleAverage)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">+TextureLODGroups=(Group=TEXTUREGROUP_WorldNormalMap,MinLODSize=1,MaxLODSize=4096,LODBias=0,MinMagFilter=point,MipFilter=point,MipGenSettings=TMGS_SimpleAverage)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">+TextureLODGroups=(Group=TEXTUREGROUP_WorldSpecular,MinLODSize=1,MaxLODSize=4096,LODBias=0,MinMagFilter=point,MipFilter=point,MipGenSettings=TMGS_SimpleAverage)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">+TextureLODGroups=(Group=TEXTUREGROUP_Character,MinLODSize=1,MaxLODSize=4096,LODBias=0,MinMagFilter=point,MipFilter=point,MipGenSettings=TMGS_SimpleAverage)</span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">....</span><br></span></code></pre></div></div>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="triplanar-projection">Triplanar Projection<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#triplanar-projection" class="hash-link" aria-label="Direct link to Triplanar Projection" title="Direct link to Triplanar Projection" translate="no">​</a></h3>
-<p>Triplanar projection is used to resolve problems with texture stretching.  On near-vertical landscape areas
-such as cliff faces  normal UV mapping results in triangles and textures which are stretched vertically
-like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_042-542365e672f955843af612e9103a0e1e.png" width="1871" height="814" class="img_ev3q"></p>
-<p>Instead of using UVs to sample the texture Triplanar projection uses the world position.  The world position
-has 3 components (x, y, z) but the UV has only 2 (u, v), so there are 3 possible selections, each one of which
-discards one of (x, y, z).    Triplanar projection works by projecting each plane (x, y), (y, z), (x, z) onto the
-target surface and then for each pixel in the surface choosing the sample from the plane
-which matches the facing (from the normal) of that pixel (or more precisely choosing a weighted
-blend from the 3 projections).</p>
-<p>This shot shows a cliff with Triplanar Project off, with the textures stretched vertically and cracks in the rock which should
-be horizontal becoming curved:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_043-029517e0c903c064e98be614bd57bd27.png" width="1871" height="809" class="img_ev3q"></p>
-<p>Here is the same shot with Triplanar Projection on:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_044-a89b7823f43ce4c7fa64d392bf041bcf.png" width="1856" height="811" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="color-variation">Color Variation<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#color-variation" class="hash-link" aria-label="Direct link to Color Variation" title="Direct link to Color Variation" translate="no">​</a></h3>
-<p>This can be done in many ways, one of which is to sample a noise texture, multiply the existing color by that sample, and then
-lerp between the existing color and the modified color like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_045-da0bb45806da28abf36dbac7c7f84e6c.png" width="1477" height="757" class="img_ev3q"></p>
-<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="runtime-virtual-textures">Runtime Virtual Textures<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#runtime-virtual-textures" class="hash-link" aria-label="Direct link to Runtime Virtual Textures" title="Direct link to Runtime Virtual Textures" translate="no">​</a></h2>
-<p>Runtime virtual textures (RVT) are textures which are filled at runtime with the shading results
-from executing part of the landscape material.</p>
-<p>Broadly speaking the landscape is rendered once in the first frame and the results are saved to a texture.  On the
-first and every subsequent frame the landscape is rendered by sampling that texture, not by executing
-the full material.</p>
-<p>This image shows a material which has nodes to write the RVT (in green) when the shader is first run
-and the read the RVT (in blue) on subsequent frames:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_087-48c2306e58432f1b9c371f469eabde57.png" width="1296" height="925" class="img_ev3q"></p>
-<p>The RVT approach gives performance benefits and enables blending of other actors
-such as static meshes or level instances with the landscape.  Advantages and disadvantages are discussed
-below.</p>
-<p>The steps involved in enabling RVT below:</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="1-project-setup">1. Project Setup<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#1-project-setup" class="hash-link" aria-label="Direct link to 1. Project Setup" title="Direct link to 1. Project Setup" translate="no">​</a></h3>
-<p>Enable this setting and restart (this recompiles all shaders so will be slow):</p>
-<p><img decoding="async" loading="lazy" alt="width90" src="https://www.unrealcode.net/assets/images/nanite_land_046-838b970625d721352619b9941f577bf1.png" width="1670" height="1109" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="2-create-an-rvt-object">2. Create an RVT object<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#2-create-an-rvt-object" class="hash-link" aria-label="Direct link to 2. Create an RVT object" title="Direct link to 2. Create an RVT object" translate="no">​</a></h3>
-<p>Right-click in the content window and chose Texture | Runtime Virtual Texture to
-create and name the RVT.</p>
-<p>Open the RVT and change the Virtual Texture Context property to "Base Color, Normal, Roughness, Specular"
-as shown:</p>
-<p><img decoding="async" loading="lazy" alt="width90" src="https://www.unrealcode.net/assets/images/nanite_land_057-90c85f15867eb91cb293bfd2e960b195.png" width="760" height="661" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="3-configure-landscape">3. Configure Landscape<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#3-configure-landscape" class="hash-link" aria-label="Direct link to 3. Configure Landscape" title="Direct link to 3. Configure Landscape" translate="no">​</a></h3>
-<p>We need to tell the landscape itself that it is using the RVT, so in the landscape
-details panel in the Virtual Texture section add an entry to the Draw in Virtual Textures
-array and set it to the name of the RVT we just created:</p>
-<p><img decoding="async" loading="lazy" alt="width90" src="https://www.unrealcode.net/assets/images/nanite_land_048-761ffd8d05d120e8ff04598ddca7fe3f.png" width="781" height="482" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="4-add--rvt-volume">4. Add  RVT volume<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#4-add--rvt-volume" class="hash-link" aria-label="Direct link to 4. Add  RVT volume" title="Direct link to 4. Add  RVT volume" translate="no">​</a></h3>
-<p>In the details panel for the landscape, below where we just set the RVT, click the
-Create Volumes button:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_055-03d34067c94d92eb17d0d2907e493f67.png" width="817" height="531" class="img_ev3q"></p>
-<p>This will add a Runtime Virtual Texture Volume to the world.  It will also:</p>
-<ul>
-<li class="">set the bounds of the Runtime Virtual Texture Volume to the bounds of the landscape</li>
-<li class="">set the Virtual Texture property of the volume to the RVT</li>
-</ul>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="5-write-to-rvt">5. Write to RVT<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#5-write-to-rvt" class="hash-link" aria-label="Direct link to 5. Write to RVT" title="Direct link to 5. Write to RVT" translate="no">​</a></h3>
-<p>The landscape material needs to both write to, and read from,  the virtual texture.  This requires the material to have Use Material Attributes set to true.</p>
-<p>If we have a material like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_052-60cf5ef1873e92a649c2bd647609f6ee.png" width="1109" height="758" class="img_ev3q"></p>
-<p>We add a Runtime Virtual Texture Output node which writes the material attributes to  the RVT, and we
-disconnect the original output node to get this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_053-df3141765a1cf9a1b8f42e9c8852b5e6.png" width="1052" height="753" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="6-read-from-the-rvt">6. Read from the RVT<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#6-read-from-the-rvt" class="hash-link" aria-label="Direct link to 6. Read from the RVT" title="Direct link to 6. Read from the RVT" translate="no">​</a></h3>
-<p>To read the RVT we add the nodes shown in the green box below and connect them as shown:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_054-c0e08719ea18b39e2969f41e8d1e1858.png" width="1260" height="875" class="img_ev3q"></p>
-<p>This is connected so that if the Runtime Virtual Texture feature is not available (perhaps on a phone) then
-the previous code path will be followed and the material will behave as a normal non-RVT material, but
-if RVT is available then the material attributes will be sampled from the RVT.</p>
-<p>Select the Runtime Virtual Texture Sample node and set its Virtual Texture property to the RVT:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_056-a56ea2a69c9820faae5240b2f3152a40.png" width="699" height="398" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="multiple-rvts">Multiple RVTs<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#multiple-rvts" class="hash-link" aria-label="Direct link to Multiple RVTs" title="Direct link to Multiple RVTs" translate="no">​</a></h3>
-<p>It is possible to have multiple RVTs in use at the same time.  The channels which can be saved in a particular  RVT
-are limited, so if for example we want to store the both base color and the landscape height we would need two separate RVTs.</p>
-<p>There are configured by adding them to the landscape object:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_088-655f68497da5cee1e95ae049e0eb7e8e.png" width="649" height="219" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="rvt-normals">RVT Normals<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#rvt-normals" class="hash-link" aria-label="Direct link to RVT Normals" title="Direct link to RVT Normals" translate="no">​</a></h3>
-<p>Usually, normals sampled from a texture are in tangent space.  Blending
-of normals between the landscape and some other mesh needs to use a common space,  usually world space.  If you will be blending the landscape with
-other objects it  makes sense to convert the normals to world space
-before writing them to the RVT.  Other normals that they are blended with
-will also need to be converted to world space as well.</p>
-<p>Converting normals to worlds space and back is done with the Transform Vector
-node.</p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="interactions-with-pcg">Interactions with PCG<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#interactions-with-pcg" class="hash-link" aria-label="Direct link to Interactions with PCG" title="Direct link to Interactions with PCG" translate="no">​</a></h3>
-<p>The same masks which are used to place landscape layers can be used to create Physical Materials using
-a Landscape Physical Output Material node and a set of Physical Material objects like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_059-652638d9379bff1fb166c9ac43cf3f69.png" width="963" height="259" class="img_ev3q"></p>
-<p>Once this has been done the names of the Physical Material objects can be used as filters
-in a PCG Attribute Filter node like this one, which filters for a Physical Material
-called "PM_Snow":</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_058-a0f757115d1ee9c81d2bc4e7be70f290.png" width="1102" height="269" class="img_ev3q"></p>
-<p>We can write a material function which samples base color and height from
-two RVTs, and uses the height value to blend the existing color of an asset
-with the color sampled from the RVT.  This function is shown below.  It
-takes a parameter specifying at what height above the landscape the blending stops:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_060-15e39ed851d23082d37f01143c551e0f.png" width="1524" height="895" class="img_ev3q"></p>
-<p>By adding this function into the material for a PCG asset such as grass, as
-shown below, we can make blend the color of the landscape with the color of
-the grass to make the grass match the landscape:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_061-165842e44790c8d4c243ce5532614a23.png" width="1208" height="804" class="img_ev3q"></p>
-<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="rvt-considerations">RVT Considerations<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#rvt-considerations" class="hash-link" aria-label="Direct link to RVT Considerations" title="Direct link to RVT Considerations" translate="no">​</a></h3>
-<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="gpu-memory">GPU Memory<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#gpu-memory" class="hash-link" aria-label="Direct link to GPU Memory" title="Direct link to GPU Memory" translate="no">​</a></h4>
-<p>Essentially using RVTs trades speed for memory.  Rendering the landscape is faster
-but at the cost of the memory occupied by the RVT textures on the GPU.</p>
-<p>The RVT itself is constructed of tiles, and these tiles are stored in GPU memory
-if they are being sampled.  Tiles which are not being sampled, because they
-are maybe behind the player or behind landscape features such as mountains are
-not held in GPU memory.</p>
-<p>If the player is close up to a terrain feature such as a cliff, or looking out to sea,
-few texture tiles are required and the pool usage is low.  Also if the player
-is far away from the terrain may tiles are needed but use of LOD means
-those tiles are smaller because they are only sampled at low resolution for
-distance terrain.</p>
-<p>The RVT textures are held in the RVT texture pool.  This can be visualized
-using the console command:</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token plain">r.VT.Residency.Show 1</span><br></span></code></pre></div></div>
-<p>This shows how much of the pool is being used for RVT textures:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_062-b5b5f15a67dbaf780f696bbcd9fd8096.png" width="1463" height="716" class="img_ev3q"></p>
-<p>To specify a fixed maximum pool size, change the Virtual Texture Pool
-the project setting like this:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_063-bf1fda18ff1c0c4d6e9fe396b3cd73c6.png" width="1670" height="512" class="img_ev3q"></p>
-<p>In Unreal 5.5.1 changing the Default Size in Megabyte might have no effect<br>
-<!-- -->if (by default) a specific transient pool is already configured for that
-texture type, like the one shown here:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_064-4c3108a8b34724ba39f607819ed52dd0.png" width="1304" height="740" class="img_ev3q"></p>
-<p>If there is not enough memory in the pool then the textures will appear blurry.</p>
-<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="no-camera-support">No Camera Support<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#no-camera-support" class="hash-link" aria-label="Direct link to No Camera Support" title="Direct link to No Camera Support" translate="no">​</a></h4>
-<p>Only some channels can be saved to the RVT, as shown here in the RVT properties:</p>
-<p><img decoding="async" loading="lazy" src="https://www.unrealcode.net/assets/images/nanite_land_051-c4509cb2fccf42aac9dfc7ec595a3e06.png" width="1068" height="361" class="img_ev3q"></p>
-<p>A material might have camera position dependent nodes, for example when using the
-Camera Depth Fade node used in Distance Tiling described above.  Because RVT
-writes into the texture from above the landscape it has no concept of
-variable camera distance, so Distance Tiling will not work.</p>
-<h4 class="anchor anchorTargetStickyNavbar_Vzrq" id="references">References<a href="https://www.unrealcode.net/NaniteLandscapeMaterials/#references" class="hash-link" aria-label="Direct link to References" title="Direct link to References" translate="no">​</a></h4>
-<ul>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=SxQ1oOaaoT8&amp;list=PL78XDi0TS4lGJ_v9lKh2dZobP_D89JjP6&amp;index=10" target="_blank" rel="noopener noreferrer" class="">Landscape Optimization Using Runtime Virtual Textures - Building Worlds In Unreal</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=SGs26giw0l0" target="_blank" rel="noopener noreferrer" class="">UE5.4 Step-by-Step Landscape Material</a></p>
-</li>
-<li class="">
-<p><a href="https://artur-schuetz.com/tutorials/article/how-to-use-landscape-layer-blending-and-height-blending" target="_blank" rel="noopener noreferrer" class="">Text article about blending and scaling</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=xyf8n-3fiIo" target="_blank" rel="noopener noreferrer" class="">Unreal 5 - Auto Materials</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=ZokkH4_eCPI" target="_blank" rel="noopener noreferrer" class="">Brushify: Bootcamp - Enabling Nanite</a></p>
-</li>
-<li class="">
-<p><a href="https://www.motionforgepictures.com/height-maps/" target="_blank" rel="noopener noreferrer" class="">Free Heightmaps</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=W-BMbadinPI" target="_blank" rel="noopener noreferrer" class="">How To Make Landscape Layer Materials with Natural Height Blending in Unreal Engine 5</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=2h2kzV7_o9c" target="_blank" rel="noopener noreferrer" class="">How to make an Auto Material in Unreal Engine 5</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=zJXw8oQcjTU&amp;t=292s" target="_blank" rel="noopener noreferrer" class="">Create a Photorealistic Mountain Landscape in Unreal Engine 5</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=yMmUdoAVfOs" target="_blank" rel="noopener noreferrer" class="">Texture Variation Node</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=Cq5H59G-DHI" target="_blank" rel="noopener noreferrer" class="">Your Triplanar is wrong. Here's how to make one that works</a></p>
-</li>
-<li class="">
-<p><a href="https://ryandowlingsoka.com/unreal/triplanar-dither-biplanar/" target="_blank" rel="noopener noreferrer" class="">Triplanar, Dithered Triplanar, and Biplanar Mapping in Unreal</a></p>
-</li>
-<li class="">
-<p><a href="https://iquilezles.org/articles/biplanar/" target="_blank" rel="noopener noreferrer" class="">Biplanar Mapping</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=oX2G5zYU_7Y" target="_blank" rel="noopener noreferrer" class="">Noise Quantizatiion</a></p>
-</li>
-<li class="">
-<p><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/runtime-virtual-texturing-in-unreal-engine" target="_blank" rel="noopener noreferrer" class="">Runtime Virtual Texturing</a></p>
-</li>
-<li class="">
-<p><a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/runtimevirtual-texturing-quick-start-in-unreal-engine" target="_blank" rel="noopener noreferrer" class="">Runtime Virtual Texturing Quick Start</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=fhoZ2qMAfa4&amp;t=1153s" target="_blank" rel="noopener noreferrer" class="">Virtual Texturing | Live from HQ | Inside Unreal</a></p>
-</li>
-<li class="">
-<p><a href="https://x.com/highlyspammable/status/1228557821815357440?lang=en&amp;mx=2" target="_blank" rel="noopener noreferrer" class="">Chris Murphy Epic</a></p>
-</li>
-<li class="">
-<p><a href="https://www.youtube.com/watch?v=E6Srr-HaicI" target="_blank" rel="noopener noreferrer" class="">View, World, Object, &amp; Tangent Space - Shader Graph Basics - Episode 10</a></p>
-</li>
-<li class="">
-<p><a href="https://www.fab.com/listings/6602874e-ef24-48c9-9055-a7ac07384696" target="_blank" rel="noopener noreferrer" class="">MAWI Auto Landscape Material</a></p>
-</li>
-</ul>]]></content>
-        <category label="Materials" term="Materials"/>
-        <category label="Nanite" term="Nanite"/>
     </entry>
 </feed>

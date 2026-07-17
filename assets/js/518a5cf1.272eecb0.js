@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3679],{87530:a=>{a.exports=JSON.parse('{"tag":{"label":"C++","permalink":"/tags/cpp","allTagsPath":"/tags","count":41,"unlisted":false},"listMetadata":{"permalink":"/tags/cpp","page":1,"postsPerPage":41,"totalPages":1,"totalCount":41,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
